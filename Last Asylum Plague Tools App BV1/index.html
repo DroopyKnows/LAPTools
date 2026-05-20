@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<!-- Cleaned source: dynamic rendered values removed so JavaScript recalculates tables on load. -->
+
+<!-- saved from url=(0051)file:///C:/Users/andre/Downloads/preview%20(7).html -->
+<html lang="en"><head><meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Last Asylum: Plague Tools - Raven Gear Mockup</title>
+<link rel="stylesheet" href="src/styles.css"/>
+
+</head>
+<body>
+<main class="app">
+<section class="" id="homePage">
+<div class="hero">
+<div class="eyebrow hero-label-white">Last Asylum: Plague</div>
+<h1 class="hero-title-purple">TOOLS</h1>
+<p>Easy-to-use calculators to plan your upgrades easier than you've ever been able to before!</p>
+</div>
+<div class="tool-grid">
+<button class="tool-card" onclick="showPage('ravenPage')">
+<div class="tool-icon">🪶</div>
+<div>
+<div class="tool-title">Raven Gear Calculator</div>
+<div class="tool-sub">Calculator and inventory pages for Raven item planning.</div>
+</div>
+<div class="arrow">›</div>
+</button>
+</div>
+</section>
+<section class="hidden" id="ravenPage">
+<div class="top-row">
+<button class="back-btn" onclick="showPage('homePage')">← Home</button>
+</div>
+<div class="hero hero-small">
+<div class="eyebrow hero-label-white">Calculator</div>
+<h1 class="hero-title-purple">RAVEN GEAR</h1>
+</div>
+<nav class="page-tabs">
+<button class="page-tab active" id="calcTab" onclick="setRavenSubPage('calculator')">Calculator</button>
+<button class="page-tab" id="inventoryTab" onclick="setRavenSubPage('inventory')">Inventory</button>
+</nav>
+<section class="" id="calculatorSubPage">
+<section class="card" id="goalCard">
+<div class="card-content">
+<div class="section-title">Goal Card</div>
+<div class="section-sub">Choose a Raven item or run a manual left/right calculation.</div>
+<div class="field-full">
+<div class="mode-tabs">
+<button class="tab active" id="specificModeBtn" onclick="setMode('specific')">Specific Item</button>
+<button class="tab" id="manualModeBtn" onclick="setMode('manual')">Manual Left/Right</button>
+</div>
+</div>
+<div class="" id="specificFields">
+<div class="item-chance-row">
+<div>
+<label for="targetItem">Target Raven Item</label>
+<select id="targetItem" onchange="onTargetItemChange()">
+<option value="Heart of Wisdom">Heart of Wisdom</option>
+<option value="Feather of Night">Feather of Night</option>
+<option value="Sharp Beak">Sharp Beak</option>
+<option value="Tail of Wind">Tail of Wind</option>
+<option value="Attackers Claw">Attackers Claw</option>
+<option value="Eye of Perception">Eye of Perception</option>
+</select>
+</div>
+<div class="chance-mini">
+<label>Chance</label>
+<div class="chance-output" id="chanceValue">22.222%</div>
+</div>
+</div>
+</div>
+<div class="hidden" id="manualFields">
+<div class="item-chance-row">
+<div>
+<label>Side</label>
+<div class="two-tabs">
+<button class="tab active" id="leftSideBtn" onclick="setManualSide('left')">Left</button>
+<button class="tab" id="rightSideBtn" onclick="setManualSide('right')">Right</button>
+</div>
+</div>
+<div class="chance-mini">
+<label>Chance</label>
+<div class="chance-output" id="chanceValueManual">22.222%</div>
+</div>
+</div>
+<div class="notice">
+                Manual mode is not connected to Raven inventory. Leftovers cannot be applied to inventory because no specific item is selected.
+              </div>
+</div>
+<div class="goal-secondary-row">
+<div>
+<label for="targetLevel">Target Gear Level</label>
+<select id="targetLevel" onchange="renderAll()"></select>
+</div>
+<div class="minor-setting">
+<label for="highestOwned">Highest Owned</label>
+<select id="highestOwned" onchange="setHighestOwned(this.value)"></select>
+</div>
+</div>
+<div class="helper">Highest Owned controls which owned-input levels are shown. Applies to all items.</div>
+</div>
+</section>
+<section class="card" id="ownedCard">
+<button class="section-button" onclick="toggleCard('ownedCard')">
+<div>
+<div class="section-title">Owned Target Items</div>
+<div class="section-sub" id="ownedSubText">Quickly update inventory here.</div>
+</div>
+<div class="chev">⌄</div>
+</button>
+<div class="section-body" id="ownedInputs"></div>
+</section>
+<section class="card" id="chestInputCard">
+<button class="section-button" onclick="toggleCard('chestInputCard')">
+<div>
+<div class="section-title">Chest Inputs</div>
+<div class="section-sub">Input chests you plan to use.</div>
+</div>
+<div class="chev">⌄</div>
+</button>
+<div class="section-body">
+<div class="mode-tabs">
+<button class="tab active" id="chestsMainTab" onclick="setChestMainMode('chests')">Chests</button>
+<button class="tab" id="topUpBundlesTab" onclick="setChestMainMode('topup')">Top Up Bundles</button>
+</div>
+
+<div class="" id="chestsCombinedPanel">
+<div class="chest-options-row">
+<label class="checkbox-row">
+<input id="showHighRandom" onchange="renderPlanInputs(); renderGuaranteedInputs(); renderAll();" type="checkbox"/>
+<span>Show Lvl 6-7</span>
+</label>
+</div>
+<div id="combinedChestInputs"></div>
+<div class="bundle-summary" id="chestsBundleAppliedSummary"></div>
+<div id="chestsChoiceBankRedeem"></div>
+</div>
+
+<div class="hidden" id="topUpBundlesPanel">
+<div id="topUpBundlesContent"></div>
+</div>
+
+<div class="button-row">
+<button class="ghost-btn" onclick="resetCurrentPlan()">Reset plans for this item</button>
+<button class="danger-btn" onclick="resetAllPlans()">Reset plans for all items</button>
+</div>
+</div>
+</section>
+<section class="card" id="resultsCard">
+<button class="section-button" onclick="toggleCard('resultsCard')">
+<div class="results-header-row">
+<div>
+<div class="section-title">Results</div>
+<div class="section-sub">Remaining items first, then probability-adjusted chests.</div>
+</div>
+<label class="hide-chests-toggle" onclick="event.stopPropagation();"><input type="checkbox" id="hideChestsUsedToggle" checked onchange="toggleChestsUsedVisibility()"> Hide chests used</label>
+</div>
+<div class="chev">⌄</div>
+</button>
+<div class="section-body results-inner">
+<div class="usage-summary hidden" id="chestsUsedSummaryBlocks">
+<div class="usage-box">
+<div class="usage-title-row"><div class="usage-title">Random Chests Used</div><label class="quick-toggle"><input type="checkbox" id="quickAdjustRandom" onchange="setQuickAdjust('plan',this.checked)"> Quick adjust</label></div>
+<div id="randomUsedSummary"></div>
+</div>
+<div class="usage-box">
+<div class="usage-title-row"><div class="usage-title">Choice Chests Used</div><label class="quick-toggle"><input type="checkbox" id="quickAdjustChoice" onchange="setQuickAdjust('guaranteed',this.checked)"> Quick adjust</label></div>
+<div id="choiceUsedSummary"></div>
+</div>
+            </div>
+
+            <div class="result-section-card" data-section-wrap="expectedTable">
+<div class="result-head">
+<div>
+<div class="section-title">Estimated Target Items From Plan</div>
+<div class="section-sub">Additional owned from planned random chests and choice chests. These items will be transferred over to "New Estimated Inventory" within the inventory tab.</div>
+</div>
+</div>
+<div class="compact-result" id="expectedTable"></div>
+</div>
+
+            <div class="result-section-card" data-section-wrap="itemsNeededTable">
+<div class="result-head">
+<div>
+<div class="section-title">Remaining Items Needed</div>
+<div class="section-sub" id="remainingItemsSubtext">Each value assumes ONLY that item level will be acquired. Values are also equal to Choice Chests Req.</div>
+</div>
+<button class="change-target-btn" onclick="jumpToTargetLevel()">Change Target Lvl</button>
+</div>
+<div class="result-chunks" id="itemsNeededTable"></div>
+</div>
+<div class="result-section-card" data-section-wrap="remainingTable">
+<div class="result-head">
+<div>
+<div class="section-title">Remaining Chests Needed <span style="font-size:12px;color:#64748b;font-weight:900;">(Chance Adjusted)</span></div>
+<div class="section-sub" id="remainingChestsSubtext">Each value assumes ONLY that level of chest will be used.</div>
+</div>
+<label class="inline-check">
+<input id="showHighChestLevels" onchange="renderAll()" type="checkbox"/>
+                Show Lvl 6–7
+              </label>
+</div>
+<div class="result-table cols-5" id="remainingTable"></div>
+</div>
+
+
+
+</div></div></section>
+<section class="card" id="advancedCard">
+<button class="section-button" onclick="toggleCard('advancedCard')">
+<div>
+<div class="section-title">Advanced / Details</div>
+<div class="section-sub">Nontarget items obtained.</div>
+</div>
+<div class="chev">⌄</div>
+</button>
+<div class="section-body">
+            <div class="advanced-result-section">
+<div class="result-section-card" data-section-wrap="randomSideLeftoverTable">
+<div class="result-head">
+<div>
+<div class="section-title">Total Nontarget Items Obtained</div>
+<div class="section-sub" id="totalLeftoverItemsSub">Items that were earned from random chests, but weren’t duplicates of the Heart of Wisdom.</div>
+</div>
+</div>
+<div class="compact-result" id="randomSideLeftoverTable"></div>
+<button class="nontarget-breakdown-toggle" id="nontargetBreakdownToggle" type="button" onclick="toggleNontargetSideBreakdown()">Show side breakdown</button>
+<div class="nontarget-side-breakdown" id="nontargetSideBreakdown">
+<div class="grouped-side-section" data-section-wrap="sameSideTable">
+<div class="side-card-head">
+<div>
+<div class="section-title" id="leftSideLeftoversTitle">Nontarget Items</div>
+<div class="section-sub" id="leftSideLeftoversSub">Split between the other 2 same-side items.</div>
+</div>
+<div class="side-badge">LEFT</div>
+</div>
+<div class="compact-result" id="sameSideTable"></div>
+</div>
+<div class="grouped-side-section" data-section-wrap="oppositeSideTable">
+<div class="side-card-head">
+<div>
+<div class="section-title" id="rightSideLeftoversTitle">Nontarget Items</div>
+<div class="section-sub" id="rightSideLeftoversSub">Split between the other 3 opposite-side items.</div>
+</div>
+<div class="side-badge right">RIGHT</div>
+</div>
+<div class="compact-result" id="oppositeSideTable"></div>
+</div>
+</div>
+</div>
+            </div>
+
+            <div class="more-info-card" id="advancedMoreInfo">
+              <button class="more-info-toggle" onclick="toggleMoreInfo()">
+                <div class="more-info-title">More Information</div>
+                <div class="chev">⌄</div>
+              </button>
+              <div class="more-info-body">
+                <p>Random Chests can give both target and nontarget items.</p>
+                <p>Target items are shown in <strong>Estimated Target Items From Plan</strong>. Nontarget items are shown here.</p>
+                <p>Nontarget items are split by side. If the selected item is on the <span class="side-text-left">left</span>, <span class="side-text-left">left-side</span> nontarget items are split between the other 2 <span class="side-text-left">left-side</span> items, while <span class="side-text-right">right-side</span> nontarget items are split between the 3 <span class="side-text-right">right-side</span> items. If the selected item is on the <span class="side-text-right">right</span>, the logic reverses.</p>
+                <p>Items that can be assigned to a specific Raven item are credited in <strong>New Estimated Inventory</strong>. Items that cannot be logically assigned to a specific item are shown as <strong>Random Items Left Over</strong>.</p>
+                <p><span class="side-text-left">Left-side</span> items have a drop rate of 2/9, while <span class="side-text-right">right-side</span> items have a drop rate of 1/9. So for every 9 random chests that are opened, with a large enough sample size, you would have approximately 2 of each <span class="side-text-left">left-side</span> item and 1 of each <span class="side-text-right">right-side</span> item.</p>
+              </div>
+            </div>
+
+</div>
+</section>
+</section>
+<section class="hidden" id="inventorySubPage">
+<section class="card">
+<div class="card-content">
+<div class="section-title">Raven Owned Overview / Inventory</div>
+<div class="section-sub">Saved inventory for all 6 Raven items, levels 1 through 12.</div>
+<div class="file-row">
+<button class="primary-btn" onclick="exportInventory()">Export Backup</button>
+<button class="ghost-btn" onclick="document.getElementById('importFile').click()">Import Backup</button>
+</div>
+<input accept=".json" class="hidden" id="importFile" onchange="importInventory(event)" type="file"/>
+<div class="button-row">
+<button class="danger-btn" onclick="resetInventory()">Reset inventory</button>
+</div>
+<div class="helper">Full backup saves locally stored Current Inventory, item plans, Top Up Bundles, Choice Chest Bank, and app settings so you can move everything to another device.</div>
+</div>
+</section>
+<section class="card" id="inventoryOwnedCard">
+<button class="section-button" onclick="toggleCard('inventoryOwnedCard')">
+<div>
+<div class="section-title">Current Inventory</div>
+<div class="section-sub">Enter what you own for each Raven item.</div>
+</div>
+<div class="chev">⌄</div>
+</button>
+<div class="section-body" id="inventoryList"></div>
+</section>
+<section class="card" id="upgradedOwnedCard">
+<button class="section-button" onclick="toggleCard('upgradedOwnedCard')">
+<div>
+<div class="section-title">New Estimated Inventory</div>
+<div class="section-sub">Switch between Combined Inventory and Calculated Inventory views.</div>
+</div>
+<div class="chev">⌄</div>
+</button>
+<div class="section-body" id="upgradedInventoryList"></div>
+</section>
+
+<section class="card" id="inventoryAdvancedDetailsCard">
+<button class="section-button" onclick="toggleCard('inventoryAdvancedDetailsCard')">
+<div>
+<div class="section-title">Advanced / Details</div>
+<div class="section-sub">Includes a complete breakdown of Estimated Inventory and total Leftover Items.</div>
+</div>
+<div class="chev">⌄</div>
+</button>
+<div class="section-body">
+<div class="inventory-advanced-tabs">
+<button class="active" id="inventoryAdvancedBreakdownTab" onclick="setInventoryAdvancedMode('breakdown')">Estimated Inventory Breakdown</button>
+<button id="inventoryAdvancedLeftoverTab" onclick="setInventoryAdvancedMode('leftover')">Leftover Items Applied</button>
+</div>
+
+<div class="inventory-advanced-panel" id="inventoryAdvancedBreakdownPanel">
+<div id="breakdownEstimatedInventoryList"></div>
+</div>
+
+<div class="inventory-advanced-panel hidden" id="inventoryAdvancedLeftoverPanel">
+<div class="grouped-side-section" data-section-wrap="inventoryRandomLeftTable">
+<div class="side-card-head">
+<div>
+<div class="section-title">Leftover Items Applied</div>
+<div class="section-sub">Saved/accrued left-side leftover items from calculated item plans.</div>
+</div>
+<div class="side-badge">LEFT</div>
+</div>
+<div class="compact-result" id="inventoryRandomLeftTable"></div>
+</div>
+
+<div class="grouped-side-section" data-section-wrap="inventoryRandomRightTable">
+<div class="side-card-head">
+<div>
+<div class="section-title">Leftover Items Applied</div>
+<div class="section-sub">Saved/accrued right-side leftover items from calculated item plans.</div>
+</div>
+<div class="side-badge right">RIGHT</div>
+</div>
+<div class="compact-result" id="inventoryRandomRightTable"></div>
+</div>
+
+<div class="more-info-card leftover-explain-card" id="leftoverAppliedExplain">
+<button class="more-info-toggle" onclick="toggleLeftoverAppliedExplain()">
+<div class="more-info-title">Explain this section.</div>
+<div class="chev">⌄</div>
+</button>
+<div class="more-info-body">
+<p><strong>Leftover Items Applied</strong> shows the combined and simplified saved nontarget leftover items from all calculated item plans. It is not every raw source number.</p>
+<p>Raw/source-level detail belongs in <strong>Estimated Inventory Breakdown</strong>. This section answers what leftover inventory is actually being credited after all plans are combined and simplified through the 3-to-1 upgrade chain.</p>
+<p><span class="side-text-left">Left-side</span> leftover items are shown under the <span class="side-text-left">LEFT</span> section. <span class="side-text-right">Right-side</span> leftover items are shown under the <span class="side-text-right">RIGHT</span> section.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+</section>
+</main>
+<script src="src/data.js"></script>
+<script src="src/state.js"></script>
+<script src="src/math.js"></script>
+<script src="src/storage.js"></script>
+<script src="src/render-home.js"></script>
+<script src="src/render-calculator.js"></script>
+<script src="src/render-inventory.js"></script>
+<script src="src/render-breakdown.js"></script>
+<script src="src/events.js"></script>
+<script src="src/app.js"></script>
+</html>
