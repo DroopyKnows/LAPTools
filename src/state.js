@@ -12,7 +12,6 @@ const DEFAULT_STATE={
   manualOwned:{},
   manualPlan:{},
   manualGuaranteed:{},
-  randomLeftovers:{},
   topUpBundles:{},
   perItemTopUpBundles:{},
   manualTopUpBundles:{},

@@ -264,6 +264,32 @@
       renderAll();
     }
 
+    function resetTopUpsForAllItems(){
+      ensureBankObjects();
+
+      ravenItems.forEach(item=>{
+        state.perItemTopUpBundles[item.name]=state.perItemTopUpBundles[item.name] || {};
+        Object.keys(topUpBundleDefinitions).forEach(key=>{
+          state.perItemTopUpBundles[item.name][key]=0;
+        });
+
+        state.choiceBankRedeemed[item.name]=state.choiceBankRedeemed[item.name] || {};
+        Object.keys(state.choiceBankRedeemed[item.name] || {}).forEach(levelKey=>{
+          state.choiceBankRedeemed[item.name][levelKey]=0;
+        });
+      });
+
+      if(state.topUpBundles){
+        Object.keys(topUpBundleDefinitions).forEach(key=>state.topUpBundles[key]=0);
+      }
+
+      syncChoiceBankFromDerived();
+      save();
+      renderTopUpBundles();
+      renderPlanInputs();
+      renderAll();
+    }
+
     function saveBundleChoiceChestsToBank(){
       syncChoiceBankFromDerived();
       save();
@@ -406,12 +432,11 @@ function setQuickAdjust(group,checked){
     }
 
     function setInventoryAdvancedMode(next){
-      state.inventoryAdvancedMode=next;
+      state.inventoryAdvancedMode=next==="summary" ? "summary" : "breakdown";
       save();
       updateInventoryAdvancedTabs();
-      if(next==="breakdown") renderBreakdownEstimatedInventory();
-      if(next==="leftover") renderInventoryRandomTables();
     }
+
 
     function setInventory(itemName,level,value){
       state.inventory[itemName]=state.inventory[itemName]||{};

@@ -100,17 +100,26 @@ function renderCompactLevelBoxes(obj, levels){
     }
 
     function updateInventoryAdvancedTabs(){
-      const mode=state.inventoryAdvancedMode || "breakdown";
+      const mode=(state.inventoryAdvancedMode==="summary") ? "summary" : "breakdown";
       const breakdownTab=document.getElementById("inventoryAdvancedBreakdownTab");
-      const leftoverTab=document.getElementById("inventoryAdvancedLeftoverTab");
+      const summaryTab=document.getElementById("inventoryAdvancedSummaryTab");
       const breakdownPanel=document.getElementById("inventoryAdvancedBreakdownPanel");
-      const leftoverPanel=document.getElementById("inventoryAdvancedLeftoverPanel");
+      const summaryPanel=document.getElementById("inventoryAdvancedSummaryPanel");
 
       if(breakdownTab) breakdownTab.classList.toggle("active",mode==="breakdown");
-      if(leftoverTab) leftoverTab.classList.toggle("active",mode==="leftover");
+      if(summaryTab) summaryTab.classList.toggle("active",mode==="summary");
+
       if(breakdownPanel) breakdownPanel.classList.toggle("hidden",mode!=="breakdown");
-      if(leftoverPanel) leftoverPanel.classList.toggle("hidden",mode!=="leftover");
+      if(summaryPanel) summaryPanel.classList.toggle("hidden",mode!=="summary");
+
+      if(mode==="breakdown" && typeof renderBreakdownEstimatedInventory==="function"){
+        renderBreakdownEstimatedInventory();
+      }
+      if(mode==="summary" && typeof renderItemPlanSummary==="function"){
+        renderItemPlanSummary();
+      }
     }
+
 
     function renderInventory(){
       const list=document.getElementById("inventoryList");

@@ -11,7 +11,6 @@
         state.inventory[item.name]=state.inventory[item.name]||{};
         state.perItemTopUpBundles[item.name]=state.perItemTopUpBundles[item.name]||{};
         state.choiceBankRedeemed[item.name]=state.choiceBankRedeemed[item.name]||{};
-        state.randomLeftovers[item.name]=state.randomLeftovers[item.name]||{left:{},right:{}};
       });
       ensureBankObjects();
 
@@ -43,6 +42,7 @@
       calculateResults();
       renderInventory();
       renderInventoryRandomTables();
+      if(typeof renderItemPlanSummary==="function") renderItemPlanSummary();
       save();
     }
 

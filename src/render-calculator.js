@@ -588,8 +588,7 @@ function renderChoiceBankRedeem(containerId){
       });
 
       const chestValues=chestResultLevels.map(level=>{
-        const additionalOwnedExcludingSameLevel=calculateAdditionalOwnedFromPlanExcludingLevel(activePlan,p,level);
-        const effectiveOwnedForChestColumn=calculateOwnedPlusPlanPlusChoice(owned,additionalOwnedExcludingSameLevel,totalChoice);
+        const effectiveOwnedForChestColumn=calculateEffectiveOwnedForRemainingChestColumn(owned,activePlan,totalChoice,p,level);
         const raw=requiredAtLevel(target,level);
         const ownedEq=levelObjectEquivalentAtLevel(effectiveOwnedForChestColumn,level);
         const remainingItems=Math.max(0,raw-ownedEq);
@@ -627,10 +626,6 @@ function renderChoiceBankRedeem(containerId){
         return parts.join(" / ");
       });
 
-      if(mode==="specific" && state.randomLeftovers){
-        state.randomLeftovers[selectedItemName()]={left:nontargetTotals.left,right:nontargetTotals.right};
-      }
-
       const noPlanMessage=hasPlanInput() || Object.values(bundleRandom||{}).some(v=>Number(v||0)>0) ? "No leftovers expected." : "No planned chests entered yet.";
 
       setRemainingSectionSubtexts(
@@ -663,6 +658,12 @@ function renderChoiceBankRedeem(containerId){
         el.classList.toggle("left-chance",chanceSide==="left");
         el.classList.toggle("right-chance",chanceSide==="right");
       });
+      const expectedSub=document.getElementById("expectedTargetSubtext");
+      if(expectedSub){
+        const itemLabel=mode==="specific" ? selectedItemName() : "target";
+        expectedSub.textContent=`Duplicate ${itemLabel} gear acquired from random and choice chests.`;
+      }
+
       toggleChestsUsedVisibility();
     }
 
@@ -670,17 +671,16 @@ function renderChoiceBankRedeem(containerId){
       const leftTotals={};
       const rightTotals={};
 
-      ravenItems.forEach(item=>{
-        const saved=state.randomLeftovers[item.name] || {left:{},right:{}};
-        chestLevels.forEach(level=>{
-          if(saved.left && saved.left[level]) addLevelObject(leftTotals,level,saved.left[level]);
-          if(saved.right && saved.right[level]) addLevelObject(rightTotals,level,saved.right[level]);
+      if(typeof computeAllRawItemPlans==="function"){
+        computeAllRawItemPlans().forEach(plan=>{
+          addObjects(leftTotals,(plan.randomItemsLeftover && plan.randomItemsLeftover.left) || {});
+          addObjects(rightTotals,(plan.randomItemsLeftover && plan.randomItemsLeftover.right) || {});
         });
-      });
+      }
 
       const leftValues=chestLevels.map(level=>displayWhole(leftTotals[level]));
       const rightValues=chestLevels.map(level=>displayWhole(rightTotals[level]));
 
-      makeFilteredResultTable("inventoryRandomLeftTable",chestLevels,leftValues,"No random left-side items saved yet.");
-      makeFilteredResultTable("inventoryRandomRightTable",chestLevels,rightValues,"No random right-side items saved yet.");
+      makeFilteredResultTable("inventoryRandomLeftTable",chestLevels,leftValues,"No random left-side items detected from item plans.");
+      makeFilteredResultTable("inventoryRandomRightTable",chestLevels,rightValues,"No random right-side items detected from item plans.");
     }

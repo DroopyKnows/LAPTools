@@ -1,6 +1,6 @@
 // Raven item data, level constants, storage key, and bundle definitions.
 
-const STORAGE_KEY="lastAsylumPlagueToolsRavenMockup";
+const STORAGE_KEY="lastAsylumPlagueToolsRavenGearV1";
 
 const RAVEN_ITEMS=[
   {name:"Heart of Wisdom",side:"left"},
@@ -17,7 +17,7 @@ const ITEM_LEVELS=[12,11,10,9,8,7,6,5,4,3,2,1];
 const CHEST_LEVELS=[7,6,5,4,3,2,1];
 const DEFAULT_CHEST_LEVELS=[5,4,3,2,1];
 
-// Backward-compatible aliases used by the existing UI/calculation code.
+// Shared aliases used throughout the app.
 const ravenItems=RAVEN_ITEMS;
 const allItemLevels=ITEM_LEVELS;
 const chestLevels=CHEST_LEVELS;

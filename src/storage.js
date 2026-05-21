@@ -41,6 +41,7 @@
           }
 
           Object.keys(state).forEach(key=>delete state[key]);
+          if(importedState && importedState.randomLeftovers) delete importedState.randomLeftovers;
           Object.assign(state,JSON.parse(JSON.stringify(DEFAULT_STATE)),importedState);
 
           state.plans=state.plans||{};
@@ -49,7 +50,6 @@
           state.manualOwned=state.manualOwned||{};
           state.manualPlan=state.manualPlan||{};
           state.manualGuaranteed=state.manualGuaranteed||{};
-          state.randomLeftovers=state.randomLeftovers||{};
           state.topUpBundles=state.topUpBundles||{};
           state.perItemTopUpBundles=state.perItemTopUpBundles||{};
           state.manualTopUpBundles=state.manualTopUpBundles||{};
@@ -63,7 +63,6 @@
             state.guaranteed[item.name]=state.guaranteed[item.name]||{};
             state.perItemTopUpBundles[item.name]=state.perItemTopUpBundles[item.name]||{};
             state.choiceBankRedeemed[item.name]=state.choiceBankRedeemed[item.name]||{};
-            state.randomLeftovers[item.name]=state.randomLeftovers[item.name]||{left:{},right:{}};
           });
 
           ensureBankObjects();

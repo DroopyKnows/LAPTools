@@ -1,5 +1,4 @@
-/* Last Asylum: Plague Tools - Raven Gear
-   Extracted from the original single-file HTML and grouped for maintainability. */
+/* Last Asylum: Plague Tools - Raven Gear */
 
 /* Base / Reset */
 :root{
@@ -544,14 +543,6 @@
       font-size:12px;
     }
 
-    .footer-note{
-      margin-top:16px;
-      padding-bottom:16px;
-      color:var(--muted);
-      text-align:center;
-      font-size:12px;
-      line-height:1.4;
-    }
 
     @media(max-width:380px){
       .field-grid{grid-template-columns:1fr}
@@ -2576,3 +2567,371 @@
       letter-spacing:-.035em;
       text-shadow:none;
     }
+
+
+
+    /* Item Plan Summary */
+    .inventory-advanced-tabs{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .inventory-advanced-tabs button{
+      font-size:11px;
+      line-height:1.15;
+      padding:9px 6px;
+    }
+    .item-plan-summary-card{
+      margin-top:10px;
+    }
+    .plan-summary-note{
+      margin:0 0 9px;
+      padding:9px 10px;
+      border:1px dashed #cbd5e1;
+      border-radius:14px;
+      background:#f8fafc;
+      color:#64748b;
+      font-size:10px;
+      line-height:1.35;
+      font-weight:850;
+    }
+    .plan-summary-pill-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:6px;
+      text-align:center;
+    }
+    .plan-summary-pill .pill-level{
+      margin-bottom:3px;
+      color:#94a3b8;
+      font-size:10px;
+      font-weight:950;
+      line-height:1.1;
+    }
+    .plan-summary-pill .pill-qty{
+      min-height:34px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #e2e8f0;
+      border-radius:12px 12px 4px 4px;
+      background:#f1f5f9;
+      color:#0f172a;
+      padding:7px 3px;
+      font-size:13px;
+      font-weight:950;
+      line-height:1.1;
+    }
+    .plan-summary-pill .pill-source{
+      min-height:22px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #e2e8f0;
+      border-top:0;
+      border-radius:4px 4px 12px 12px;
+      background:#fff;
+      color:#64748b;
+      padding:4px 2px;
+      font-size:8.5px;
+      font-weight:950;
+      line-height:1.05;
+      text-transform:uppercase;
+      letter-spacing:.02em;
+    }
+    .plan-summary-pill.random-manual .pill-qty{
+      background:#f1f5f9;
+      border-color:#e2e8f0;
+      color:#0f172a;
+    }
+    .plan-summary-pill.random-topup .pill-qty{
+      background:#f0fdf4;
+      border-color:#bbf7d0;
+      color:#166534;
+    }
+    .plan-summary-pill.choice-manual .pill-qty{
+      background:#fef2f2;
+      border-color:#fecaca;
+      color:#991b1b;
+    }
+    .plan-summary-pill.choice-bank .pill-qty{
+      background:#fffbeb;
+      border-color:#fde68a;
+      color:#92400e;
+    }
+    .plan-summary-pill.random-manual .pill-source{border-color:#e2e8f0;color:#475569;}
+    .plan-summary-pill.random-topup .pill-source{border-color:#bbf7d0;color:#166534;background:#f7fee7;}
+    .plan-summary-pill.choice-manual .pill-source{border-color:#fecaca;color:#991b1b;background:#fff5f5;}
+    .plan-summary-pill.choice-bank .pill-source{border-color:#fde68a;color:#92400e;background:#fffbeb;}
+    .raw-pill.summary-leftover .pill-qty{
+      background:#fff;
+      border-color:#cbd5e1;
+      color:#334155;
+      font-size:11px;
+    }
+
+
+    .plan-summary-calculation-line{
+      border-color:#dbe4ef;
+      background:#fbfdff;
+    }
+    .plan-summary-calculation-line .breakdown-line-title{
+      color:#334155;
+      line-height:1.25;
+    }
+
+
+    /* Keep three Advanced / Details tabs contained */
+    .inventory-advanced-tabs{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      align-items:stretch;
+    }
+    .inventory-advanced-tabs button{
+      min-width:0;
+      min-height:48px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      white-space:normal;
+      overflow-wrap:anywhere;
+    }
+
+
+    .plan-summary-control-line{
+      background:#f8fafc;
+      border-color:#cbd5e1;
+    }
+    .plan-summary-control-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:6px;
+    }
+    .plan-summary-control-grid div{
+      border:1px solid #e2e8f0;
+      border-radius:12px;
+      background:#fff;
+      padding:7px 6px;
+      text-align:center;
+    }
+    .plan-summary-control-grid span{
+      display:block;
+      color:#64748b;
+      font-size:9px;
+      font-weight:950;
+      text-transform:uppercase;
+      line-height:1.1;
+    }
+    .plan-summary-control-grid strong{
+      display:block;
+      margin-top:3px;
+      color:#0f172a;
+      font-size:12px;
+      font-weight:950;
+    }
+    .plan-summary-control-grid .ok{
+      border-color:#bbf7d0;
+      background:#f0fdf4;
+    }
+    .plan-summary-control-grid .ok strong{color:#166534;}
+    .plan-summary-control-grid .bad{
+      border-color:#fecaca;
+      background:#fef2f2;
+    }
+    .plan-summary-control-grid .bad strong{color:#991b1b;}
+
+
+    .reset-options{
+      margin-top:12px;
+      border:1px solid #e2e8f0;
+      border-radius:16px;
+      background:#f8fafc;
+      padding:0;
+      overflow:hidden;
+    }
+    .reset-options summary{
+      cursor:pointer;
+      padding:10px 12px;
+      font-size:11px;
+      font-weight:950;
+      color:#475569;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      list-style:none;
+    }
+    .reset-options summary::-webkit-details-marker{display:none;}
+    .reset-options summary::after{
+      content:"⌄";
+      float:right;
+      color:#94a3b8;
+    }
+    .reset-options[open] summary::after{transform:rotate(180deg);}
+    .reset-options-row{
+      padding:0 10px 10px;
+      margin:0;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+    @media(max-width:420px){
+      .reset-options-row{grid-template-columns:1fr;}
+    }
+
+    .allocated-other-plans-line{
+      background:#fbfdff;
+      border-color:#dbe4ef;
+    }
+    .contribution-row{
+      display:grid;
+      grid-template-columns:minmax(92px,.7fr) minmax(0,1.3fr);
+      gap:8px;
+      align-items:start;
+      margin-top:7px;
+    }
+    .contribution-source{
+      color:#64748b;
+      font-size:10px;
+      font-weight:950;
+      line-height:1.2;
+      padding-top:8px;
+    }
+    .show-more-contributions{
+      margin-top:8px;
+      border:1px solid #e2e8f0;
+      border-radius:12px;
+      background:#fff;
+      padding:0;
+    }
+    .show-more-contributions summary{
+      cursor:pointer;
+      padding:8px 10px;
+      color:#64748b;
+      font-size:10px;
+      font-weight:950;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+      list-style:none;
+    }
+    .show-more-contributions summary::-webkit-details-marker{display:none;}
+    .contribution-detail-list{
+      padding:0 10px 10px;
+    }
+    .audit-total-heading{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+    .audit-simplify-toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      color:#64748b;
+      font-size:10px;
+      font-weight:950;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+      white-space:nowrap;
+    }
+
+
+    /* Results header compact layout */
+    #resultsCard .results-card-top{
+      position:relative;
+    }
+    #resultsCard .results-toggle-button{
+      width:100%;
+      padding-right:138px;
+      min-height:40px;
+    }
+    #resultsCard .results-hide-toggle{
+      position:absolute;
+      top:14px;
+      right:40px;
+      z-index:2;
+      margin:0;
+    }
+    @media(max-width:420px){
+      #resultsCard .results-toggle-button{
+        padding-right:0;
+        padding-bottom:22px;
+      }
+      #resultsCard .results-hide-toggle{
+        left:16px;
+        right:auto;
+        top:38px;
+      }
+    }
+
+    /* Calculator Advanced / Details side-breakdown toggle */
+    .nontarget-breakdown-toggle{
+      display:block;
+      margin:10px 0 0 auto;
+      border:1px solid #cbd5e1;
+      border-radius:999px;
+      background:#fff;
+      color:#334155;
+      padding:8px 14px;
+      font-size:11px;
+      font-weight:950;
+      cursor:pointer;
+      box-shadow:0 4px 10px rgba(100,116,139,.10);
+    }
+    .nontarget-side-breakdown{
+      display:none;
+      margin-top:10px;
+    }
+    .nontarget-side-breakdown.open{
+      display:block;
+    }
+    .nontarget-side-breakdown .grouped-side-section:first-child{
+      margin-top:0;
+    }
+
+    /* Inventory Summary allocated non-target T-chart */
+    .nontarget-t-chart{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+    }
+    .nontarget-t-col{
+      border:1px solid #e2e8f0;
+      border-radius:14px;
+      background:#fff;
+      padding:10px;
+      min-width:0;
+    }
+    .nontarget-t-heading{
+      font-size:11px;
+      font-weight:950;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      margin-bottom:7px;
+      line-height:1.1;
+    }
+    .nontarget-t-pill-grid .raw-pill-grid{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .nontarget-t-empty{
+      border:1px dashed #cbd5e1;
+      border-radius:12px;
+      padding:9px;
+      color:#94a3b8;
+      font-size:11px;
+      font-weight:900;
+      text-align:center;
+    }
+    @media(max-width:420px){
+      .nontarget-t-chart{
+        grid-template-columns:1fr;
+      }
+    }
+
+    .inventory-explain-card{
+      margin-top:12px;
+    }
+
+
+    .non-target-t-chart{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+    .non-target-t-col{border:1px solid #e2e8f0;border-radius:14px;background:#fff;padding:10px;min-width:0;}
+    .non-target-t-heading{font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px;line-height:1.1;}
+    .non-target-t-empty{border:1px dashed #cbd5e1;border-radius:12px;padding:9px;color:#94a3b8;font-size:11px;font-weight:900;text-align:center;}

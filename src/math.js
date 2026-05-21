@@ -675,9 +675,234 @@
       return { leftBuckets:oppositeBuckets, rightBuckets:sameBuckets };
     }
 
-    function computePlanOutputsForItem(itemName){
+
+    function levelObjectTotalCount(obj){
+      return Object.values(obj||{}).reduce((sum,value)=>sum+Math.floor(Number(value||0)),0);
+    }
+
+    function allocatePoolToItems(pool,itemNames){
+      const allocatedByItem={};
+      const leftover={};
+      const divisor=Math.max(1,itemNames.length);
+
+      itemNames.forEach(name=>allocatedByItem[name]={});
+
+      Object.keys(pool||{}).forEach(levelKey=>{
+        const level=Number(levelKey);
+        const value=Math.floor(Number(pool[levelKey]||0));
+        if(value<=0) return;
+
+        const each=Math.floor(value/divisor);
+        const rem=value % divisor;
+
+        if(each>0){
+          itemNames.forEach(name=>{
+            allocatedByItem[name][level]=(allocatedByItem[name][level]||0)+each;
+          });
+        }
+        if(rem>0) leftover[level]=(leftover[level]||0)+rem;
+      });
+
+      return {allocatedByItem,leftover};
+    }
+
+
+    function getCombinedRandomChests(rawPlan){
+      if(!rawPlan || !rawPlan.randomChests) return {};
+      return addLevelObjects(rawPlan.randomChests.manual || {}, rawPlan.randomChests.topUp || {});
+    }
+
+    function getCombinedChoiceChests(rawPlan){
+      if(!rawPlan || !rawPlan.choiceChests) return {};
+      return addLevelObjects(rawPlan.choiceChests.manual || {}, rawPlan.choiceChests.redeemed || {});
+    }
+
+    function getRandomTargetDuplicatesForPlan(rawPlan){
+      if(!rawPlan) return {};
+      const item=ravenItems.find(x=>x.name===rawPlan.sourceItem);
+      if(!item) return {};
+      const p=item.side==="left" ? 2/9 : 1/9;
+      return rawTargetFromRandomPlan(getCombinedRandomChests(rawPlan),p);
+    }
+
+    function rawTargetAdditionsFromPlanExcludingLevel(plan, p, excludedLevel){
+      const rawWhole={};
+      Object.keys(plan || {}).forEach(levelKey=>{
+        const level=Number(levelKey);
+        if(level===Number(excludedLevel)) return;
+        const qty=Math.floor(Number(plan[levelKey] || 0));
+        if(qty>0){
+          const whole=Math.floor(qty * p);
+          if(whole>0) rawWhole[level]=(rawWhole[level] || 0) + whole;
+        }
+      });
+      return rawWhole;
+    }
+
+    function calculateEffectiveOwnedForRemainingChestColumn(owned, plan, guaranteed, p, excludedLevel){
+      const rawCombined={};
+
+      addObjectsRaw(rawCombined,owned || {});
+      addObjectsRaw(rawCombined,rawTargetAdditionsFromPlanExcludingLevel(plan,p,excludedLevel));
+      addObjectsRaw(rawCombined,guaranteed || {});
+
+      return simplifyWholeByLevel(rawCombined);
+    }
+
+
+    function computeRawItemPlan(itemName){
       const item=ravenItems.find(x=>x.name===itemName);
-      if(!item) return {
+      if(!item){
+        return null;
+      }
+
+      const currentInventory=cloneLevelObject((state.inventory && state.inventory[itemName]) || {});
+      const randomManual=cloneLevelObject((state.plans && state.plans[itemName]) || {});
+      const bundleTotals=bundleTotalsForItem(itemName);
+      const randomTopUp=cloneLevelObject((bundleTotals && bundleTotals.random) || {});
+      const randomCombined=addLevelObjects(randomManual,randomTopUp);
+
+      const choiceManual=cloneLevelObject((state.guaranteed && state.guaranteed[itemName]) || {});
+      const choiceRedeemed=cloneLevelObject((state.choiceBankRedeemed && state.choiceBankRedeemed[itemName]) || {});
+
+      const p=item.side==="left" ? 2/9 : 1/9;
+
+      const randomTargetTotal=rawTargetFromRandomPlan(randomCombined,p);
+
+      const targetDuplicates={
+        random:randomTargetTotal,
+        choiceManual:rawChoiceObject(choiceManual),
+        choiceRedeemed:rawChoiceObject(choiceRedeemed)
+      };
+
+      const randomSideGenerated=deterministicSideTotalsFromRandomPlan(randomCombined);
+
+      const nontargetPools={
+        left:item.side==="left" ? subtractLevelObjects(randomSideGenerated.left,randomTargetTotal) : cloneLevelObject(randomSideGenerated.left),
+        right:item.side==="right" ? subtractLevelObjects(randomSideGenerated.right,randomTargetTotal) : cloneLevelObject(randomSideGenerated.right)
+      };
+
+      const sameSideItemNames=otherItemsOnSide(item.side,itemName);
+      const oppositeSide=item.side==="left" ? "right" : "left";
+      const oppositeSideItemNames=itemsBySide(oppositeSide);
+
+      const sameAllocation=allocatePoolToItems(nontargetPools[item.side] || {},sameSideItemNames);
+      const oppositeAllocation=allocatePoolToItems(nontargetPools[oppositeSide] || {},oppositeSideItemNames);
+
+      const randomItemsLeftover={left:{},right:{}};
+      randomItemsLeftover[item.side]=sameAllocation.leftover || {};
+      randomItemsLeftover[oppositeSide]=oppositeAllocation.leftover || {};
+
+      const assignedNontargetByItem={};
+      Object.keys(sameAllocation.allocatedByItem||{}).forEach(name=>{
+        assignedNontargetByItem[name]=addLevelObjects(assignedNontargetByItem[name]||{},sameAllocation.allocatedByItem[name]);
+      });
+      Object.keys(oppositeAllocation.allocatedByItem||{}).forEach(name=>{
+        assignedNontargetByItem[name]=addLevelObjects(assignedNontargetByItem[name]||{},oppositeAllocation.allocatedByItem[name]);
+      });
+
+      const rawRandomChestCount=levelObjectTotalCount(randomCombined);
+      const generatedCount=levelObjectTotalCount(randomSideGenerated.left)+levelObjectTotalCount(randomSideGenerated.right);
+      const targetRandomCount=levelObjectTotalCount(randomTargetTotal);
+      const nontargetCount=levelObjectTotalCount(nontargetPools.left)+levelObjectTotalCount(nontargetPools.right);
+      const allocatedCount=Object.values(assignedNontargetByItem).reduce((sum,obj)=>sum+levelObjectTotalCount(obj),0);
+      const leftoverCount=levelObjectTotalCount(randomItemsLeftover.left)+levelObjectTotalCount(randomItemsLeftover.right);
+
+      return {
+        sourceItem:itemName,
+        sourceSide:item.side,
+        currentInventory,
+        randomChests:{
+          manual:randomManual,
+          topUp:randomTopUp
+        },
+        choiceChests:{
+          manual:choiceManual,
+          redeemed:choiceRedeemed
+        },
+        targetDuplicates,
+        randomSideGenerated,
+        nontargetPools,
+        allocation:{
+          sameSide:{
+            side:item.side,
+            appliesTo:sameSideItemNames,
+            allocatedByItem:sameAllocation.allocatedByItem || {},
+            leftover:sameAllocation.leftover || {}
+          },
+          oppositeSide:{
+            side:oppositeSide,
+            appliesTo:oppositeSideItemNames,
+            allocatedByItem:oppositeAllocation.allocatedByItem || {},
+            leftover:oppositeAllocation.leftover || {}
+          }
+        },
+        assignedNontargetByItem,
+        randomItemsLeftover,
+        audit:{
+          randomChestCount:rawRandomChestCount,
+          generatedCount,
+          targetRandomCount,
+          nontargetCount,
+          allocatedCount,
+          leftoverCount,
+          balances:rawRandomChestCount===generatedCount && generatedCount===(targetRandomCount+nontargetCount) && nontargetCount===(allocatedCount+leftoverCount)
+        }
+      };
+    }
+
+    function computeAllRawItemPlans(){
+      return ravenItems.map(item=>computeRawItemPlan(item.name)).filter(Boolean);
+    }
+
+    function targetDuplicatesForPlanRaw(rawPlan){
+      if(!rawPlan || !rawPlan.targetDuplicates) return {};
+      return addLevelObjects(
+        rawPlan.targetDuplicates.random || getRandomTargetDuplicatesForPlan(rawPlan),
+        rawPlan.targetDuplicates.choiceManual || {},
+        rawPlan.targetDuplicates.choiceRedeemed || {}
+      );
+    }
+
+    function calculatedItemPlanInventoryRawFromPlan(rawPlan){
+      if(!rawPlan) return {};
+      return addLevelObjects(rawPlan.currentInventory || {}, targetDuplicatesForPlanRaw(rawPlan));
+    }
+
+    function duplicatesFromOtherRawPlans(itemName,excludeSourceName){
+      const total={};
+      computeAllRawItemPlans().forEach(plan=>{
+        if(!plan || plan.sourceItem===excludeSourceName) return;
+        const assigned=(plan.assignedNontargetByItem && plan.assignedNontargetByItem[itemName]) || {};
+        addObjects(total,assigned);
+      });
+      return total;
+    }
+
+    function duplicateContributionDetailsForItem(itemName,excludeSourceName){
+      const details=[];
+      computeAllRawItemPlans().forEach(plan=>{
+        if(!plan || plan.sourceItem===excludeSourceName) return;
+        const assigned=(plan.assignedNontargetByItem && plan.assignedNontargetByItem[itemName]) || {};
+        if(levelObjectHasValues(assigned)){
+          details.push({sourceItem:plan.sourceItem, values:assigned});
+        }
+      });
+      return details;
+    }
+
+    function totalCalculatedInventoryRawFromPlan(rawPlan){
+      if(!rawPlan) return {};
+      return addLevelObjects(
+        calculatedItemPlanInventoryRawFromPlan(rawPlan),
+        duplicatesFromOtherRawPlans(rawPlan.sourceItem,rawPlan.sourceItem)
+      );
+    }
+
+
+    function computePlanOutputsForItem(itemName){
+      const rawPlan=computeRawItemPlan(itemName);
+      if(!rawPlan) return {
         additionalOwned:{},
         rawTargetRandom:{},
         rawManualChoice:{},
@@ -691,31 +916,24 @@
         randomRight:{},
         manualRandom:{},
         topUpRandom:{},
-        combinedRandom:{}
+        combinedRandom:{},
+        rawPlan:null
       };
 
-      const manualPlan=(state.plans && state.plans[itemName]) || {};
-      const topUpRandom=(bundleTotalsForItem(itemName).random || {});
-      const plan=levelObjectPlus(manualPlan,topUpRandom);
-
-      const guaranteed=(state.guaranteed && state.guaranteed[itemName]) || {};
-      const redeemedChoice=(state.choiceBankRedeemed && state.choiceBankRedeemed[itemName]) || {};
-      const totalChoiceForItem=levelObjectPlus(guaranteed,redeemedChoice);
-      const p=item.side==="left" ? 2/9 : 1/9;
-
-      const rawTargetRandom=rawTargetFromRandomPlan(plan,p);
-      const rawManualChoice=rawChoiceObject(guaranteed);
-      const rawRedeemedChoice=rawChoiceObject(redeemedChoice);
-      const rawChoice=rawChoiceObject(totalChoiceForItem);
-
-      const additionalOwned=targetItemsFromPlanAndChoice(plan,totalChoiceForItem,p);
-      const allocated=buildAllocatedLeftoverObjects(plan,item.side);
-      const randomTotals=rawRandomSideTotals ? rawRandomSideTotals(plan,item.side) : {left:{},right:{}};
+      const rawTargetRandom=rawPlan.targetDuplicates.random || getRandomTargetDuplicatesForPlan(rawPlan);
+      const rawManualChoice=rawPlan.targetDuplicates.choiceManual || {};
+      const rawRedeemedChoice=rawPlan.targetDuplicates.choiceRedeemed || {};
+      const rawChoice=addLevelObjects(rawManualChoice,rawRedeemedChoice);
+      const additionalOwned=simplifyUpByLevel(targetDuplicatesForPlanRaw(rawPlan));
 
       const rawAssignedLeft={};
       const rawAssignedRight={};
-      (allocated.leftBuckets || []).forEach(bucket=>addObjectsRaw(rawAssignedLeft,bucket));
-      (allocated.rightBuckets || []).forEach(bucket=>addObjectsRaw(rawAssignedRight,bucket));
+      Object.keys(rawPlan.assignedNontargetByItem || {}).forEach(itemNameKey=>{
+        const item=ravenItems.find(x=>x.name===itemNameKey);
+        if(!item) return;
+        if(item.side==="left") addObjectsRaw(rawAssignedLeft,rawPlan.assignedNontargetByItem[itemNameKey]);
+        if(item.side==="right") addObjectsRaw(rawAssignedRight,rawPlan.assignedNontargetByItem[itemNameKey]);
+      });
 
       return {
         additionalOwned,
@@ -725,51 +943,32 @@
         rawChoice,
         rawAssignedLeft,
         rawAssignedRight,
-        leftBuckets:allocated.leftBuckets || [],
-        rightBuckets:allocated.rightBuckets || [],
-        randomLeft:randomTotals.left || {},
-        randomRight:randomTotals.right || {},
-        manualRandom:manualPlan || {},
-        topUpRandom:topUpRandom || {},
-        combinedRandom:plan || {}
+        leftBuckets:Object.keys(rawPlan.allocation.sameSide.side==="left" ? rawPlan.allocation.sameSide.allocatedByItem : rawPlan.allocation.oppositeSide.allocatedByItem).map(name=>(rawPlan.allocation.sameSide.side==="left" ? rawPlan.allocation.sameSide.allocatedByItem[name] : rawPlan.allocation.oppositeSide.allocatedByItem[name])),
+        rightBuckets:Object.keys(rawPlan.allocation.sameSide.side==="right" ? rawPlan.allocation.sameSide.allocatedByItem : rawPlan.allocation.oppositeSide.allocatedByItem).map(name=>(rawPlan.allocation.sameSide.side==="right" ? rawPlan.allocation.sameSide.allocatedByItem[name] : rawPlan.allocation.oppositeSide.allocatedByItem[name])),
+        randomLeft:rawPlan.nontargetPools.left || {},
+        randomRight:rawPlan.nontargetPools.right || {},
+        manualRandom:rawPlan.randomChests.manual || {},
+        topUpRandom:rawPlan.randomChests.topUp || {},
+        combinedRandom:getCombinedRandomChests(rawPlan),
+        rawPlan
       };
     }
+
 
     function projectedAdditionsForInventoryItem(inventoryItemName){
       const total={};
 
-      ravenItems.forEach(sourceItem=>{
-        const sourceName=sourceItem.name;
-        const outputs=computePlanOutputsForItem(sourceName);
-
-        if(sourceName===inventoryItemName){
-          addObjects(total,outputs.additionalOwned);
-          return;
+      computeAllRawItemPlans().forEach(plan=>{
+        if(!plan) return;
+        if(plan.sourceItem===inventoryItemName){
+          addObjects(total,targetDuplicatesForPlanRaw(plan));
         }
-
-        const targetItem=ravenItems.find(x=>x.name===inventoryItemName);
-        if(!targetItem) return;
-
-        const sameSideItems=otherItemsOnSide(sourceItem.side, sourceName);
-        const oppositeSideItems=itemsBySide(sourceItem.side==="left" ? "right" : "left");
-
-        if(targetItem.side===sourceItem.side){
-          const idx=sameSideItems.indexOf(inventoryItemName);
-          if(idx>=0){
-            const sideBuckets=sourceItem.side==="left" ? outputs.leftBuckets : outputs.rightBuckets;
-            addObjects(total,sideBuckets[idx] || {});
-          }
-        }else{
-          const idx=oppositeSideItems.indexOf(inventoryItemName);
-          if(idx>=0){
-            const sideBuckets=targetItem.side==="left" ? outputs.leftBuckets : outputs.rightBuckets;
-            addObjects(total,sideBuckets[idx] || {});
-          }
-        }
+        addObjects(total,(plan.assignedNontargetByItem && plan.assignedNontargetByItem[inventoryItemName]) || {});
       });
 
       return total;
     }
+
 
     function projectedOwnedForInventoryItem(itemName){
       return addLevelObjects((state.inventory && state.inventory[itemName]) || {}, projectedAdditionsForInventoryItem(itemName));
@@ -777,9 +976,8 @@
 
     function totalRandomLeftoversBySide(side){
       const total={};
-      ravenItems.forEach(item=>{
-        const outputs=computePlanOutputsForItem(item.name);
-        addObjects(total,side==="left" ? outputs.randomLeft : outputs.randomRight);
+      computeAllRawItemPlans().forEach(plan=>{
+        addObjects(total,(plan.randomItemsLeftover && plan.randomItemsLeftover[side]) || {});
       });
       return total;
     }
@@ -866,10 +1064,10 @@
     }
 
     function combinedInventoryForItem(itemName){
-      const raw={};
-      addObjectsRaw(raw,(state.inventory && state.inventory[itemName]) || {});
-      addObjectsRaw(raw,rawAcquiredForInventoryItem(itemName));
-      return simplifyUpByLevel(raw);
+      return addLevelObjects(
+        (state.inventory && state.inventory[itemName]) || {},
+        projectedAdditionsForInventoryItem(itemName)
+      );
     }
 
     function finalBreakdownContribution(outputs){
