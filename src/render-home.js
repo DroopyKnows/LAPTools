@@ -1,13 +1,97 @@
-// Home-page rendering/navigation helpers.
+    const appPageRoutes={
+      home:"homePage",
+      raven:"ravenPage",
+      calculator:"ravenPage",
+      inventory:"ravenPage",
+      whatif:"ravenPage",
+      "what-if":"ravenPage",
+      settings:"settingsPage",
+      guides:"guidesPage",
+      other:"otherPage",
+      about:"aboutPage",
+      faq:"faqPage",
+      "report-bug":"reportBugPage"
+    };
 
-    function showPage(id){
+    const appPageHashes={
+      homePage:"home",
+      ravenPage:"raven/calculator",
+      settingsPage:"settings",
+      guidesPage:"guides",
+      otherPage:"other",
+      aboutPage:"about",
+      faqPage:"faq",
+      reportBugPage:"report-bug"
+    };
+
+    const ravenPageRoutes={
+      calculator:"calculator",
+      inventory:"inventory",
+      whatif:"whatif",
+      "what-if":"whatif"
+    };
+
+    let applyingAppRoute=false;
+
+    function cleanAppHash(value){
+      return String(value || "")
+        .replace(/^#/,"")
+        .replace(/^\/+/,"")
+        .replace(/\/+$/g,"")
+        .trim()
+        .toLowerCase();
+    }
+
+    function appHashForPage(id){
+      if(id==="ravenPage") return `raven/${ravenSubPage || "calculator"}`;
+      return appPageHashes[id] || "home";
+    }
+
+    function updateAppHash(hash,replace){
+      if(applyingAppRoute) return;
+      const clean=cleanAppHash(hash) || "home";
+      const target=`#${clean}`;
+      if(window.location.hash===target) return;
+      if(replace) history.replaceState(null,"",target);
+      else history.pushState(null,"",target);
+    }
+
+    function showPage(id,options){
+      const opts=options || {};
       const pageIds=["homePage","ravenPage","settingsPage","guidesPage","otherPage","aboutPage","faqPage","reportBugPage"];
+      const targetId=pageIds.includes(id) ? id : "homePage";
       pageIds.forEach(pageId=>{
         const el=document.getElementById(pageId);
-        if(el) el.classList.toggle("hidden",pageId!==id);
+        if(el) el.classList.toggle("hidden",pageId!==targetId);
       });
       if(typeof applyGlobalDisplaySettings==="function") applyGlobalDisplaySettings();
-      window.scrollTo({top:0,behavior:"smooth"});
+      if(!opts.skipHash) updateAppHash(appHashForPage(targetId),!!opts.replaceHash);
+      if(!opts.skipScroll) window.scrollTo({top:0,behavior:opts.instantScroll ? "auto" : "smooth"});
+    }
+
+    function applyRouteFromHash(options){
+      const opts=options || {};
+      const route=cleanAppHash(window.location.hash);
+      const parts=(route || "home").split("/").filter(Boolean);
+      const main=parts[0] || "home";
+      const sub=parts[1] || "";
+      const pageId=appPageRoutes[main] || "homePage";
+      applyingAppRoute=true;
+      showPage(pageId,{skipHash:true,skipScroll:!!opts.skipScroll,instantScroll:true});
+      if(pageId==="ravenPage"){
+        const ravenRoute=ravenPageRoutes[sub] || (main==="inventory" ? "inventory" : main==="whatif" || main==="what-if" ? "whatif" : "calculator");
+        if(typeof setRavenSubPage==="function") setRavenSubPage(ravenRoute,{skipHash:true,skipScroll:!!opts.skipScroll,instantScroll:true});
+      }
+      applyingAppRoute=false;
+      if(!route) updateAppHash("home",true);
+      else if(pageId==="ravenPage" && main==="raven" && !sub) updateAppHash("raven/calculator",true);
+    }
+
+    function bindAppRouteEvents(){
+      if(window.__lapAppRouteEventsBound) return;
+      window.__lapAppRouteEventsBound=true;
+      window.addEventListener("hashchange",()=>applyRouteFromHash());
+      window.addEventListener("popstate",()=>applyRouteFromHash());
     }
 
     function openGlobalMenu(){

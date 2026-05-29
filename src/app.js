@@ -1,5 +1,3 @@
-// App bootstrap and top-level render cycle.
-
     function init(){
       const saved=localStorage.getItem(STORAGE_KEY);
       if(saved){
@@ -31,6 +29,8 @@
       highest.value=state.highestGlobalOwned || 5;
 
       renderAll();
+      if(typeof bindAppRouteEvents==="function") bindAppRouteEvents();
+      if(typeof applyRouteFromHash==="function") applyRouteFromHash({skipScroll:true});
     }
 
     function captureActiveInputState(){

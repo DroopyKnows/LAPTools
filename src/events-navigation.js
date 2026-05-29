@@ -1,19 +1,22 @@
-// UI event handlers and user actions.
-
-    function setRavenSubPage(page){
-      ravenSubPage=page;
+    function setRavenSubPage(page,options){
+      const opts=options || {};
+      const normalized=page==="what-if" ? "whatif" : page;
+      ravenSubPage=["whatif","calculator","inventory"].includes(normalized) ? normalized : "calculator";
       const whatIfTab=document.getElementById("whatIfTab");
       const calcTab=document.getElementById("calcTab");
       const inventoryTab=document.getElementById("inventoryTab");
-      if(whatIfTab) whatIfTab.classList.toggle("active",page==="whatif");
-      if(calcTab) calcTab.classList.toggle("active",page==="calculator");
-      if(inventoryTab) inventoryTab.classList.toggle("active",page==="inventory");
+      if(whatIfTab) whatIfTab.classList.toggle("active",ravenSubPage==="whatif");
+      if(calcTab) calcTab.classList.toggle("active",ravenSubPage==="calculator");
+      if(inventoryTab) inventoryTab.classList.toggle("active",ravenSubPage==="inventory");
       const whatIfPage=document.getElementById("whatIfSubPage");
-      if(whatIfPage) whatIfPage.classList.toggle("hidden",page!=="whatif");
-      document.getElementById("calculatorSubPage").classList.toggle("hidden",page!=="calculator");
-      document.getElementById("inventorySubPage").classList.toggle("hidden",page!=="inventory");
-      if(page==="whatif" && typeof renderWhatIf==="function") renderWhatIf();
-      window.scrollTo({top:0,behavior:"smooth"});
+      if(whatIfPage) whatIfPage.classList.toggle("hidden",ravenSubPage!=="whatif");
+      const calculatorPage=document.getElementById("calculatorSubPage");
+      const inventoryPage=document.getElementById("inventorySubPage");
+      if(calculatorPage) calculatorPage.classList.toggle("hidden",ravenSubPage!=="calculator");
+      if(inventoryPage) inventoryPage.classList.toggle("hidden",ravenSubPage!=="inventory");
+      if(ravenSubPage==="whatif" && typeof renderWhatIf==="function") renderWhatIf();
+      if(!opts.skipHash && typeof updateAppHash==="function") updateAppHash(`raven/${ravenSubPage}`,!!opts.replaceHash);
+      if(!opts.skipScroll) window.scrollTo({top:0,behavior:opts.instantScroll ? "auto" : "smooth"});
     }
 
     function toggleCard(id){
