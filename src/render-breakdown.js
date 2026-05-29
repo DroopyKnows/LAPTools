@@ -1,16 +1,15 @@
 // Estimated inventory breakdown rendering helpers.
 
     function renderRawPills(obj,type){
-      const levels=levelsWithValues(obj,allItemLevels);
-      if(!levels.length) return `<div class="empty-message" style="margin-top:0;">None.</div>`;
-      return `<div class="raw-pill-grid">
-        ${levels.map(level=>`
-          <div class="raw-pill ${type||""}">
-            <div class="pill-level">L${level}</div>
-            <div class="pill-qty">${Math.floor(Number(obj[level]||0))}</div>
-          </div>
-        `).join("")}
-      </div>`;
+      return renderLevelPillGrid(obj,{
+        levels: allItemLevels,
+        gridClass:"raw-pill-grid",
+        pillClass:`raw-pill ${type||""}`.trim(),
+        levelClass:"pill-level",
+        qtyClass:"pill-qty",
+        emptyHtml:`<div class="empty-message" style="margin-top:0;">None.</div>`,
+        valueFormatter:value=>String(Math.floor(Number(value||0)))
+      });
     }
 
     function renderMixedRandomPills(manualObj,topUpObj){
@@ -80,11 +79,7 @@
       return `
         <div class="breakdown-filter-row">
           <span>Filter:</span>
-          <div class="side-filter-tabs compact">
-            <button class="tab ${current==="left" ? "active" : ""}" onclick="setBreakdownInventoryFilter('left')">Left</button>
-            <button class="tab ${current==="right" ? "active" : ""}" onclick="setBreakdownInventoryFilter('right')">Right</button>
-            <button class="tab ${current==="all" ? "active" : ""}" onclick="setBreakdownInventoryFilter('all')">All</button>
-          </div>
+          ${renderFilterTabs({active:current,setter:"setBreakdownInventoryFilter",labels:{left:"Left",right:"Right",all:"All"}})}
         </div>
       `;
     }
@@ -113,17 +108,23 @@
 
     function inventoryBreakdownExplainMarkup(){
       return `
-        <div class="more-info-card inventory-explain-card" id="inventoryBreakdownExplain">
-          <button class="more-info-toggle" onclick="toggleInventoryBreakdownExplain()">
+        <div class="more-info-card inventory-explain-card" id="inventoryBreakdownExplain" data-more-info-section>
+          <button class="more-info-toggle" data-action="toggleInventoryBreakdownExplain" data-action-event="click">
             <div class="more-info-title">Explain this section.</div>
             <div class="chev">⌄</div>
           </button>
           <div class="more-info-body">
-            <p><strong>Inventory Summary</strong> shows how item-plan results become estimated inventory.</p>
-            <p><strong>Random Chests Used</strong> shows source inputs. <span class="explain-neutral">Neutral pills</span> are manual random chests. <span class="explain-green">Green pills</span> are top-up random chests.</p>
-            <p><strong>Raw Duplicates</strong> are duplicate gear for the card's item from random or choice chests. Choice chest source values may use <span class="explain-gold">gold pills</span> when they came from redeemed bank/top-up choice chests.</p>
-            <p><strong>Final Target Item Added</strong> is the duplicate result credited to that item.</p>
-            <p><strong>Allocated Non-target Items</strong> shows non-target gear assigned by destination: <span class="explain-blue">blue</span> for <span class="side-text-left">Left Inventory</span> and <span class="explain-purple">purple</span> for <span class="side-text-right">Right Inventory</span>.</p>
+            <p><strong>Inventory Summary</strong> shows how each Raven item’s estimated inventory is built. Each item card can include different sections depending on what data exists for that item.</p>
+            <p><strong>Current Inventory</strong> shows the items you manually entered for that Raven item.</p>
+            <p><strong>Random Chests Used</strong> shows source inputs for that item plan. <span class="explain-neutral">Neutral pills</span> are manual random chests. <span class="explain-green">Green pills</span> are top-up random chests.</p>
+            <p><strong>Raw Duplicates for [Item] - Random Chests</strong> shows estimated duplicate target items from random chests before final 3-to-1 simplification.</p>
+            <p><strong>Raw Duplicates for [Item] - Choice Chests</strong> shows guaranteed duplicate target items from manual choice chests or redeemed bank choice chests. Choice chest source values may use <span class="explain-gold">gold pills</span> when they came from redeemed bank/top-up choice chests.</p>
+            <p><strong>Final Target Item Added</strong> shows the simplified/upgraded duplicate result credited to that Raven item.</p>
+            <p><strong>Allocated Non-target Items</strong> shows non-target gear assigned by destination. <span class="explain-blue">Blue pills</span> go to <span class="side-text-left">Left Inventory</span>, and <span class="explain-purple">purple pills</span> go to <span class="side-text-right">Right Inventory</span>.</p>
+            <p><strong>Allocated [Item] Duplicates From Other Plans</strong> shows duplicates credited to this item from other Raven item plans. The <strong>Show more</strong> expansion can list which specific item plans contributed those duplicates.</p>
+            <p><strong>Starting Inventory</strong> is the Current Inventory already entered for that item. <strong>Other Plans Total</strong> is the combined duplicate contribution coming from other item plans.</p>
+            <p><strong>Random Items Unassigned</strong> may appear elsewhere in inventory views when side-based random results cannot be confidently assigned to one specific Raven item.</p>
+            <p>Some sections may not appear if there are no matching values for the selected item, side, filter, or saved plan.</p>
           </div>
         </div>
       `;
@@ -148,7 +149,7 @@
         const rawPlan=computeRawItemPlan(itemName);
         const contributionDetails=duplicateContributionDetailsForItem(itemName,itemName);
         const duplicatesFromOtherPlans=duplicatesFromOtherRawPlans(itemName,itemName);
-        const currentInventory=(rawPlan && rawPlan.currentInventory) || ((state.inventory && state.inventory[itemName]) || {});
+        const currentInventory=(rawPlan && rawPlan.currentInventory) || ((state.inventory.active && state.inventory.active[itemName]) || {});
 
         const hasManualRandom=levelObjectHasValues(outputs.manualRandom || {});
         const hasTopUpRandom=levelObjectHasValues(outputs.topUpRandom || {});
@@ -178,7 +179,7 @@
         `).join("") : `<div class="empty-message" style="margin-top:0;">No duplicate contributions from other plans.</div>`;
 
         card.innerHTML=`
-          <button class="breakdown-source-toggle" type="button" onclick="toggleBreakdownSource(this)">
+          <button class="breakdown-source-toggle" type="button" data-action="toggleBreakdownSource" data-action-event="click" data-source0="element">
             <div class="breakdown-source-title">
               <div class="breakdown-source-name">${itemName}</div>
             </div>
@@ -264,7 +265,7 @@
 
     function itemPlanHasAnyActivity(itemName){
       const outputs=computePlanOutputsForItem(itemName);
-      return levelObjectHasValues((state.inventory && state.inventory[itemName]) || {})
+      return levelObjectHasValues((state.inventory.active && state.inventory.active[itemName]) || {})
         || levelObjectHasValues(outputs.manualRandom || {})
         || levelObjectHasValues(outputs.topUpRandom || {})
         || levelObjectHasValues(outputs.rawManualChoice || {})
@@ -398,12 +399,12 @@
     }
 
     function calculatedItemPlanInventoryRaw(itemName,targetRaw){
-      return addLevelObjects((state.inventory && state.inventory[itemName]) || {}, targetRaw || {});
+      return addLevelObjects((state.inventory.active && state.inventory.active[itemName]) || {}, targetRaw || {});
     }
 
     function totalCalculatedInventoryRaw(itemName,targetRaw,otherPlanDuplicates){
       return addLevelObjects(
-        (state.inventory && state.inventory[itemName]) || {},
+        (state.inventory.active && state.inventory.active[itemName]) || {},
         targetRaw || {},
         otherPlanDuplicates || {}
       );
@@ -425,7 +426,7 @@
         const targetRaw=targetDuplicatesForPlanRaw(rawPlan);
         const calculatedItemPlanInventory=calculatedItemPlanInventoryRawFromPlan(rawPlan);
         const duplicatesFromOtherPlans=duplicatesFromOtherRawPlans(sourceName,sourceName);
-        const totalCalculatedInventory=totalCalculatedInventoryRawFromPlan(rawPlan);
+        const totalCalculatedInventory=totalCalculatedInventoryRaw(sourceName,targetRaw,duplicatesFromOtherPlans);
         const planLeftovers=(rawPlan && rawPlan.randomItemsLeftover) || {left:{},right:{}};
 
         const card=document.createElement("div");
@@ -433,7 +434,7 @@
         card.setAttribute("data-source-item",sourceName);
 
         card.innerHTML=`
-          <button class="breakdown-source-toggle" type="button" onclick="toggleBreakdownSource(this)">
+          <button class="breakdown-source-toggle" type="button" data-action="toggleBreakdownSource" data-action-event="click" data-source0="element">
             <div class="breakdown-source-title">
               <div class="breakdown-source-name">${sourceName}</div>
             </div>
@@ -473,7 +474,7 @@
               <div class="audit-total-heading">
                 <div class="breakdown-line-title">Total Calculated Inventory</div>
                 <label class="audit-simplify-toggle">
-                  <input type="checkbox" onchange="this.closest('.audit-total-line').querySelector('.audit-total-raw').classList.toggle('hidden',this.checked); this.closest('.audit-total-line').querySelector('.audit-total-simplified').classList.toggle('hidden',!this.checked);" />
+                  <input type="checkbox" data-action="toggleAuditTotalView" data-action-event="change" />
                   <span>Simplify</span>
                 </label>
               </div>

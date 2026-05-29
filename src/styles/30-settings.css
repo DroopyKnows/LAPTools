@@ -1,0 +1,194 @@
+/* Raven Gear settings tile/page and visibility toggles. */
+
+/* Header Settings tile */
+.raven-hero-with-settings{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  min-height:104px;
+}
+.raven-hero-with-settings .raven-hero-copy,
+.raven-hero-with-settings .settings-tile,
+.raven-hero-with-settings .settings-panel{
+  position:relative;
+  z-index:2;
+}
+.settings-tile{
+  width:74px;
+  height:74px;
+  flex:0 0 74px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:22px;
+  background:rgba(255,255,255,.10);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  font-size:10px;
+  font-weight:950;
+  cursor:pointer;
+  box-shadow:0 12px 24px rgba(15,23,42,.20);
+  backdrop-filter:blur(8px);
+}
+.settings-tile.active,
+.settings-tile:hover{
+  background:rgba(255,255,255,.18);
+}
+.settings-icon{
+  font-size:21px;
+  line-height:1;
+}
+.settings-panel{
+  display:none;
+  position:absolute;
+  top:98px;
+  right:14px;
+  width:min(320px,calc(100% - 28px));
+  border:1px solid #dbe4ef;
+  border-radius:20px;
+  background:rgba(255,255,255,.98);
+  color:#0f172a;
+  box-shadow:0 18px 44px rgba(15,23,42,.28);
+  padding:14px;
+  text-align:left;
+}
+.settings-panel.open{display:block;}
+.settings-panel-title{
+  font-size:13px;
+  font-weight:950;
+  margin-bottom:10px;
+}
+.settings-toggle-row{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:12px;
+  font-weight:950;
+  color:#1e293b;
+  margin-top:10px;
+}
+.settings-toggle-row input{width:auto;min-height:0;}
+.settings-helper{
+  margin:4px 0 0 25px;
+  color:#64748b;
+  font-size:11px;
+  line-height:1.35;
+}
+body.hide-more-info-sections [data-more-info-section]{
+  display:none!important;
+}
+body.hide-advanced-sections [data-advanced-section]{
+  display:none!important;
+}
+.results-more-info-card,
+.inventory-view-more-info-card{
+  margin-top:16px;
+}
+@media(max-width:420px){
+  .settings-tile{
+    width:68px;
+    height:68px;
+    flex-basis:68px;
+    border-radius:20px;
+  }
+  .settings-panel{top:92px;}
+}
+.raven-hero-with-settings{
+  overflow:visible;
+  z-index:20;
+  margin-bottom:14px;
+}
+.raven-hero-with-settings::after{z-index:0;}
+.settings-panel{z-index:30;}
+
+/* Settings page + corrected Raven hero layering */
+.hero::after{
+  pointer-events:none;
+  z-index:0;
+}
+.hero > *{
+  position:relative;
+  z-index:1;
+}
+.raven-hero-with-settings{
+  overflow:hidden;
+  z-index:1;
+  margin-bottom:14px;
+}
+.raven-hero-with-settings::after{
+  pointer-events:none;
+  right:-46px;
+  bottom:-84px;
+  z-index:0;
+}
+.raven-hero-with-settings .raven-hero-copy,
+.raven-hero-with-settings .settings-tile{
+  position:relative;
+  z-index:2;
+}
+.settings-page-card{
+  border-radius:28px;
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(226,232,240,.95);
+  box-shadow:0 18px 42px rgba(15,23,42,.16);
+  padding:18px;
+}
+.settings-page-header{
+  border-radius:24px;
+  background:linear-gradient(145deg,#0f172a,#111827);
+  color:#fff;
+  padding:20px;
+  margin-bottom:14px;
+  box-shadow:0 14px 34px rgba(15,23,42,.22);
+}
+.settings-eyebrow{
+  color:#fff;
+  letter-spacing:.08em;
+  margin-bottom:6px;
+}
+.settings-page-header h1{
+  font-size:25px;
+  line-height:1.05;
+  margin-bottom:8px;
+  color:#a78bfa;
+}
+.settings-page-options{
+  display:grid;
+  gap:12px;
+}
+.settings-page-option{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  padding:14px;
+  border:1px solid #dbe4ef;
+  border-radius:18px;
+  background:#fff;
+  box-shadow:0 8px 20px rgba(15,23,42,.07);
+}
+.settings-page-option input{
+  width:auto;
+  min-height:0;
+  margin-top:3px;
+  flex:0 0 auto;
+}
+.settings-page-option strong{
+  display:block;
+  color:#0f172a;
+  font-size:13px;
+  font-weight:950;
+  line-height:1.25;
+}
+.settings-page-option em{
+  display:block;
+  margin-top:5px;
+  color:#64748b;
+  font-style:normal;
+  font-size:12px;
+  line-height:1.4;
+}
+
+

@@ -1,0 +1,197 @@
+/* Homepage hub base layout and helper actions. */
+
+/* v0415 homepage hub layout */
+.home-topbar{
+  width:100%;
+  border:1px solid rgba(255,255,255,.85);
+  border-radius:22px;
+  padding:18px 22px;
+  background:rgba(255,255,255,.82);
+  box-shadow:0 14px 32px rgba(100,116,139,.18);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:22px;
+}
+.home-brand{
+  color:#1563dc;
+  font-size:26px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:-.04em;
+}
+.home-menu-btn{
+  border:0;
+  background:transparent;
+  color:#1563dc;
+  font-size:32px;
+  line-height:1;
+  font-weight:950;
+  cursor:pointer;
+}
+.home-hero-card{
+  position:relative;
+  overflow:hidden;
+  border-radius:28px;
+  padding:26px 24px 28px;
+  color:#fff;
+  background:linear-gradient(135deg,#071426,#111a36 55%,#3b1679);
+  box-shadow:0 18px 42px rgba(15,23,42,.3);
+  margin-bottom:22px;
+}
+.home-hero-card::before{
+  content:"";
+  position:absolute;
+  width:210px;
+  height:210px;
+  right:-62px;
+  bottom:-70px;
+  border-radius:999px;
+  background:radial-gradient(circle,rgba(124,58,237,.65),rgba(124,58,237,.14) 62%,transparent 70%);
+}
+.home-hero-card::after{
+  content:"🪶";
+  position:absolute;
+  right:34px;
+  bottom:46px;
+  font-size:78px;
+  opacity:.44;
+  transform:rotate(-22deg);
+}
+.home-game-pill{
+  position:relative;
+  z-index:1;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  border-radius:18px;
+  border:1px solid rgba(196,181,253,.35);
+  background:rgba(30,41,59,.68);
+  color:#cbd5e1;
+  font-weight:900;
+}
+.home-game-pill span:first-child{color:#d8b4fe;font-size:20px;}
+.home-hero-card h1{
+  position:relative;
+  z-index:1;
+  margin-top:22px;
+  font-size:34px;
+  line-height:1.07;
+  letter-spacing:-.045em;
+}
+.home-hero-card h1 span{
+  background:linear-gradient(90deg,#f0abfc,#a78bfa,#93c5fd);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.home-hero-card p{
+  position:relative;
+  z-index:1;
+  max-width:330px;
+  margin-top:16px;
+  font-size:18px;
+  line-height:1.45;
+  color:#cbd5e1;
+}
+.home-category-tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:0;
+  padding:7px;
+  border-radius:22px;
+  background:rgba(255,255,255,.86);
+  border:1px solid rgba(203,213,225,.8);
+  box-shadow:0 14px 32px rgba(100,116,139,.18);
+  margin-bottom:22px;
+}
+.home-category-tab{
+  border:0;
+  border-right:1px solid rgba(203,213,225,.62);
+  background:transparent;
+  border-radius:17px;
+  padding:14px 8px;
+  color:#334155;
+  font-size:14px;
+  font-weight:950;
+  cursor:pointer;
+}
+.home-category-tab:last-child{border-right:0;}
+.home-category-tab.active{
+  color:#fff;
+  background:linear-gradient(145deg,#0b76ff,#255de8);
+  box-shadow:0 12px 24px rgba(37,99,235,.26);
+}
+.home-card-list{display:flex;flex-direction:column;gap:18px;}
+.home-feature-card{
+  width:100%;
+  border:0;
+  border-radius:24px;
+  padding:20px;
+  display:grid;
+  grid-template-columns:76px 1fr auto;
+  gap:18px;
+  align-items:center;
+  background:rgba(255,255,255,.92);
+  box-shadow:0 14px 32px rgba(100,116,139,.18);
+  text-align:left;
+  cursor:pointer;
+}
+.home-feature-card.static-card{cursor:default;}
+.home-feature-icon{
+  width:76px;
+  height:76px;
+  border-radius:22px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(145deg,rgba(124,58,237,.14),rgba(37,99,235,.09));
+  font-size:36px;
+}
+.home-feature-icon.blue-icon{
+  color:#2563eb;
+  background:linear-gradient(145deg,rgba(219,234,254,.9),rgba(237,233,254,.8));
+}
+.home-feature-title{
+  color:#0f172a;
+  font-size:23px;
+  line-height:1.1;
+  font-weight:950;
+  letter-spacing:-.035em;
+}
+.home-feature-sub{
+  margin-top:9px;
+  color:#475569;
+  font-size:15px;
+  line-height:1.45;
+}
+.home-feature-arrow{
+  color:#0969e8;
+  font-size:46px;
+  line-height:1;
+  font-weight:700;
+}
+.home-mini-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.home-mini-actions button{
+  border:1px solid #cbd5e1;
+  border-radius:14px;
+  background:#fff;
+  color:#0969e8;
+  padding:8px 10px;
+  font-weight:950;
+  cursor:pointer;
+}
+@media(max-width:420px){
+  .home-brand{font-size:22px;}
+  .home-feature-card{grid-template-columns:62px 1fr auto;padding:17px;gap:13px;}
+  .home-feature-icon{width:62px;height:62px;font-size:30px;}
+  .home-feature-title{font-size:20px;}
+  .home-feature-sub{font-size:13px;}
+  .home-category-tab{font-size:12px;padding:12px 4px;}
+}
+

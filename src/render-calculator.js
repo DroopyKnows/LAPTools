@@ -14,9 +14,9 @@
             <div class="level-help">Quantity</div>
           </div>
           <div class="stepper">
-            <button onclick="adjustGroup('${group}',${level},-1)">−</button>
-            <input type="number" min="0" step="1" value="${obj[level]||""}" placeholder="0" oninput="setGroupValue('${group}',${level},this.value)" />
-            <button onclick="adjustGroup('${group}',${level},1)">+</button>
+            <button data-action="adjustGroup" data-action-event="click" data-arg0="${group}" data-arg1="${level}" data-arg2="-1">−</button>
+            <input data-input-key="${group}-${level}" type="number" min="0" step="1" value="${obj[level]||""}" placeholder="0" data-action="setGroupValue" data-action-event="input" data-arg0="${group}" data-arg1="${level}" data-source2="value" />
+            <button data-action="adjustGroup" data-action-event="click" data-arg0="${group}" data-arg1="${level}" data-arg2="1">+</button>
           </div>
         `;
         wrap.appendChild(row);
@@ -39,9 +39,9 @@
             <div class="bundle-card-head">
               <div class="bundle-card-title">${def.title}</div>
               <div class="bundle-qty-control">
-                <button onclick="adjustBundleQty('${key}',-1)">−</button>
-                <input type="number" min="0" step="1" value="${qty || ""}" placeholder="0" oninput="setBundleQty('${key}',this.value)" />
-                <button onclick="adjustBundleQty('${key}',1)">+</button>
+                <button data-action="adjustBundleQty" data-action-event="click" data-arg0="${key}" data-arg1="-1">−</button>
+                <input data-input-key="bundle-${key}" type="number" min="0" step="1" value="${qty || ""}" placeholder="0" data-action="setBundleQty" data-action-event="input" data-arg0="${key}" data-source1="value" />
+                <button data-action="adjustBundleQty" data-action-event="click" data-arg0="${key}" data-arg1="1">+</button>
               </div>
             </div>
             ${makeBundlePills(def.random,"random",def.choice)}
@@ -68,7 +68,7 @@
 
         <div class="button-row">
           
-          <button class="danger-btn" onclick="resetTopUpsForCurrentItem()">Reset Top Ups for this item</button>
+          <button class="danger-btn" data-action="resetTopUpsForCurrentItem" data-action-event="click">Reset Top Ups for this item</button>
         </div>
       `;
 
@@ -91,11 +91,11 @@
           <div class="compact-chest-level">Lvl ${level}</div>
           <div class="compact-chest-field">
             <label>Random</label>
-            <input type="number" min="0" step="1" value="${plan[level]||""}" placeholder="0" oninput="setGroupValue('plan',${level},this.value)" />
+            <input data-input-key="plan-${level}" type="number" min="0" step="1" value="${plan[level]||""}" placeholder="0" data-action="setGroupValue" data-action-event="input" data-arg0="plan" data-arg1="${level}" data-source2="value" />
           </div>
           <div class="compact-chest-field">
             <label>Choice</label>
-            <input type="number" min="0" step="1" value="${guaranteed[level]||""}" placeholder="0" oninput="setGroupValue('guaranteed',${level},this.value)" />
+            <input data-input-key="guaranteed-${level}" type="number" min="0" step="1" value="${guaranteed[level]||""}" placeholder="0" data-action="setGroupValue" data-action-event="input" data-arg0="guaranteed" data-arg1="${level}" data-source2="value" />
           </div>
         `;
         wrap.appendChild(row);
@@ -183,7 +183,7 @@
         manualEntries.forEach(entry=>{
           const line=document.createElement("div");
           line.className="quick-adjust-line";
-          line.innerHTML=`<span>Lvl ${entry.level}</span><span class="quick-adjust-controls"><button onclick="adjustGroup('${group}',${entry.level},-1)">−</button><input type="number" min="0" step="1" value="${Math.floor(entry.value)}" oninput="setGroupValue('${group}',${entry.level},this.value)" /><button onclick="adjustGroup('${group}',${entry.level},1)">+</button></span>`;
+          line.innerHTML=`<span>Lvl ${entry.level}</span><span class="quick-adjust-controls"><button data-action="adjustGroup" data-action-event="click" data-arg0="${group}" data-arg1="${entry.level}" data-arg2="-1">−</button><input data-input-key="quick-${group}-${entry.level}" type="number" min="0" step="1" value="${Math.floor(entry.value)}" data-action="setGroupValue" data-action-event="input" data-arg0="${group}" data-arg1="${entry.level}" data-source2="value" /><button data-action="adjustGroup" data-action-event="click" data-arg0="${group}" data-arg1="${entry.level}" data-arg2="1">+</button></span>`;
           wrap.appendChild(line);
         });
       }
@@ -196,7 +196,7 @@
           sourceEntries.forEach(entry=>{
             const line=document.createElement("div");
             line.className="bank-adjust-line";
-            line.innerHTML=`<span>Lvl ${entry.level}</span><span class="quick-adjust-controls"><button onclick="adjustRedeemedChoice(${entry.level},-1)">−</button><input type="number" min="0" step="1" value="${Math.floor(entry.value)}" oninput="setRedeemedChoice(${entry.level},this.value)" /><button onclick="redeemChoiceFromBank(${entry.level},1)">+</button></span>`;
+            line.innerHTML=`<span>Lvl ${entry.level}</span><span class="quick-adjust-controls"><button data-action="adjustRedeemedChoice" data-action-event="click" data-arg0="${entry.level}" data-arg1="-1">−</button><input data-input-key="redeemed-${entry.level}" type="number" min="0" step="1" value="${Math.floor(entry.value)}" data-action="setRedeemedChoice" data-action-event="input" data-arg0="${entry.level}" data-source1="value" /><button data-action="redeemChoiceFromBank" data-action-event="click" data-arg0="${entry.level}" data-arg1="1">+</button></span>`;
             wrap.appendChild(line);
           });
         }else{
@@ -539,7 +539,7 @@ function renderChoiceBankRedeem(containerId){
       })).filter(x=>x.earnedHere>0 || x.value>0 || x.redeemed>0).sort((a,b)=>b.level-a.level);
       if(!entries.length){ el.innerHTML=""; return; }
       el.innerHTML=`<div class="choice-bank-card ${choiceBankExpanded ? "choice-bank-open" : ""}">
-        <button class="choice-bank-toggle" type="button" onclick="toggleChoiceBankCollapse()">
+        <button class="choice-bank-toggle" type="button" data-action="toggleChoiceBankCollapse" data-action-event="click">
           <span>Choice Chest Bank Available</span>
           <span class="chev">⌄</span>
         </button>
@@ -548,10 +548,10 @@ function renderChoiceBankRedeem(containerId){
             <div class="redeem-level">Lvl ${entry.level}</div>
             <div class="redeem-available">${entry.earnedHere} earned here · ${entry.value} available${entry.redeemed>0 ? ` · ${entry.redeemed} redeemed here` : ""}</div>
             <div class="redeem-actions">
-              <button onclick="redeemChoiceFromBank(${entry.level},1)">+1</button>
-              <button onclick="adjustRedeemedChoice(${entry.level},-1)">-1</button>
-              <button onclick="redeemChoiceFromBank(${entry.level},${entry.value})">Use all</button>
-              <button onclick="removeAllRedeemedChoice(${entry.level})">Remove all</button>
+              <button data-action="redeemChoiceFromBank" data-action-event="click" data-arg0="${entry.level}" data-arg1="1">+1</button>
+              <button data-action="adjustRedeemedChoice" data-action-event="click" data-arg0="${entry.level}" data-arg1="-1">-1</button>
+              <button data-action="redeemChoiceFromBank" data-action-event="click" data-arg0="${entry.level}" data-arg1="${entry.value}">Use all</button>
+              <button data-action="removeAllRedeemedChoice" data-action-event="click" data-arg0="${entry.level}">Remove all</button>
             </div>
           </div>`).join("")}
         </div>

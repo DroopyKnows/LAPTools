@@ -7,8 +7,9 @@
     function exportInventory(){
       const payload={
         version:"last-asylum-raven-full-backup-v2",
+        stateSchemaVersion:CURRENT_STATE_SCHEMA_VERSION,
         exportedAt:new Date().toISOString(),
-        state:state
+        state:normalizeStateShape(state)
       };
       const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
       const url=URL.createObjectURL(blob);
@@ -23,7 +24,7 @@
       const file=event.target.files[0];
       if(!file) return;
       const reader=new FileReader();
-      reader.onload=()=>{
+      reader.onload=async ()=>{
         try{
           const payload=JSON.parse(reader.result);
           let importedState=null;
@@ -32,7 +33,7 @@
             importedState=payload.state;
           }else if(payload && payload.inventory){
             // Backward compatibility for older inventory-only backups.
-            importedState={...state, inventory:payload.inventory};
+            importedState={...state, inventory:{...state.inventory, active:payload.inventory}};
           }
 
           if(!importedState){
@@ -40,31 +41,18 @@
             return;
           }
 
-          Object.keys(state).forEach(key=>delete state[key]);
-          if(importedState && importedState.randomLeftovers) delete importedState.randomLeftovers;
-          Object.assign(state,JSON.parse(JSON.stringify(DEFAULT_STATE)),importedState);
-
-          state.plans=state.plans||{};
-          state.guaranteed=state.guaranteed||{};
-          state.inventory=state.inventory||{};
-          state.manualOwned=state.manualOwned||{};
-          state.manualPlan=state.manualPlan||{};
-          state.manualGuaranteed=state.manualGuaranteed||{};
-          state.topUpBundles=state.topUpBundles||{};
-          state.perItemTopUpBundles=state.perItemTopUpBundles||{};
-          state.manualTopUpBundles=state.manualTopUpBundles||{};
-          state.choiceBank=state.choiceBank||{};
-          state.choiceBankRedeemed=state.choiceBankRedeemed||{};
-          state.manualChoiceBankRedeemed=state.manualChoiceBankRedeemed||{};
-
-          ravenItems.forEach(item=>{
-            state.inventory[item.name]=state.inventory[item.name]||{};
-            state.plans[item.name]=state.plans[item.name]||{};
-            state.guaranteed[item.name]=state.guaranteed[item.name]||{};
-            state.perItemTopUpBundles[item.name]=state.perItemTopUpBundles[item.name]||{};
-            state.choiceBankRedeemed[item.name]=state.choiceBankRedeemed[item.name]||{};
+          const shouldImport=await showConfirmModal({
+            title:"Import Backup?",
+            message:"This will replace the current app data with the backup file.",
+            confirmLabel:"Import Backup",
+            cancelLabel:"Cancel",
+            confirmClass:"primary-btn"
           });
+          if(!shouldImport) return;
 
+          if(importedState && importedState.randomLeftovers) delete importedState.randomLeftovers;
+          replaceStateWithNormalized(importedState);
+          if(typeof ensureWhatIfState==="function") ensureWhatIfState();
           ensureBankObjects();
           syncChoiceBankFromDerived();
           save();

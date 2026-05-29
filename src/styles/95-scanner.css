@@ -1,0 +1,92 @@
+/* AI Bag Scanner integration */
+.scanner-body{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.scanner-field-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+.scanner-field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:12px;
+  font-weight:900;
+  color:#475569;
+}
+.scanner-field input[type="url"],
+.scanner-field input[type="file"]{
+  width:100%;
+  border:1px solid rgba(148,163,184,.45);
+  border-radius:14px;
+  padding:10px 12px;
+  background:#fff;
+  color:#0f172a;
+  font:inherit;
+  font-weight:800;
+}
+.scanner-actions-row{
+  align-items:center;
+  justify-content:flex-start;
+  gap:10px;
+}
+.scanner-status{
+  min-height:18px;
+  color:#64748b;
+  font-size:13px;
+  font-weight:800;
+}
+.scanner-status.loading{color:#6d28d9;}
+.scanner-status.ok{color:#047857;}
+.scanner-status.error{color:#b91c1c;}
+.scanner-review-card{
+  margin-top:2px;
+}
+.scanner-meta-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:10px 0 12px;
+}
+.scanner-meta-pill{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:5px 10px;
+  border-radius:999px;
+  background:#f1f5f9;
+  color:#475569;
+  font-size:12px;
+  font-weight:900;
+}
+.scanner-meta-pill.ok{
+  background:#dcfce7;
+  color:#166534;
+}
+.scanner-meta-pill.warn{
+  background:#fef3c7;
+  color:#92400e;
+}
+.scanner-warning-list{
+  margin:0 0 12px;
+  padding-left:18px;
+  color:#92400e;
+  font-size:12px;
+  font-weight:800;
+}
+.scanner-result-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.scanner-item-block{
+  margin:0;
+}
+@media (min-width: 720px){
+  .scanner-field-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}

@@ -1,0 +1,266 @@
+/* Latest What If, inventory, homepage menu, and Need Help chip polish. */
+
+/* v0416 compact What If preview and side breakdown cleanup */
+.scenario-setup-preview{padding:8px 10px;border-radius:16px;margin-top:12px;}
+.scenario-setup-preview:not(.open){padding:8px 10px;}
+.scenario-setup-preview .compact-toggle-row{font-size:14px;min-height:28px;}
+.scenario-setup-preview .compact-dropdown-body{margin-top:8px;}
+.scenario-compact-label{
+  font-size:11px;
+  font-weight:900;
+  color:#475569;
+  text-transform:none!important;
+  letter-spacing:0!important;
+}
+.whatif-pill-grid,
+.scenario-compact-values .whatif-pill-grid,
+.scenario-compact-values .compact-readout-grid{
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+}
+.nontarget-breakdown-toggle{display:block;margin:10px 0 0 auto;}
+.nontarget-side-breakdown.open{
+  display:grid!important;
+  grid-template-columns:1fr 1fr;
+  gap:0;
+  align-items:stretch;
+}
+.nontarget-side-breakdown .grouped-side-section{margin-top:10px!important;}
+.nontarget-side-breakdown .grouped-side-section + .grouped-side-section{margin-left:0;margin-top:10px!important;}
+.side-card-head{align-items:flex-start;}
+.side-card-head .section-sub{display:none!important;}
+.side-card-head .section-title{font-size:15px;}
+
+/* v0416 inventory/action polish */
+.button-row .snapshot-style-btn{
+  color:#fff;
+  background:linear-gradient(145deg,#7c3aed,#2563eb);
+  border:0;
+  box-shadow:0 12px 24px rgba(37,99,235,.28);
+}
+.file-row .backup-btn,
+.backup-btn{
+  background:#f1f5f9;
+  color:#475569;
+  border:1px solid #dbe4ef;
+  box-shadow:none;
+}
+
+@media(max-width:420px){
+  .global-brand{font-size:20px;}
+  .global-topbar{border-radius:16px;padding:9px 12px;}
+  .global-menu-btn{width:36px;height:36px;font-size:22px;}
+  .home-hero-card h1{font-size:25px;}
+  .nontarget-side-breakdown.open{grid-template-columns:1fr;}
+  .nontarget-side-breakdown .grouped-side-section + .grouped-side-section{margin-top:8px!important;}
+}
+
+/* v0417 homepage/menu refinement */
+.global-menu-panel{
+  right:0!important;
+  transform:translateX(110%)!important;
+  width:min(360px,86vw)!important;
+}
+.global-menu-panel.open{transform:translateX(0)!important;}
+.menu-scrim.hidden{display:none!important;}
+.home-hero-card{
+  min-height:0;
+  padding:16px 18px 17px!important;
+  border-radius:20px!important;
+}
+.home-hero-card::before{
+  width:140px!important;
+  height:140px!important;
+  right:-42px!important;
+  bottom:-56px!important;
+}
+.home-hero-card::after{
+  right:28px!important;
+  bottom:22px!important;
+  font-size:48px!important;
+  opacity:.42!important;
+}
+.home-game-pill{
+  position:absolute!important;
+  z-index:2!important;
+  top:14px!important;
+  right:14px!important;
+  max-width:170px;
+  padding:7px 10px!important;
+  border-radius:14px!important;
+  font-size:12px!important;
+  white-space:nowrap;
+}
+.home-game-pill span:first-child{font-size:15px!important;}
+.home-hero-card h1{
+  margin-top:0!important;
+  max-width:245px;
+  font-size:27px!important;
+  line-height:1.06!important;
+}
+.home-hero-card p{
+  max-width:285px!important;
+  margin-top:9px!important;
+  font-size:14px!important;
+  line-height:1.35!important;
+}
+.home-category-panel.hidden{display:none!important;}
+.raven-home-card{
+  min-height:128px;
+  grid-template-columns:1fr!important;
+  justify-items:center;
+  text-align:center!important;
+  gap:10px!important;
+  padding:18px 16px!important;
+}
+.raven-home-card .home-feature-icon{
+  width:52px!important;
+  height:52px!important;
+  border-radius:17px!important;
+  font-size:26px!important;
+}
+.raven-home-card .home-feature-title{
+  font-size:18px!important;
+}
+.raven-home-card .home-feature-sub{
+  margin-top:5px!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+}
+.compact-coming-card{
+  min-height:82px;
+}
+@media(max-width:420px){
+  .home-game-pill{
+    max-width:148px;
+    font-size:11px!important;
+  }
+  .home-hero-card h1{max-width:210px;font-size:25px!important;}
+  .home-hero-card p{max-width:250px;font-size:13px!important;}
+}
+
+
+/* v0417a homepage Need Help placement + soft chip polish */
+.home-help-card{
+  align-items:center;
+}
+.home-help-card .help-icon-text{
+  font-family:inherit;
+  font-size:24px;
+  font-weight:950;
+  color:#2563eb;
+}
+.home-soft-chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:10px;
+}
+.home-soft-chips button{
+  appearance:none;
+  border:1px solid rgba(37,99,235,.10);
+  background:linear-gradient(180deg,#f8fbff 0%,#eef5ff 100%);
+  color:#155bd6;
+  border-radius:999px;
+  padding:9px 15px;
+  min-height:36px;
+  font-size:13px;
+  font-weight:900;
+  line-height:1;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 5px 12px rgba(37,99,235,.08);
+  cursor:pointer;
+}
+.home-soft-chips button:hover{
+  transform:translateY(-1px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 8px 16px rgba(37,99,235,.12);
+}
+.home-soft-chips button:active{
+  transform:translateY(0);
+}
+@media(max-width:420px){
+  .home-soft-chips{gap:7px;}
+  .home-soft-chips button{padding:8px 12px;font-size:12px;min-height:34px;}
+}
+
+    /* Shared helper: empty states */
+    .empty-state-title{
+      font-weight:900;
+      color:#334155;
+      margin-bottom:4px;
+    }
+    .empty-state-message{
+      color:#64748b;
+      font-size:13px;
+      line-height:1.35;
+    }
+    .empty-state-icon{
+      width:34px;
+      height:34px;
+      display:grid;
+      place-items:center;
+      border-radius:12px;
+      background:#f1f5f9;
+      color:#64748b;
+      font-weight:900;
+      margin:0 auto 8px;
+    }
+    .empty-state-actions{
+      margin-top:12px;
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+
+    /* Shared helper: modal confirmations */
+    .app-modal-host{
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      display:grid;
+      place-items:center;
+      padding:18px;
+    }
+    .app-modal-host.hidden{
+      display:none;
+    }
+    .app-modal-scrim{
+      position:absolute;
+      inset:0;
+      background:rgba(15,23,42,.48);
+      backdrop-filter:blur(2px);
+    }
+    .app-modal-card{
+      position:relative;
+      width:min(420px,100%);
+      background:#ffffff;
+      border:1px solid rgba(148,163,184,.35);
+      border-radius:22px;
+      box-shadow:0 22px 60px rgba(15,23,42,.28);
+      padding:18px;
+    }
+    .app-modal-title{
+      color:#111827;
+      font-size:18px;
+      font-weight:950;
+      letter-spacing:-.02em;
+      margin-bottom:8px;
+    }
+    .app-modal-message{
+      color:#475569;
+      font-size:14px;
+      line-height:1.45;
+      margin-bottom:16px;
+    }
+    .app-modal-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .app-modal-actions.stacked{
+      display:grid;
+      grid-template-columns:1fr;
+    }
+    .app-modal-actions.stacked button{
+      width:100%;
+    }

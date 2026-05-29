@@ -1,0 +1,93 @@
+/* Compact dropdowns, saved scenario snapshots, archive filters, and backup button polish. */
+
+/* v0415 compact dropdown and snapshot polish */
+.scenario-setup-preview .compact-toggle-row{
+  width:100%;
+  border:0;
+  background:transparent;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:#0f172a;
+  font-size:15px;
+  font-weight:950;
+  cursor:pointer;
+}
+.scenario-setup-preview .compact-dropdown-body{margin-top:12px;}
+.scenario-setup-preview:not(.open){padding:12px 14px;}
+.whatif-pill-grid,
+.scenario-compact-values .whatif-pill-grid,
+.scenario-compact-values .compact-readout-grid{
+  grid-template-columns:repeat(5,minmax(0,1fr));
+}
+.scenario-compact-row{
+  grid-template-columns:104px 1fr;
+  align-items:center;
+}
+.scenario-compact-label{
+  font-size:11px;
+  line-height:1.15;
+  font-weight:900;
+  color:#475569;
+  text-transform:none;
+  letter-spacing:0;
+}
+.compact-saved-card{
+  display:block;
+  cursor:pointer;
+}
+.saved-scenario-main{min-width:0;}
+.saved-snapshot-dropdown{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid rgba(226,232,240,.9);
+}
+.save-scenario-panel{
+  border:1px solid rgba(226,232,240,.9);
+  border-radius:18px;
+  background:rgba(248,250,252,.75);
+  padding:12px;
+  margin-top:12px;
+}
+.save-scenario-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.save-scenario-grid input{
+  width:100%;
+  min-height:42px;
+  border:1px solid #dbe4ef;
+  border-radius:14px;
+  padding:10px 12px;
+  font-size:14px;
+  font-weight:800;
+  background:#fff;
+}
+.snapshot-style-btn{
+  background:#eef2f7;
+  color:#334155;
+  border:1px solid #dbe4ef;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+}
+.backup-btn{
+  background:#f1f5f9;
+  color:#475569;
+  border:1px solid #dbe4ef;
+}
+.archive-filter-row{margin-bottom:12px;}
+.inventory-archive-card .archive-items-wrap.hidden{display:none!important;}
+.nontarget-side-breakdown.open{display:flex;}
+@media(max-width:420px){
+  .scenario-compact-row{grid-template-columns:90px 1fr;}
+  .whatif-pill-grid,
+  .scenario-compact-values .whatif-pill-grid,
+  .scenario-compact-values .compact-readout-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;}
+  .whatif-pill .pill-qty{min-height:30px;padding:7px 1px;font-size:12px;}
+  .save-scenario-grid{grid-template-columns:1fr;}
+}
+.inventory-difference-row{margin-top:8px;}
+.diff-cell.positive .td{color:#047857;}
+.diff-cell.negative .td{color:#b91c1c;}
+
