@@ -1,5 +1,3 @@
-// AI Bag Scanner event handlers.
-
 let bagScannerRunId=0;
 
 function resetBagScannerBeforeRun(){
@@ -21,9 +19,10 @@ function openBagScanner(){
 }
 
 function closeBagScanner(){
+  bagScannerRunId++;
+  purgeBagScannerData();
   const card=document.getElementById("bagScannerCard");
   if(card) card.classList.add("hidden");
-  clearBagScannerReview();
 }
 
 function toggleBagScannerCard(){
@@ -68,10 +67,10 @@ async function replaceActiveInventoryFromBagScan(){
   if(!shouldReplace) return;
   const replacementInventory=JSON.parse(JSON.stringify(bagScannerLastScan.inventory));
   bagScannerRunId++;
-  clearBagScannerReview();
   state.inventory.active=replacementInventory;
   ravenItems.forEach(item=>state.inventory.active[item.name]=state.inventory.active[item.name]||{});
   save();
+  purgeBagScannerData();
   closeBagScanner();
   renderAll();
   setRavenSubPage("inventory");

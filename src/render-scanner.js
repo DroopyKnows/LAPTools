@@ -1,5 +1,3 @@
-// AI Bag Scanner rendering.
-
 let bagScannerLastScan=null;
 
 function renderBagScannerPanel(){
@@ -133,7 +131,7 @@ function renderBagScannerReview(scan){
       ${renderBagScannerIssue(scan)}
       <div class="scanner-result-list">${renderBagScannerInventory(scan.inventory)}</div>
       <div class="button-row scanner-actions-row">
-        <button class="ghost-btn backup-btn" type="button" data-action="clearBagScannerReview" data-action-event="click">Clear Results</button>
+        <button class="ghost-btn backup-btn" type="button" data-action="purgeBagScannerData" data-action-event="click">Clear Results</button>
         <button class="ghost-btn snapshot-style-btn" type="button" data-action="replaceActiveInventoryFromBagScan" data-action-event="click">Replace Active Inventory</button>
       </div>
     </div>
@@ -155,4 +153,15 @@ function clearBagScannerReview(){
     review.innerHTML="";
   }
   setBagScannerStatus("","");
+}
+
+function clearBagScannerFileInput(){
+  const input=document.getElementById("bagScannerFiles");
+  if(input) input.value="";
+}
+
+function purgeBagScannerData(){
+  bagScannerLastScan=null;
+  clearBagScannerReview();
+  clearBagScannerFileInput();
 }
