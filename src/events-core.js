@@ -11,7 +11,7 @@ const delegatedActionAllowlist = new Set([
   "exportInventory","importInventory","saveCurrentInventorySnapshot","resetInventory","setInventoryArchiveMode",
   "setInventoryAdvancedMode","setInventory","setHideUnacquiredInventory","setUpgradedOwnedViewMode",
   "setInventoryInputFilter","setUpgradedOwnedFilter","setInventoryArchiveFilter","setBreakdownInventoryFilter",
-  "toggleInventoryArchiveSnapshot","loadInventorySnapshot","deleteInventorySnapshot","openBagScanner","closeBagScanner","toggleBagScannerCard","setBagScannerFiles","runBagScanner","clearBagScannerReview","replaceActiveInventoryFromBagScan","setGlobalSetting",
+  "toggleInventoryArchiveSnapshot","loadInventorySnapshot","deleteInventorySnapshot","openBagScanner","closeBagScanner","toggleBagScannerCard","setBagScannerFiles","runBagScanner","clearBagScannerReview","purgeBagScannerData","replaceActiveInventoryFromBagScan","setGlobalSetting",
   "toggleInventoryBreakdownExplain","toggleBreakdownSource","adjustGroup","setGroupValue","adjustBundleQty",
   "setBundleQty","toggleChoiceBankCollapse","redeemChoiceFromBank","adjustRedeemedChoice","setRedeemedChoice",
   "removeAllRedeemedChoice"
