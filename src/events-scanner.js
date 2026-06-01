@@ -1,6 +1,7 @@
 let bagScannerRunId=0;
 
 function resetBagScannerBeforeRun(){
+  if(typeof resetScannerStateInAppState==="function") resetScannerStateInAppState();
   bagScannerLastScan=null;
   const review=document.getElementById("bagScannerReview");
   if(review){
@@ -34,6 +35,10 @@ function setBagScannerFiles(event){
   const input=event && event.target ? event.target : document.getElementById("bagScannerFiles");
   const count=input && input.files ? input.files.length : 0;
   clearBagScannerReview();
+  if(state && state.ui){
+    state.ui.bagScanner=createEmptyScannerState();
+    state.ui.bagScanner.selectedFileNames=input && input.files ? Array.from(input.files).map(file=>file.name) : [];
+  }
   setBagScannerStatus(count ? `${count} screenshot${count===1 ? "" : "s"} selected.` : "","");
 }
 
@@ -65,13 +70,25 @@ async function replaceActiveInventoryFromBagScan(){
     confirmClass:"primary-btn"
   });
   if(!shouldReplace) return;
-  const replacementInventory=JSON.parse(JSON.stringify(bagScannerLastScan.inventory));
+  const replacementInventory=typeof normalizeInventory==="function" ? normalizeInventory(bagScannerLastScan.inventory) : JSON.parse(JSON.stringify(bagScannerLastScan.inventory));
   bagScannerRunId++;
   state.inventory.active=replacementInventory;
   ravenItems.forEach(item=>state.inventory.active[item.name]=state.inventory.active[item.name]||{});
   save();
   purgeBagScannerData();
+  save();
   closeBagScanner();
   renderAll();
   setRavenSubPage("inventory");
 }
+
+
+// v1.0.13 module bridge exports
+Object.assign(window,{
+  bagScannerRunId,
+  closeBagScanner,
+  openBagScanner,
+  resetBagScannerBeforeRun,
+  setBagScannerFiles,
+  toggleBagScannerCard
+});

@@ -1,9 +1,13 @@
     function init(){
+      if(typeof purgeLegacyScannerStorage==="function") purgeLegacyScannerStorage();
       const saved=localStorage.getItem(STORAGE_KEY);
       if(saved){
         try{replaceStateWithNormalized(JSON.parse(saved));}catch(e){normalizeCurrentState();}
       }
       normalizeCurrentState();
+      if(typeof resetScannerStateInAppState==="function") resetScannerStateInAppState();
+      if(typeof resetScannerRuntimeDomState==="function") resetScannerRuntimeDomState();
+      try{save();}catch(error){}
       ensureBankObjects();
       if(typeof ensureWhatIfState==="function") ensureWhatIfState();
       if(typeof applyGlobalDisplaySettings==="function") applyGlobalDisplaySettings();

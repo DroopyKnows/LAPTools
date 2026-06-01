@@ -124,12 +124,15 @@
 <div class="chance-output" id="whatIfChanceValue">22.222%</div>
 </div>
 </div>
-<div class="goal-secondary-row">
+<div class="goal-secondary-row whatif-setup-save-row">
 <div>
 <label for="whatIfTargetLevel">Target Gear Level</label>
 <select id="whatIfTargetLevel" data-action="setWhatIfTargetLevel" data-action-event="change" data-source0="value">
 <option value="1">Level 1</option><option value="2">Level 2</option><option value="3">Level 3</option><option value="4">Level 4</option><option value="5">Level 5</option><option value="6">Level 6</option><option value="7">Level 7</option><option value="8">Level 8</option><option value="9">Level 9</option><option value="10">Level 10</option><option value="11">Level 11</option><option value="12">Level 12</option>
 </select>
+</div>
+<div class="whatif-inline-save-wrap">
+<button class="primary-btn whatif-inline-save-btn" type="button" data-action="saveWhatIfScenario" data-action-event="click">Save Scenario</button>
 </div>
 </div>
 <div class="scenario-setup-preview" id="whatIfSetupPreviewCard">
@@ -232,18 +235,8 @@
 <div class="card-content">
 <div class="section-title">Saved Scenarios</div>
 <div class="section-sub">Save, load, or remove What If setups.</div>
-<div class="save-scenario-panel">
-  <div class="save-scenario-grid">
-    <div>
-      <label for="whatIfSaveName">Scenario Name</label>
-      <input data-input-key="whatif-save-name" id="whatIfSaveName" type="text" placeholder="Optional" />
-    </div>
-    <div>
-      <label for="whatIfSaveNote">Note</label>
-      <input data-input-key="whatif-save-note" id="whatIfSaveNote" type="text" placeholder="Optional" />
-    </div>
-  </div>
-  <button class="primary-btn snapshot-style-btn" type="button" data-action="saveWhatIfScenario" data-action-event="click">Save Current Scenario</button>
+<div class="save-scenario-panel compact-save-panel">
+  <button class="primary-btn snapshot-style-btn whatif-saved-wide-save-btn" type="button" data-action="saveWhatIfScenario" data-action-event="click">Save Current Scenario</button>
 </div>
 <div id="savedWhatIfScenarios"></div>
 </div>
@@ -599,30 +592,5 @@
 </div>
 </section>
 </main>
-<script src="src/data.js"></script>
-<script src="src/state.js"></script>
-<script src="src/math-core.js"></script>
-<script src="src/math-levels.js"></script>
-<script src="src/math-plans.js"></script>
-<script src="src/math-bundles.js"></script>
-<script src="src/math-inventory.js"></script>
-<script src="src/math.js"></script>
-<script src="src/storage.js"></script>
-<script src="src/ui-components.js"></script>
-<script src="src/scanner-adapter.js"></script>
-<script src="src/scanner-client.js"></script>
-<script src="src/render-scanner.js"></script>
-<script src="src/render-home.js"></script>
-<script src="src/render-calculator.js"></script>
-<script src="src/render-inventory.js"></script>
-<script src="src/render-breakdown.js"></script>
-<script src="src/render-whatif.js"></script>
-<script src="src/events-navigation.js"></script>
-<script src="src/events-whatif.js"></script>
-<script src="src/events-calculator.js"></script>
-<script src="src/events-inventory.js"></script>
-<script src="src/events-scanner.js"></script>
-<script src="src/events-core.js"></script>
-<script src="src/events.js"></script>
-<script src="src/app.js"></script>
+<script type="module" src="src/main.js?v=1.0.15-split-boot-1"></script>
 </html>

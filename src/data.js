@@ -44,3 +44,21 @@ const topUpBundleDefinitions={
     choice:{5:1}
   }
 };
+
+
+// v1.0.13 module bridge exports
+Object.assign(window,{
+  CHEST_LEVELS,
+  DEFAULT_CHEST_LEVELS,
+  ITEM_LEVELS,
+  MAX_CHEST_LEVEL,
+  MAX_ITEM_LEVEL,
+  RAVEN_ITEMS,
+  STORAGE_KEY,
+  allItemLevels,
+  chestDefaultLevels,
+  chestLevels,
+  guaranteedDefaultLevels,
+  ravenItems,
+  topUpBundleDefinitions
+});

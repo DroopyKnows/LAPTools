@@ -134,3 +134,21 @@ function scannerAdaptWorkerResponse(json){
     quantityConflicts
   };
 }
+
+
+// v1.0.13 module bridge exports
+Object.assign(window,{
+  SCANNER_ITEM_ALIASES,
+  SCANNER_WORKER_ITEM_NAMES,
+  scannerAdaptWorkerResponse,
+  scannerDetectedCount,
+  scannerEmptyInventory,
+  scannerFirstIssueReason,
+  scannerHasInventoryValues,
+  scannerInventoryFromFinalItems,
+  scannerInventoryFromGlobalRows,
+  scannerInventoryFromResult,
+  scannerNormalizeItemName,
+  scannerNormalizeLevelQty,
+  scannerSafeQty
+});

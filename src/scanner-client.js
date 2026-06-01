@@ -37,3 +37,11 @@ async function scanBagItemsWithWorker(filesOrBaseUrl, maybeFiles, maybeOptions) 
 
   return json;
 }
+
+
+// v1.0.13 module bridge exports
+Object.assign(window,{
+  BAG_SCANNER_WORKER_URL,
+  getBagScannerWorkerUrl,
+  normalizeScannerBaseUrl
+});

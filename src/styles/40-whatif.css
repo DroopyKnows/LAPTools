@@ -91,4 +91,59 @@
   .saved-scenario-actions{flex-direction:row;width:100%;}
 }
 
+.whatif-setup-save-row{
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:end;
+}
+.whatif-inline-save-wrap{
+  display:flex;
+  align-items:end;
+}
+.whatif-inline-save-btn{
+  min-height:40px;
+  padding:10px 13px;
+  border-radius:14px;
+  font-size:12px;
+  line-height:1;
+  white-space:nowrap;
+  box-shadow:0 10px 22px rgba(37,99,235,.18);
+}
+@media(max-width:420px){
+  .whatif-setup-save-row{grid-template-columns:1fr auto;gap:8px;}
+  .whatif-inline-save-btn{padding:10px 11px;font-size:11px;}
+}
 
+/* Saved Scenarios full-width save button */
+.save-scenario-panel.compact-save-panel{
+  display:block;
+  width:100%;
+  margin-top:12px;
+  margin-bottom:14px;
+}
+.save-scenario-panel.compact-save-panel .whatif-saved-wide-save-btn{
+  width:100%;
+  min-height:46px;
+  justify-content:center;
+  border-radius:16px;
+  font-weight:800;
+}
+
+
+/* Force Saved Scenarios save button to match blue primary save styling */
+.save-scenario-panel.compact-save-panel .whatif-saved-wide-save-btn,
+.save-scenario-panel.compact-save-panel button.whatif-saved-wide-save-btn{
+  width:100%;
+  min-height:46px;
+  justify-content:center;
+  border-radius:16px;
+  font-weight:800;
+  color:#ffffff;
+  border:0;
+  background:linear-gradient(135deg,#7c2df2 0%,#235df5 100%);
+  box-shadow:0 10px 22px rgba(71,82,255,.24);
+}
+
+.save-scenario-panel.compact-save-panel .whatif-saved-wide-save-btn:hover,
+.save-scenario-panel.compact-save-panel button.whatif-saved-wide-save-btn:hover{
+  filter:brightness(1.03);
+}

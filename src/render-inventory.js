@@ -262,9 +262,7 @@ function renderCompactLevelBoxes(obj, levels){
         list.appendChild(heading.firstElementChild);
 
         ravenItems.filter(item=>item.side===side).forEach(item=>{
-          const badgeClass=item.side==="right" ? "side-badge right" : "side-badge";
           const card=document.createElement("div");
-          card.className="inventory-item";
 
           const visibleLevels=allItemLevels.filter(level=>{
             if(!hideUnacquired) return true;
@@ -273,21 +271,16 @@ function renderCompactLevelBoxes(obj, levels){
 
           if(hideUnacquired && !visibleLevels.length) return;
 
-          card.innerHTML=`
-            <div class="inventory-head">
-              <div class="item-name">${item.name}</div>
-              <div class="${badgeClass}">${item.side.toUpperCase()}</div>
-            </div>
-            <div class="mini-grid">
-              ${visibleLevels.map(level=>`
-                <div class="mini-cell">
-                  <label>L${level}</label>
-                  <input data-input-key="inventory-${item.name}-${level}" type="number" min="0" step="1" value="${state.inventory.active[item.name]?.[level]||""}" placeholder="0" data-action="setInventory" data-action-event="input" data-arg0="${item.name}" data-arg1="${level}" data-source2="value" />
-                </div>
-              `).join("")}
-            </div>
-          `;
-          list.appendChild(card);
+          card.innerHTML=renderInventoryItemCard({
+            title:item.name,
+            side:item.side,
+            bodyHtml:renderLevelInputGrid({
+              itemName:item.name,
+              levels:visibleLevels,
+              values:state.inventory.active[item.name] || {}
+            })
+          });
+          list.appendChild(card.firstElementChild);
         });
       };
 
@@ -302,7 +295,6 @@ function renderCompactLevelBoxes(obj, levels){
         let renderedCount=0;
 
         ravenItems.filter(item=>item.side===side).forEach(item=>{
-          const badgeClass=item.side==="right" ? "side-badge right" : "side-badge";
           const calculated=projectedAdditionsForInventoryItem(item.name);
           const sourceObject = upgradedViewMode==="calculated"
             ? calculated
@@ -312,34 +304,25 @@ function renderCompactLevelBoxes(obj, levels){
           if(!levelObjectHasValues(simplified)) return;
 
           const upCard=document.createElement("div");
-          upCard.className="inventory-item";
-          upCard.innerHTML=`
-            <div class="inventory-head">
-              <div class="item-name">${item.name}</div>
-              <div class="${badgeClass}">${item.side.toUpperCase()}</div>
-            </div>
-            ${renderCompactLevelBoxes(simplified,allItemLevels)}
-          `;
-          upgraded.appendChild(upCard);
+          upCard.innerHTML=renderInventoryItemCard({
+            title:item.name,
+            side:item.side,
+            bodyHtml:renderCompactLevelBoxes(simplified,allItemLevels)
+          });
+          upgraded.appendChild(upCard.firstElementChild);
           renderedCount++;
         });
 
         const randomTotal=totalRandomLeftoversBySide(side);
         if(levelObjectHasValues(randomTotal)){
-          const randomBadgeClass=side==="right" ? "side-badge right" : "side-badge";
           const randomCard=document.createElement("div");
-          randomCard.className="inventory-item";
-          randomCard.innerHTML=`
-            <div class="inventory-head">
-              <div>
-                <div class="item-name">Random Items Left Over</div>
-                <div class="random-leftover-subtext">Could be for any item on this side.</div>
-              </div>
-              <div class="${randomBadgeClass}">${sideLabel}</div>
-            </div>
-            ${renderCompactLevelBoxes(randomTotal,chestLevels)}
-          `;
-          upgraded.appendChild(randomCard);
+          randomCard.innerHTML=renderInventoryItemCard({
+            title:"Random Items Left Over",
+            subtitle:"Could be for any item on this side.",
+            side,
+            bodyHtml:renderCompactLevelBoxes(randomTotal,chestLevels)
+          });
+          upgraded.appendChild(randomCard.firstElementChild);
           renderedCount++;
         }
 
@@ -367,3 +350,9 @@ function renderCompactLevelBoxes(obj, levels){
       renderInventoryRandomTables();
       updateInventoryAdvancedTabs();
     }
+
+
+// v1.0.13 module bridge exports
+Object.assign(window,{
+  renderCompactLevelBoxes
+});

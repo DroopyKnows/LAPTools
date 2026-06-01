@@ -684,3 +684,9 @@ function renderChoiceBankRedeem(containerId){
       makeFilteredResultTable("inventoryRandomLeftTable",chestLevels,leftValues,"No random left-side items detected from item plans.");
       makeFilteredResultTable("inventoryRandomRightTable",chestLevels,rightValues,"No random right-side items detected from item plans.");
     }
+
+
+// v1.0.13 module bridge exports
+Object.assign(window,{
+  renderChoiceBankRedeem
+});

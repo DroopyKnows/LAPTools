@@ -367,3 +367,9 @@ function setQuickAdjust(group,checked){
       if(topUpContainer) renderChoiceBankRedeem("topUpChoiceBankRedeem");
       if(chestsContainer) renderChoiceBankRedeem("chestsChoiceBankRedeem");
     }
+
+
+// v1.0.13 module bridge exports
+Object.assign(window,{
+  setQuickAdjust
+});

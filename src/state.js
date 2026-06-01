@@ -1,11 +1,11 @@
 // Central app state. Schema v2 groups related data by feature while preserving
 // non-enumerable flat aliases for the existing no-framework render/event code.
 
-const CURRENT_STATE_SCHEMA_VERSION=2;
+const CURRENT_STATE_SCHEMA_VERSION=3;
 
-let mode="specific";
-let manualSide="left";
-let ravenSubPage="calculator";
+var mode="specific";
+var manualSide="left";
+var ravenSubPage="calculator";
 
 const DEFAULT_STATE={
   schemaVersion:CURRENT_STATE_SCHEMA_VERSION,
@@ -260,7 +260,9 @@ function normalizeSettingsState(source){
 }
 
 function normalizeUiState(source){
-  return isPlainObject(source) ? JSON.parse(JSON.stringify(source)) : {};
+  const ui=isPlainObject(source) ? JSON.parse(JSON.stringify(source)) : {};
+  ui.bagScanner=createEmptyScannerState();
+  return ui;
 }
 
 function normalizeStateShape(source){
@@ -337,6 +339,47 @@ function normalizeCurrentState(){
   return replaceStateWithNormalized(state);
 }
 
-const state=normalizeStateShape(DEFAULT_STATE);
+var state=normalizeStateShape(DEFAULT_STATE);
 
-let choiceBankExpanded=false;
+var choiceBankExpanded=false;
+
+
+// v1.0.13 module bridge exports
+Object.assign(window,{
+  CURRENT_STATE_SCHEMA_VERSION,
+  DEFAULT_STATE,
+  attachStateAliases,
+  choiceBankExpanded,
+  cleanString,
+  cloneDefaultState,
+  defineAlias,
+  getStateSchemaVersion,
+  isPlainObject,
+  manualSide,
+  mode,
+  normalizeBooleanMap,
+  normalizeBundleObject,
+  normalizeCalculatorState,
+  normalizeChoiceBankObject,
+  normalizeChoiceBankRedeemedMap,
+  normalizeCurrentState,
+  normalizeFilter,
+  normalizeInventoryArchiveEntry,
+  normalizeInventoryState,
+  normalizeItemLevelMap,
+  normalizeLevelObject,
+  normalizePerItemBundleMap,
+  normalizeSettingsState,
+  normalizeStateShape,
+  normalizeUiState,
+  normalizeWhatIfBaseline,
+  normalizeWhatIfSavedEntry,
+  normalizeWhatIfScenario,
+  normalizeWhatIfState,
+  ravenSubPage,
+  replaceStateWithNormalized,
+  state,
+  toBoolean,
+  toSafeInteger,
+  validRavenItemName
+});

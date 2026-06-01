@@ -17,15 +17,16 @@
       renderInventory();
     }
 
-    function saveCurrentInventorySnapshot(){
-      const name=prompt("Snapshot name",`Inventory ${new Date().toLocaleDateString()}`);
-      if(name===null) return;
-      const note=prompt("Optional note","");
+    async function saveCurrentInventorySnapshot(){
+      const snapshot=await showInventorySnapshotModal({
+        defaultName:`Inventory ${new Date().toLocaleDateString()}`
+      });
+      if(!snapshot) return;
       state.inventoryArchives=Array.isArray(state.inventoryArchives) ? state.inventoryArchives : [];
       state.inventoryArchives.unshift({
         id:String(Date.now()),
-        name:(name||"Inventory Snapshot").trim()||"Inventory Snapshot",
-        note:(note||"").trim(),
+        name:(snapshot.name||"Inventory Snapshot").trim()||"Inventory Snapshot",
+        note:(snapshot.note||"").trim(),
         savedAt:new Date().toISOString(),
         inventory:JSON.parse(JSON.stringify(state.inventory.active||{}))
       });
@@ -166,7 +167,15 @@
       renderAll();
     }
 
-    function resetInventory(){
+    async function resetInventory(){
+      const shouldReset=await showConfirmModal({
+        title:"Reset Active Inventory?",
+        message:"This clears all current Raven inventory values and cannot be undone.",
+        confirmLabel:"Reset Active Inventory",
+        cancelLabel:"Cancel",
+        confirmClass:"danger-btn"
+      });
+      if(!shouldReset) return;
       ravenItems.forEach(item=>state.inventory.active[item.name]={});
       state.manualOwned={};
       save();

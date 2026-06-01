@@ -106,28 +106,37 @@
       renderWhatIfPreserve();
     }
 
-    function saveWhatIfScenario(){
+    async function saveWhatIfScenario(){
       if(typeof ensureWhatIfState==="function") ensureWhatIfState();
       const current=JSON.parse(JSON.stringify(state.whatIf.current));
+      const defaultName=`${current.item || "Scenario"} → Level ${current.targetLevel || 7}`;
+      const details=await showInventorySnapshotModal({
+        title:"Save Current Scenario",
+        message:"Name this What If scenario and optionally add a note.",
+        defaultName,
+        defaultNote:current.note || "",
+        nameLabel:"Scenario Name",
+        noteLabel:"Optional Note",
+        fallbackName:defaultName,
+        confirmLabel:"Save Scenario",
+        cancelLabel:"Cancel"
+      });
+      if(!details) return;
       const stamp=new Date();
       const baseline=buildWhatIfBaselineSnapshot(current.item || "Heart of Wisdom");
+      current.name=details.name;
+      current.note=details.note;
       current.baselineMode="current";
       current.savedBaseline=baseline;
-      const nameInput=document.getElementById("whatIfSaveName");
-      const noteInput=document.getElementById("whatIfSaveNote");
-      const name=(nameInput?.value||"").trim() || `${current.item} → Level ${current.targetLevel}`;
-      const note=(noteInput?.value||"").trim();
       state.whatIf.saved.unshift({
         id:String(Date.now()),
-        name,
-        note,
+        name:details.name,
+        note:details.note,
         savedAt:stamp.toISOString(),
         updatedAt:stamp.toISOString(),
         baseline,
         scenario:current
       });
-      if(nameInput) nameInput.value="";
-      if(noteInput) noteInput.value="";
       save();
       state.whatIf.activeTab="saved";
       renderWhatIfPreserve();
@@ -137,6 +146,14 @@
       if(typeof ensureWhatIfState==="function") ensureWhatIfState();
       const found=(state.whatIf.saved||[]).find(x=>x.id===id);
       if(!found) return;
+      const shouldLoad=await showConfirmModal({
+        title:"Load Saved Scenario?",
+        message:"This will replace the current What If setup with the saved scenario.",
+        confirmLabel:"Load Scenario",
+        cancelLabel:"Cancel",
+        confirmClass:"primary-btn"
+      });
+      if(!shouldLoad) return;
       const loaded=JSON.parse(JSON.stringify(found.scenario || {}));
       const itemName=loaded.item || found.baseline?.item || "Heart of Wisdom";
       const savedBaseline=found.baseline || loaded.savedBaseline || buildWhatIfBaselineSnapshot(itemName);
@@ -174,8 +191,18 @@
       window.scrollTo({top:0,behavior:"smooth"});
     }
 
-    function deleteWhatIfScenario(id){
+    async function deleteWhatIfScenario(id){
       if(typeof ensureWhatIfState==="function") ensureWhatIfState();
+      const found=(state.whatIf.saved||[]).find(x=>x.id===id);
+      if(!found) return;
+      const shouldDelete=await showConfirmModal({
+        title:"Delete Saved Scenario?",
+        message:"This saved What If scenario will be permanently removed.",
+        confirmLabel:"Delete",
+        cancelLabel:"Cancel",
+        confirmClass:"danger-btn"
+      });
+      if(!shouldDelete) return;
       state.whatIf.saved=(state.whatIf.saved||[]).filter(x=>x.id!==id);
       save();
       renderWhatIfPreserve();

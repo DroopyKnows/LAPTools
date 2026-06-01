@@ -1,6 +1,6 @@
 // Centralized delegated event handling for rendered UI.
 // Markup declares named actions with data-action and data-* arguments.
-const delegatedActionAllowlist = new Set([
+const delegatedActionNames = [
   "showPage","closeGlobalMenu","openGlobalMenu","setHomeCategory","setRavenSubPage","setWhatIfTab",
   "setWhatIfItem","setWhatIfTargetLevel","setWhatIfShowHigh","setWhatIfChestValue","resetWhatIfScenario",
   "toggleWhatIfSetupPreview","toggleWhatIfNontargetSideBreakdown","saveWhatIfScenario","toggleSavedScenarioSnapshot",
@@ -15,39 +15,46 @@ const delegatedActionAllowlist = new Set([
   "toggleInventoryBreakdownExplain","toggleBreakdownSource","adjustGroup","setGroupValue","adjustBundleQty",
   "setBundleQty","toggleChoiceBankCollapse","redeemChoiceFromBank","adjustRedeemedChoice","setRedeemedChoice",
   "removeAllRedeemedChoice"
-]);
+];
 
-const delegatedSpecialActions = {
-  openImportFile(event, element){
-    const input=document.getElementById('importFile');
-    if(input) input.click();
-  },
-  navigateAndCloseMenu(event, element){
-    const page=element.dataset.page;
-    if(page && typeof showPage==="function") showPage(page);
-    if(typeof closeGlobalMenu==="function") closeGlobalMenu();
-  },
-  refreshChestInputs(){
-    if(typeof renderPlanInputs==="function") renderPlanInputs();
-    if(typeof renderGuaranteedInputs==="function") renderGuaranteedInputs();
-    if(typeof renderAll==="function") renderAll();
-  },
-  toggleAuditTotalView(event, element){
-    const line=element.closest('.audit-total-line');
-    if(!line) return;
-    const raw=line.querySelector('.audit-total-raw');
-    const simplified=line.querySelector('.audit-total-simplified');
-    if(raw) raw.classList.toggle('hidden',element.checked);
-    if(simplified) simplified.classList.toggle('hidden',!element.checked);
-  }
-};
+function registerDelegatedActions(){
+  if(!window.LAP_ACTIONS) return;
 
-function parseDelegatedDataValue(value){
+  window.LAP_ACTIONS.registerWindowActions(delegatedActionNames);
+
+  window.LAP_ACTIONS.registerActions({
+    openImportFile({event,element}){
+      const input=document.getElementById('importFile');
+      if(input) input.click();
+    },
+    navigateAndCloseMenu({event,element}){
+      const page=element && element.dataset ? element.dataset.page : "";
+      if(page && typeof showPage==="function") showPage(page);
+      if(typeof closeGlobalMenu==="function") closeGlobalMenu();
+    },
+    refreshChestInputs(){
+      if(typeof renderPlanInputs==="function") renderPlanInputs();
+      if(typeof renderGuaranteedInputs==="function") renderGuaranteedInputs();
+      if(typeof renderAll==="function") renderAll();
+    },
+    toggleAuditTotalView({event,element}){
+      const line=element ? element.closest('.audit-total-line') : null;
+      if(!line) return;
+      const raw=line.querySelector('.audit-total-raw');
+      const simplified=line.querySelector('.audit-total-simplified');
+      if(raw) raw.classList.toggle('hidden',element.checked);
+      if(simplified) simplified.classList.toggle('hidden',!element.checked);
+    }
+  });
+}
+
+function parseDelegatedDataValue(value,type){
   if(value===undefined) return undefined;
+  if(type==="string") return String(value);
+  if(type==="number") return Number(value);
   if(value==="true") return true;
   if(value==="false") return false;
   if(value==="null") return null;
-  if(/^-?\d+(\.\d+)?$/.test(String(value))) return Number(value);
   return value;
 }
 
@@ -66,7 +73,8 @@ function collectDelegatedArgs(element,event){
       continue;
     }
     if(Object.prototype.hasOwnProperty.call(element.dataset,argKey)){
-      args.push(parseDelegatedDataValue(element.dataset[argKey]));
+      const typeKey=`arg${index}Type`;
+      args.push(parseDelegatedDataValue(element.dataset[argKey],element.dataset[typeKey]));
       continue;
     }
     break;
@@ -76,15 +84,14 @@ function collectDelegatedArgs(element,event){
 
 function runNamedDelegatedAction(element,event){
   const action=element.dataset.action;
-  if(!action) return;
-  if(delegatedSpecialActions[action]){
-    delegatedSpecialActions[action](event,element);
-    return;
-  }
-  if(!delegatedActionAllowlist.has(action)) return;
-  const fn=window[action] || globalThis[action];
-  if(typeof fn!=="function") return;
-  fn(...collectDelegatedArgs(element,event));
+  if(!action || !window.LAP_ACTIONS) return;
+
+  window.LAP_ACTIONS.runAction(action,{
+    action,
+    args:collectDelegatedArgs(element,event),
+    event,
+    element
+  });
 }
 
 function bindDelegatedUiEvents(){
@@ -103,4 +110,16 @@ function bindDelegatedUiEvents(){
   });
 }
 
+registerDelegatedActions();
 bindDelegatedUiEvents();
+
+
+// v1.0.13 module bridge exports
+Object.assign(window,{
+  bindDelegatedUiEvents,
+  collectDelegatedArgs,
+  delegatedActionNames,
+  parseDelegatedDataValue,
+  registerDelegatedActions,
+  runNamedDelegatedAction
+});

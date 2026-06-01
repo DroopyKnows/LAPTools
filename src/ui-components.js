@@ -50,7 +50,8 @@ function uiActionArgAttrs(args){
     if(value==="this") return ` data-source${index}="element"`;
     const quoted=(value.startsWith("'") && value.endsWith("'")) || (value.startsWith('"') && value.endsWith('"')) || (value.startsWith('`') && value.endsWith('`'));
     const clean=quoted ? value.slice(1,-1) : value;
-    return ` data-arg${index}="${uiEscapeAttr(clean)}"`;
+    const typeAttr=quoted ? ` data-arg${index}-type="string"` : "";
+    return ` data-arg${index}="${uiEscapeAttr(clean)}"${typeAttr}`;
   }).join("");
 }
 
@@ -288,6 +289,102 @@ function renderCollapsibleCard(config){
   </section>`;
 }
 
+
+function renderSectionTitleBlock(config){
+  const cfg=Object.assign({
+    title:"",
+    subtitle:"",
+    titleClass:"section-title",
+    subClass:"section-sub",
+    wrapperClass:""
+  }, config || {});
+  return `${cfg.wrapperClass ? `<div class="${cfg.wrapperClass}">` : ""}
+    ${cfg.title ? `<div class="${cfg.titleClass}">${cfg.title}</div>` : ""}
+    ${cfg.subtitle ? `<div class="${cfg.subClass}">${cfg.subtitle}</div>` : ""}
+  ${cfg.wrapperClass ? "</div>" : ""}`;
+}
+
+function renderButtonRow(buttons, options){
+  const cfg=Object.assign({wrapperClass:"button-row", stopPropagation:false}, options || {});
+  if(!buttons || !buttons.length) return "";
+  return `<div class="${cfg.wrapperClass}"${cfg.stopPropagation ? ' data-stop-propagation="true"' : ""}>
+    ${buttons.map(btn=>`<button class="${btn.className || "ghost-btn"}" type="button"${renderActionAttrs(btn.action || btn.onclick,"click")}>${btn.label}</button>`).join("")}
+  </div>`;
+}
+
+function renderMetaPillRow(pills, options){
+  const cfg=Object.assign({wrapperClass:"scanner-meta-row", pillClass:"scanner-meta-pill"}, options || {});
+  if(!pills || !pills.length) return "";
+  return `<div class="${cfg.wrapperClass}">
+    ${pills.map(pill=>{
+      if(typeof pill==="string") return `<span class="${cfg.pillClass}">${pill}</span>`;
+      return `<span class="${cfg.pillClass}${pill.className ? ` ${pill.className}` : ""}">${pill.label || ""}</span>`;
+    }).join("")}
+  </div>`;
+}
+
+function renderResultSectionCard(config){
+  const cfg=Object.assign({
+    className:"result-section-card",
+    title:"",
+    subtitle:"",
+    headerRightHtml:"",
+    bodyHtml:"",
+    actions:[]
+  }, config || {});
+  return `<div class="${cfg.className}">
+    ${(cfg.title || cfg.subtitle || cfg.headerRightHtml) ? `
+      <div class="result-head">
+        <div>${renderSectionTitleBlock({title:cfg.title,subtitle:cfg.subtitle})}</div>
+        ${cfg.headerRightHtml || ""}
+      </div>
+    ` : ""}
+    ${cfg.bodyHtml || ""}
+    ${renderButtonRow(cfg.actions,{wrapperClass:"button-row scanner-actions-row"})}
+  </div>`;
+}
+
+function renderInventoryItemCard(config){
+  const cfg=Object.assign({
+    className:"inventory-item",
+    title:"",
+    subtitle:"",
+    side:null,
+    badgeHtml:"",
+    bodyHtml:"",
+    headerExtraHtml:""
+  }, config || {});
+  const badge=cfg.badgeHtml || (cfg.side ? renderSideBadge(cfg.side) : "");
+  return `<div class="${cfg.className}">
+    <div class="inventory-head">
+      <div>
+        <div class="item-name">${cfg.title}</div>
+        ${cfg.subtitle ? `<div class="random-leftover-subtext">${cfg.subtitle}</div>` : ""}
+      </div>
+      ${cfg.headerExtraHtml || badge}
+    </div>
+    ${cfg.bodyHtml || ""}
+  </div>`;
+}
+
+function renderLevelInputGrid(config){
+  const cfg=Object.assign({
+    itemName:"",
+    levels:[],
+    values:{},
+    inputKeyPrefix:"inventory",
+    action:"setInventory"
+  }, config || {});
+  return `<div class="mini-grid">
+    ${(cfg.levels || []).map(level=>`
+      <div class="mini-cell">
+        <label>L${level}</label>
+        <input data-input-key="${cfg.inputKeyPrefix}-${cfg.itemName}-${level}" type="number" min="0" step="1" value="${(cfg.values || {})[level]||""}" placeholder="0" data-action="${cfg.action}" data-action-event="input" data-arg0="${cfg.itemName}" data-arg1="${level}" data-source2="value" />
+      </div>
+    `).join("")}
+  </div>`;
+}
+
 function ensureModalHost(){
   let host=document.getElementById("appModalHost");
   if(host) return host;
@@ -303,6 +400,65 @@ function closeAppModal(){
   if(!host) return;
   host.classList.add("hidden");
   host.innerHTML="";
+}
+
+
+function escapeModalValue(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;");
+}
+
+function showInventorySnapshotModal(config){
+  const cfg=Object.assign({
+    title:"Save Current Inventory Snapshot",
+    message:"Name this snapshot and optionally add a note.",
+    defaultName:`Inventory ${new Date().toLocaleDateString()}`,
+    defaultNote:"",
+    nameLabel:"Snapshot Name",
+    noteLabel:"Optional Note",
+    fallbackName:"Inventory Snapshot",
+    confirmLabel:"Save Snapshot",
+    cancelLabel:"Cancel"
+  }, config || {});
+  return new Promise(resolve=>{
+    const host=ensureModalHost();
+    const finish=value=>{ closeAppModal(); resolve(value); };
+    host.className="app-modal-host";
+    host.innerHTML=`
+      <div class="app-modal-scrim" data-modal-cancel></div>
+      <form class="app-modal-card" role="dialog" aria-modal="true" aria-labelledby="appModalTitle" data-snapshot-modal>
+        <div class="app-modal-title" id="appModalTitle">${cfg.title}</div>
+        ${cfg.message ? `<div class="app-modal-message">${cfg.message}</div>` : ""}
+        <div class="field-full">
+          <label for="snapshotNameInput">${cfg.nameLabel}</label>
+          <input id="snapshotNameInput" type="text" value="${escapeModalValue(cfg.defaultName)}" autocomplete="off" />
+        </div>
+        <div class="field-full">
+          <label for="snapshotNoteInput">${cfg.noteLabel}</label>
+          <input id="snapshotNoteInput" type="text" value="${escapeModalValue(cfg.defaultNote)}" autocomplete="off" />
+        </div>
+        <div class="app-modal-actions" style="margin-top:16px">
+          <button type="button" class="ghost-btn" data-modal-cancel>${cfg.cancelLabel}</button>
+          <button type="submit" class="primary-btn" data-modal-confirm>${cfg.confirmLabel}</button>
+        </div>
+      </form>
+    `;
+    host.querySelectorAll("[data-modal-cancel]").forEach(el=>el.addEventListener("click",()=>finish(null),{once:true}));
+    const form=host.querySelector("[data-snapshot-modal]");
+    const nameInput=host.querySelector("#snapshotNameInput");
+    if(nameInput) nameInput.focus();
+    if(form){
+      form.addEventListener("submit",event=>{
+        event.preventDefault();
+        const name=(host.querySelector("#snapshotNameInput")?.value || "").trim() || cfg.fallbackName;
+        const note=(host.querySelector("#snapshotNoteInput")?.value || "").trim();
+        finish({name,note});
+      },{once:true});
+    }
+  });
 }
 
 function showConfirmModal(config){
@@ -360,3 +516,38 @@ function showChoiceModal(config){
     host.querySelectorAll("[data-modal-choice]").forEach(el=>el.addEventListener("click",()=>finish(el.getAttribute("data-modal-choice")),{once:true}));
   });
 }
+
+
+// v1.0.13 module bridge exports
+Object.assign(window,{
+  closeAppModal,
+  ensureModalHost,
+  escapeModalValue,
+  renderActionAttrs,
+  renderButtonRow,
+  renderCollapsibleCard,
+  renderCompactActionCard,
+  renderCompactInventoryRows,
+  renderEmptyState,
+  renderFilterTabs,
+  renderInventoryItemCard,
+  renderInventorySnapshotBlock,
+  renderLevelInputGrid,
+  renderLevelPillGrid,
+  renderMetaPillRow,
+  renderResultSectionCard,
+  renderSectionTitleBlock,
+  renderSideBadge,
+  renderSingleCompactRow,
+  renderSoftChipButtons,
+  renderStateRows,
+  renderUiActions,
+  showChoiceModal,
+  showConfirmModal,
+  showInventorySnapshotModal,
+  uiActionArgAttrs,
+  uiEscapeAttr,
+  uiLevelsWithPositiveValues,
+  uiNumber,
+  uiSplitActionArgs
+});

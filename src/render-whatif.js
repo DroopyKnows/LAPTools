@@ -262,3 +262,21 @@ function renderWhatIf(){
   renderWhatIfScenario();
   renderSavedWhatIfScenarios();
 }
+
+
+// v1.0.13 module bridge exports
+Object.assign(window,{
+  ensureWhatIfState,
+  getWhatIfBaselineForCurrent,
+  renderSavedWhatIfScenarios,
+  renderWhatIf,
+  renderWhatIfChestInputs,
+  renderWhatIfScenario,
+  renderWhatIfSetupPreview,
+  whatIfCompactInventoryRows,
+  whatIfHasInputs,
+  whatIfItem,
+  whatIfLevelPills,
+  whatIfProbability,
+  whatIfRawPills
+});

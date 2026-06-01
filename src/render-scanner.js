@@ -115,27 +115,24 @@ function renderBagScannerReview(scan){
   const uncertainCount=(scan.uncertain||[]).length;
   const needsReview=scannerHasReviewIssue(scan);
   review.classList.remove("hidden");
-  review.innerHTML=`
-    <div class="result-section-card scanner-review-card">
-      <div class="result-head">
-        <div>
-          <div class="section-title">Review Scan Results</div>
-          <div class="section-sub">Detected ${roundNice(scan.detectedCount||0)} total Raven item${(scan.detectedCount||0)===1 ? "" : "s"}.</div>
-        </div>
-      </div>
-      <div class="scanner-meta-row">
-        <span class="scanner-meta-pill ${needsReview ? "warn" : "ok"}">${needsReview ? "Review needed" : "Ready to apply"}</span>
-        <span class="scanner-meta-pill">Ignored: ${roundNice(ignoredCount)}</span>
-        <span class="scanner-meta-pill">Uncertain: ${roundNice(uncertainCount)}</span>
-      </div>
+  review.innerHTML=renderResultSectionCard({
+    className:"result-section-card scanner-review-card",
+    title:"Review Scan Results",
+    subtitle:`Detected ${roundNice(scan.detectedCount||0)} total Raven item${(scan.detectedCount||0)===1 ? "" : "s"}.`,
+    bodyHtml:`
+      ${renderMetaPillRow([
+        {label:needsReview ? "Review needed" : "Ready to apply",className:needsReview ? "warn" : "ok"},
+        {label:`Ignored: ${roundNice(ignoredCount)}`},
+        {label:`Uncertain: ${roundNice(uncertainCount)}`}
+      ])}
       ${renderBagScannerIssue(scan)}
       <div class="scanner-result-list">${renderBagScannerInventory(scan.inventory)}</div>
-      <div class="button-row scanner-actions-row">
-        <button class="ghost-btn backup-btn" type="button" data-action="purgeBagScannerData" data-action-event="click">Clear Results</button>
-        <button class="ghost-btn snapshot-style-btn" type="button" data-action="replaceActiveInventoryFromBagScan" data-action-event="click">Replace Active Inventory</button>
-      </div>
-    </div>
-  `;
+    `,
+    actions:[
+      {label:"Clear Results",className:"ghost-btn backup-btn",action:"purgeBagScannerData"},
+      {label:"Replace Active Inventory",className:"ghost-btn snapshot-style-btn",action:"replaceActiveInventoryFromBagScan"}
+    ]
+  });
 }
 
 function setBagScannerStatus(message,type){
@@ -162,6 +159,25 @@ function clearBagScannerFileInput(){
 
 function purgeBagScannerData(){
   bagScannerLastScan=null;
+  if(typeof resetScannerStateInAppState==="function") resetScannerStateInAppState();
   clearBagScannerReview();
   clearBagScannerFileInput();
 }
+
+
+// v1.0.13 module bridge exports
+Object.assign(window,{
+  bagScannerLastScan,
+  clearBagScannerFileInput,
+  clearBagScannerReview,
+  purgeBagScannerData,
+  renderBagScannerInventory,
+  renderBagScannerIssue,
+  renderBagScannerPanel,
+  renderBagScannerReview,
+  scannerFirstCleanText,
+  scannerHasReviewIssue,
+  scannerIsDevExplanation,
+  scannerReviewReason,
+  setBagScannerStatus
+});
