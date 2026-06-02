@@ -1,0 +1,123 @@
+// Raven Gear bridge and test export surfaces.
+// Keeps compatibility/export lists out of the core Raven Gear runtime coordinator.
+
+export function createRavenGearBridgeModule(ctx){
+  function exposeRavenGearRuntimeBridge(){
+    ctx.ensureScannerFeatureRuntime();
+    window.LAP_MODULE_BRIDGE_VERSION="1.0.15-bundled-split";
+    ctx.exposeAppBridge({
+      showPage: ctx.showPage,
+      closeGlobalMenu: ctx.closeGlobalMenu,
+      openGlobalMenu: ctx.openGlobalMenu,
+      setHomeCategory: ctx.setHomeCategory,
+      setRavenSubPage: ctx.setRavenSubPage,
+      setWhatIfTab: ctx.setWhatIfTab,
+      setWhatIfItem: ctx.setWhatIfItem,
+      setWhatIfTargetLevel: ctx.setWhatIfTargetLevel,
+      setWhatIfShowHigh: ctx.setWhatIfShowHigh,
+      setWhatIfChestValue: ctx.setWhatIfChestValue,
+      resetWhatIfScenario: ctx.resetWhatIfScenario,
+      toggleWhatIfSetupPreview: ctx.toggleWhatIfSetupPreview,
+      toggleWhatIfNontargetSideBreakdown: ctx.toggleWhatIfNontargetSideBreakdown,
+      saveWhatIfScenario: ctx.saveWhatIfScenario,
+      toggleSavedScenarioSnapshot: ctx.toggleSavedScenarioSnapshot,
+      loadWhatIfScenario: ctx.loadWhatIfScenario,
+      deleteWhatIfScenario: ctx.deleteWhatIfScenario,
+      setMode: ctx.setMode,
+      setManualSide: ctx.setManualSide,
+      onTargetItemChange: ctx.onTargetItemChange,
+      renderAll: ctx.renderAll,
+      setHighestOwned: ctx.setHighestOwned,
+      toggleCard: ctx.toggleCard,
+      setChestMainMode: ctx.setChestMainMode,
+      renderPlanInputs: ctx.renderPlanInputs,
+      renderGuaranteedInputs: ctx.renderGuaranteedInputs,
+      resetTopUpsForCurrentItem: ctx.resetTopUpsForCurrentItem,
+      resetTopUpsForAllItems: ctx.resetTopUpsForAllItems,
+      resetCurrentPlan: ctx.resetCurrentPlan,
+      resetAllPlans: ctx.resetAllPlans,
+      toggleChestsUsedVisibility: ctx.toggleChestsUsedVisibility,
+      setQuickAdjust: ctx.setQuickAdjust,
+      jumpToTargetLevel: ctx.jumpToTargetLevel,
+      toggleResultsMoreInfo: ctx.toggleResultsMoreInfo,
+      toggleNontargetSideBreakdown: ctx.toggleNontargetSideBreakdown,
+      toggleMoreInfo: ctx.toggleMoreInfo,
+      exportInventory: ctx.exportInventory,
+      importInventory: ctx.importInventory,
+      saveCurrentInventorySnapshot: ctx.saveCurrentInventorySnapshot,
+      resetInventory: ctx.resetInventory,
+      setInventoryArchiveMode: ctx.setInventoryArchiveMode,
+      setInventoryAdvancedMode: ctx.setInventoryAdvancedMode,
+      setInventory: ctx.setInventory,
+      setHideUnacquiredInventory: ctx.setHideUnacquiredInventory,
+      setUpgradedOwnedViewMode: ctx.setUpgradedOwnedViewMode,
+      setInventoryInputFilter: ctx.setInventoryInputFilter,
+      setUpgradedOwnedFilter: ctx.setUpgradedOwnedFilter,
+      setInventoryArchiveFilter: ctx.setInventoryArchiveFilter,
+      setBreakdownInventoryFilter: ctx.setBreakdownInventoryFilter,
+      toggleInventoryArchiveSnapshot: ctx.toggleInventoryArchiveSnapshot,
+      loadInventorySnapshot: ctx.loadInventorySnapshot,
+      deleteInventorySnapshot: ctx.deleteInventorySnapshot,
+      openBagScanner: window.openBagScanner,
+      closeBagScanner: window.closeBagScanner,
+      toggleBagScannerCard: window.toggleBagScannerCard,
+      setBagScannerFiles: window.setBagScannerFiles,
+      runBagScanner: window.runBagScanner,
+      clearBagScannerReview: window.clearBagScannerReview,
+      purgeBagScannerData: window.purgeBagScannerData,
+      replaceActiveInventoryFromBagScan: window.replaceActiveInventoryFromBagScan,
+      setGlobalSetting: ctx.setGlobalSetting,
+      toggleInventoryBreakdownExplain: ctx.toggleInventoryBreakdownExplain,
+      toggleBreakdownSource: ctx.toggleBreakdownSource,
+      adjustGroup: ctx.adjustGroup,
+      setGroupValue: ctx.setGroupValue,
+      adjustBundleQty: ctx.adjustBundleQty,
+      setBundleQty: ctx.setBundleQty,
+      toggleChoiceBankCollapse: ctx.toggleChoiceBankCollapse,
+      redeemChoiceFromBank: ctx.redeemChoiceFromBank,
+      adjustRedeemedChoice: ctx.adjustRedeemedChoice,
+      setRedeemedChoice: ctx.setRedeemedChoice,
+      removeAllRedeemedChoice: ctx.removeAllRedeemedChoice,
+      bindAppRouteEvents: ctx.bindAppRouteEvents,
+      applyRouteFromHash: ctx.applyRouteFromHash,
+      renderInventory: ctx.renderInventory,
+      renderWhatIf: ctx.renderWhatIf,
+      renderHomePanels: ctx.renderHomePanels,
+      save: ctx.save,
+      load: ctx.load,
+      normalizeStateShape: ctx.normalizeStateShape,
+      showConfirmModal: ctx.showConfirmModal,
+      showFormModal: ctx.showFormModal,
+      renderSoftChipButtons: ctx.renderSoftChipButtons
+    });
+  }
+
+  function exposeRavenGearRuntimeTests(){
+    ctx.ensureScannerFeatureRuntime();
+    ctx.exposeTestExports({
+      addLevelObjects: ctx.addLevelObjects,
+      subtractLevelObjects: ctx.subtractLevelObjects,
+      levelObjectTotalCount: ctx.levelObjectTotalCount,
+      levelObjectEquivalentAtLevel: ctx.levelObjectEquivalentAtLevel,
+      simplifyUpByLevel: ctx.simplifyUpByLevel,
+      simplifyWholeByLevel: ctx.simplifyWholeByLevel,
+      simplifyBucketDecimal: ctx.simplifyBucketDecimal,
+      targetItemsFromRandomPlan: ctx.targetItemsFromRandomPlan,
+      targetItemsFromPlanAndChoice: ctx.targetItemsFromPlanAndChoice,
+      calculateAdditionalOwnedFromPlan: ctx.calculateAdditionalOwnedFromPlan,
+      normalizeBackupPayload: ctx.normalizeBackupPayload,
+      parseBackupJson: ctx.parseBackupJson,
+      buildFullBackupPayload: ctx.buildFullBackupPayload,
+      scannerAdaptWorkerResponse: ctx.scannerAdaptWorkerResponse,
+      ...ctx.DomainInventory,
+      ...ctx.DomainBackup,
+      ...ctx.DomainScanner,
+      ...ctx.DomainPlanning
+    });
+  }
+
+  return {
+    exposeRavenGearRuntimeBridge,
+    exposeRavenGearRuntimeTests
+  };
+}

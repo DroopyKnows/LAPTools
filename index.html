@@ -1,77 +1,47 @@
 <!DOCTYPE html>
+
 <html lang="en"><head><meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Last Asylum: Plague Tools</title>
-<link rel="stylesheet" href="src/styles.css"/>
-
+<link href="src/styles.css" rel="stylesheet"/>
 </head>
 <body>
 <main class="app">
 <header class="global-topbar">
-  <button class="global-brand" type="button" data-action="showPage" data-action-event="click" data-arg0="homePage">Sirox’s LAP Hub</button>
-  <button class="global-menu-btn" type="button" aria-label="Menu" data-action="openGlobalMenu" data-action-event="click">☰</button>
+<button class="global-brand" data-action="showPage" data-action-event="click" data-arg0="homePage" type="button">Sirox’s LAP Hub</button>
+<button aria-label="Menu" class="global-menu-btn" data-action="openGlobalMenu" data-action-event="click" type="button">☰</button>
 </header>
-<div class="menu-scrim hidden" id="menuScrim" data-action="closeGlobalMenu" data-action-event="click"></div>
-<aside class="global-menu-panel" id="globalMenuPanel" aria-hidden="true">
-  <button class="menu-back" type="button" data-action="closeGlobalMenu" data-action-event="click">‹ Back</button>
-  <button type="button" data-action="navigateAndCloseMenu" data-action-event="click" data-page="homePage">Home</button>
-  <button type="button" data-action="navigateAndCloseMenu" data-action-event="click" data-page="ravenPage">Raven Gear Calculator</button>
-  <button type="button" data-action="navigateAndCloseMenu" data-action-event="click" data-page="guidesPage">Guides</button>
-  <button type="button" data-action="navigateAndCloseMenu" data-action-event="click" data-page="otherPage">Other</button>
-  <button type="button" data-action="navigateAndCloseMenu" data-action-event="click" data-page="aboutPage">About</button>
-  <button type="button" data-action="navigateAndCloseMenu" data-action-event="click" data-page="faqPage">FAQ</button>
-  <button type="button" data-action="navigateAndCloseMenu" data-action-event="click" data-page="reportBugPage">Report Bug</button>
+<div class="menu-scrim hidden" data-action="closeGlobalMenu" data-action-event="click" id="menuScrim"></div>
+<aside aria-hidden="true" class="global-menu-panel" id="globalMenuPanel">
+<button class="menu-back" data-action="closeGlobalMenu" data-action-event="click" type="button">‹ Back</button>
+<nav class="global-menu-tree" aria-label="Hub navigation">
+  <button class="menu-link menu-link-top" data-action="navigateAndCloseMenu" data-action-event="click" data-page="homePage" type="button">Home</button>
+
+  <button class="menu-link menu-link-top menu-link-section" data-action="navigateAndCloseMenu" data-action-event="click" data-page="homePage" data-category="tools" type="button">Tools</button>
+  <button class="menu-link menu-link-child" data-action="navigateAndCloseMenu" data-action-event="click" data-page="ravenPage" type="button">Raven Gear Calculator</button>
+
+  <button class="menu-link menu-link-top" data-action="navigateAndCloseMenu" data-action-event="click" data-page="guidesPage" type="button">Guides</button>
+
+  <button class="menu-link menu-link-top" data-action="navigateAndCloseMenu" data-action-event="click" data-page="otherPage" type="button">Other</button>
+  <button class="menu-link menu-link-child" data-action="navigateAndCloseMenu" data-action-event="click" data-page="aboutPage" type="button">About</button>
+  <button class="menu-link menu-link-child" data-action="navigateAndCloseMenu" data-action-event="click" data-page="faqPage" type="button">FAQ</button>
+  <button class="menu-link menu-link-child" data-action="navigateAndCloseMenu" data-action-event="click" data-page="reportBugPage" type="button">Report a Problem</button>
+</nav>
 </aside>
 <section class="" id="homePage">
 <section class="home-hero-card">
-  <div class="home-game-pill"><span>☣</span><span>Last Asylum: Plague</span></div>
-  <h1>Welcome to<br/><span>Sirox’s LAP Hub</span></h1>
-  <p>Tools by Sirox and fan-made guides for Last Asylum: Plague.</p>
+<div class="home-game-pill"><span>☣</span><span>Last Asylum: Plague</span></div>
+<h1>Welcome to<br/><span>Sirox’s LAP Hub</span></h1>
+<p>Tools by Sirox and fan-made guides for Last Asylum: Plague.</p>
 </section>
 <nav class="home-category-tabs">
-  <button class="home-category-tab active" id="homeTabTools" type="button" data-action="setHomeCategory" data-action-event="click" data-arg0="tools">🛠 LAP Tools</button>
-  <button class="home-category-tab" id="homeTabGuides" type="button" data-action="setHomeCategory" data-action-event="click" data-arg0="guides">📖 Guides</button>
-  <button class="home-category-tab" id="homeTabOther" type="button" data-action="setHomeCategory" data-action-event="click" data-arg0="other">★ Other</button>
+<button class="home-category-tab active" data-action="setHomeCategory" data-action-event="click" data-arg0="tools" id="homeTabTools" type="button">🛠 LAP Tools</button>
+<button class="home-category-tab" data-action="setHomeCategory" data-action-event="click" data-arg0="guides" id="homeTabGuides" type="button">📖 Guides</button>
+<button class="home-category-tab" data-action="setHomeCategory" data-action-event="click" data-arg0="other" id="homeTabOther" type="button">★ Other</button>
 </nav>
-<section class="home-card-list home-category-panel" id="homeToolsPanel">
-  <button class="home-feature-card raven-home-card" data-action="showPage" data-action-event="click" data-arg0="ravenPage">
-    <div class="home-feature-icon">🪶</div>
-    <div class="home-feature-copy">
-      <div class="home-feature-title">Raven Gear Calculator</div>
-      <div class="home-feature-sub">Calculator and inventory pages for Raven item planning.</div>
-    </div>
-  </button>
-</section>
-<section class="home-card-list home-category-panel hidden" id="homeGuidesPanel">
-  <div class="home-feature-card static-card compact-coming-card">
-    <div class="home-feature-icon blue-icon">▣</div>
-    <div class="home-feature-copy">
-      <div class="home-feature-title">Coming Soon</div>
-      <div class="home-feature-sub">More guides are on the way.</div>
-    </div>
-  </div>
-</section>
-<section class="home-card-list home-category-panel hidden" id="homeOtherPanel">
-  <div class="home-feature-card static-card">
-    <div class="home-feature-icon blue-icon">ℹ</div>
-    <div class="home-feature-copy">
-      <div class="home-feature-title">Need Help?</div>
-      <div class="home-feature-sub">Learn more about this project or address an issue.</div>
-      <div class="home-mini-actions">
-        <button type="button" data-action="showPage" data-action-event="click" data-arg0="aboutPage">ⓘ About</button>
-        <button type="button" data-action="showPage" data-action-event="click" data-arg0="faqPage">? FAQ</button>
-        <button type="button" data-action="showPage" data-action-event="click" data-arg0="reportBugPage">🐞 Report Bug</button>
-      </div>
-    </div>
-  </div>
-  <div class="home-feature-card static-card compact-coming-card">
-    <div class="home-feature-icon blue-icon">▣</div>
-    <div class="home-feature-copy">
-      <div class="home-feature-title">Coming Soon</div>
-      <div class="home-feature-sub">More tools and pages are on the way.</div>
-    </div>
-  </div>
-</section>
+<section class="home-card-list home-category-panel" id="homeToolsPanel"></section>
+<section class="home-card-list home-category-panel hidden" id="homeGuidesPanel"></section>
+<section class="home-card-list home-category-panel hidden" id="homeOtherPanel"></section>
 </section>
 <section class="hidden" id="ravenPage">
 <div class="hero hero-small raven-hero-with-settings">
@@ -79,29 +49,27 @@
 <div class="eyebrow hero-label-white">Calculator</div>
 <h1 class="hero-title-purple">RAVEN GEAR</h1>
 </div>
-<button class="settings-tile" id="settingsTile" type="button" data-action="showPage" data-action-event="click" data-arg0="settingsPage">
+<button class="settings-tile" data-action="showPage" data-action-event="click" data-arg0="settingsPage" id="settingsTile" type="button">
 <span class="settings-icon">⚙</span>
 <span>Settings</span>
 </button>
 </div>
 <nav class="page-tabs">
-<button class="page-tab" id="whatIfTab" data-action="setRavenSubPage" data-action-event="click" data-arg0="whatif">What If</button>
-<button class="page-tab active" id="calcTab" data-action="setRavenSubPage" data-action-event="click" data-arg0="calculator">Calculator</button>
-<button class="page-tab" id="inventoryTab" data-action="setRavenSubPage" data-action-event="click" data-arg0="inventory">Inventory</button>
+<button class="page-tab" data-action="setRavenSubPage" data-action-event="click" data-arg0="whatif" id="whatIfTab">What If</button>
+<button class="page-tab active" data-action="setRavenSubPage" data-action-event="click" data-arg0="calculator" id="calcTab">Calculator</button>
+<button class="page-tab" data-action="setRavenSubPage" data-action-event="click" data-arg0="inventory" id="inventoryTab">Inventory</button>
 </nav>
-
 <section class="hidden" id="whatIfSubPage">
 <section class="card">
 <div class="card-content">
 <div class="section-title">What If</div>
 <div class="section-sub">Test a temporary scenario using Combined Inventory as the baseline.</div>
 <div class="mode-tabs whatif-inner-tabs">
-<button class="tab active" id="whatIfScenarioTab" data-action="setWhatIfTab" data-action-event="click" data-arg0="scenarios">Scenarios</button>
-<button class="tab" id="whatIfSavedTab" data-action="setWhatIfTab" data-action-event="click" data-arg0="saved">Saved Scenarios</button>
+<button class="tab active" data-action="setWhatIfTab" data-action-event="click" data-arg0="scenarios" id="whatIfScenarioTab">Scenarios</button>
+<button class="tab" data-action="setWhatIfTab" data-action-event="click" data-arg0="saved" id="whatIfSavedTab">Saved Scenarios</button>
 </div>
 </div>
 </section>
-
 <div id="whatIfScenarioPanel">
 <section class="card">
 <div class="card-content">
@@ -110,7 +78,7 @@
 <div class="item-chance-row">
 <div>
 <label for="whatIfTargetItem">Target Raven Item</label>
-<select id="whatIfTargetItem" data-action="setWhatIfItem" data-action-event="change" data-source0="value">
+<select data-action="setWhatIfItem" data-action-event="change" data-source0="value" id="whatIfTargetItem">
 <option value="Heart of Wisdom">Heart of Wisdom</option>
 <option value="Feather of Night">Feather of Night</option>
 <option value="Sharp Beak">Sharp Beak</option>
@@ -127,26 +95,25 @@
 <div class="goal-secondary-row whatif-setup-save-row">
 <div>
 <label for="whatIfTargetLevel">Target Gear Level</label>
-<select id="whatIfTargetLevel" data-action="setWhatIfTargetLevel" data-action-event="change" data-source0="value">
+<select data-action="setWhatIfTargetLevel" data-action-event="change" data-source0="value" id="whatIfTargetLevel">
 <option value="1">Level 1</option><option value="2">Level 2</option><option value="3">Level 3</option><option value="4">Level 4</option><option value="5">Level 5</option><option value="6">Level 6</option><option value="7">Level 7</option><option value="8">Level 8</option><option value="9">Level 9</option><option value="10">Level 10</option><option value="11">Level 11</option><option value="12">Level 12</option>
 </select>
 </div>
 <div class="whatif-inline-save-wrap">
-<button class="primary-btn whatif-inline-save-btn" type="button" data-action="saveWhatIfScenario" data-action-event="click">Save Scenario</button>
+<button class="primary-btn whatif-inline-save-btn" data-action="saveWhatIfScenario" data-action-event="click" type="button">Save Scenario</button>
 </div>
 </div>
 <div class="scenario-setup-preview" id="whatIfSetupPreviewCard">
-  <button class="compact-toggle-row" type="button" data-action="toggleWhatIfSetupPreview" data-action-event="click">
-    <span>Inventory Preview</span>
-    <span class="chev">⌄</span>
-  </button>
-  <div class="compact-dropdown-body" id="whatIfSetupPreviewBody">
-    <div id="whatIfSetupInventoryPreview"></div>
-  </div>
+<button class="compact-toggle-row" data-action="toggleWhatIfSetupPreview" data-action-event="click" type="button">
+<span>Inventory Preview</span>
+<span class="chev">⌄</span>
+</button>
+<div class="compact-dropdown-body" id="whatIfSetupPreviewBody">
+<div id="whatIfSetupInventoryPreview"></div>
+</div>
 </div>
 </div>
 </section>
-
 <section class="card" id="whatIfChestCard">
 <button class="section-button" data-action="toggleCard" data-action-event="click" data-arg0="whatIfChestCard">
 <div>
@@ -157,15 +124,14 @@
 </button>
 <div class="section-body">
 <div class="chest-options-row">
-<label class="checkbox-row"><input id="whatIfShowHighRandom" data-action="setWhatIfShowHigh" data-action-event="change" data-source0="checked" type="checkbox"/> <span>Show Lvl 6-7</span></label>
+<label class="checkbox-row"><input data-action="setWhatIfShowHigh" data-action-event="change" data-source0="checked" id="whatIfShowHighRandom" type="checkbox"/> <span>Show Lvl 6-7</span></label>
 </div>
 <div id="whatIfChestInputs"></div>
 <div class="button-row">
-<button class="ghost-btn" data-action="resetWhatIfScenario" data-action-event="click">Reset scenario</button>
+<button class="danger-btn" data-action="resetWhatIfScenario" data-action-event="click">Reset scenario</button>
 </div>
 </div>
 </section>
-
 <section class="card open" id="whatIfResultsCard">
 <button class="section-button" data-action="toggleCard" data-action-event="click" data-arg0="whatIfResultsCard">
 <div>
@@ -195,7 +161,6 @@
 </div>
 </div>
 </section>
-
 <section class="card open" id="whatIfSummaryCard">
 <button class="section-button" data-action="toggleCard" data-action-event="click" data-arg0="whatIfSummaryCard">
 <div>
@@ -206,8 +171,7 @@
 </button>
 <div class="section-body" id="whatIfChangeSummary"></div>
 </section>
-
-<section class="card" id="whatIfAdvancedCard" data-advanced-section>
+<section class="card" data-advanced-section="" id="whatIfAdvancedCard">
 <button class="section-button" data-action="toggleCard" data-action-event="click" data-arg0="whatIfAdvancedCard">
 <div>
 <div class="section-title">Advanced / Details</div>
@@ -220,30 +184,28 @@
 <div class="section-title">Total Non-target Items Obtained</div>
 <div class="section-sub">Estimated random chest items that are not duplicates of the selected target item.</div>
 <div class="compact-result" id="whatIfNontargetTable"></div>
-<button class="nontarget-breakdown-toggle" id="whatIfNontargetBreakdownToggle" type="button" data-action="toggleWhatIfNontargetSideBreakdown" data-action-event="click">Show side breakdown</button>
+<button class="nontarget-breakdown-toggle" data-action="toggleWhatIfNontargetSideBreakdown" data-action-event="click" id="whatIfNontargetBreakdownToggle" type="button">Show side breakdown</button>
 <div class="nontarget-side-breakdown" id="whatIfNontargetSideBreakdown">
-  <div class="grouped-side-section"><div class="side-card-head"><div><div class="section-title">Items Assigned</div></div><div class="side-badge">LEFT</div></div><div class="compact-result" id="whatIfNontargetLeftTable"></div></div>
-  <div class="grouped-side-section"><div class="side-card-head"><div><div class="section-title">Items Assigned</div></div><div class="side-badge right">RIGHT</div></div><div class="compact-result" id="whatIfNontargetRightTable"></div></div>
+<div class="grouped-side-section"><div class="side-card-head"><div><div class="section-title">Items Assigned</div></div><div class="side-badge">LEFT</div></div><div class="compact-result" id="whatIfNontargetLeftTable"></div></div>
+<div class="grouped-side-section"><div class="side-card-head"><div><div class="section-title">Items Assigned</div></div><div class="side-badge right">RIGHT</div></div><div class="compact-result" id="whatIfNontargetRightTable"></div></div>
 </div>
 </div>
 </div>
 </section>
 </div>
-
 <div class="hidden" id="whatIfSavedPanel">
 <section class="card">
 <div class="card-content">
 <div class="section-title">Saved Scenarios</div>
 <div class="section-sub">Save, load, or remove What If setups.</div>
 <div class="save-scenario-panel compact-save-panel">
-  <button class="primary-btn snapshot-style-btn whatif-saved-wide-save-btn" type="button" data-action="saveWhatIfScenario" data-action-event="click">Save Current Scenario</button>
+<button class="primary-btn snapshot-style-btn whatif-saved-wide-save-btn" data-action="saveWhatIfScenario" data-action-event="click" type="button">Save Current Scenario</button>
 </div>
 <div id="savedWhatIfScenarios"></div>
 </div>
 </section>
 </div>
 </section>
-
 <section class="" id="calculatorSubPage">
 <section class="card" id="goalCard">
 <div class="card-content">
@@ -251,15 +213,15 @@
 <div class="section-sub">Choose a Raven item or run a manual left/right calculation.</div>
 <div class="field-full">
 <div class="mode-tabs">
-<button class="tab active" id="specificModeBtn" data-action="setMode" data-action-event="click" data-arg0="specific">Specific Item</button>
-<button class="tab" id="manualModeBtn" data-action="setMode" data-action-event="click" data-arg0="manual">Manual Left/Right</button>
+<button class="tab active" data-action="setMode" data-action-event="click" data-arg0="specific" id="specificModeBtn">Specific Item</button>
+<button class="tab" data-action="setMode" data-action-event="click" data-arg0="manual" id="manualModeBtn">Manual Left/Right</button>
 </div>
 </div>
 <div class="" id="specificFields">
 <div class="item-chance-row">
 <div>
 <label for="targetItem">Target Raven Item</label>
-<select id="targetItem" data-action="onTargetItemChange" data-action-event="change">
+<select data-action="onTargetItemChange" data-action-event="change" id="targetItem">
 <option value="Heart of Wisdom">Heart of Wisdom</option>
 <option value="Feather of Night">Feather of Night</option>
 <option value="Sharp Beak">Sharp Beak</option>
@@ -279,8 +241,8 @@
 <div>
 <label>Side</label>
 <div class="two-tabs">
-<button class="tab active" id="leftSideBtn" data-action="setManualSide" data-action-event="click" data-arg0="left">Left</button>
-<button class="tab" id="rightSideBtn" data-action="setManualSide" data-action-event="click" data-arg0="right">Right</button>
+<button class="tab active" data-action="setManualSide" data-action-event="click" data-arg0="left" id="leftSideBtn">Left</button>
+<button class="tab" data-action="setManualSide" data-action-event="click" data-arg0="right" id="rightSideBtn">Right</button>
 </div>
 </div>
 <div class="chance-mini">
@@ -295,11 +257,11 @@
 <div class="goal-secondary-row">
 <div>
 <label for="targetLevel">Target Gear Level</label>
-<select id="targetLevel" data-action="renderAll" data-action-event="change"></select>
+<select data-action="renderAll" data-action-event="change" id="targetLevel"></select>
 </div>
 <div class="minor-setting">
 <label for="highestOwned">Highest Owned</label>
-<select id="highestOwned" data-action="setHighestOwned" data-action-event="change" data-source0="value"></select>
+<select data-action="setHighestOwned" data-action-event="change" data-source0="value" id="highestOwned"></select>
 </div>
 </div>
 <div class="helper">Highest Owned controls which owned-input levels are shown.</div>
@@ -325,14 +287,13 @@
 </button>
 <div class="section-body">
 <div class="mode-tabs">
-<button class="tab active" id="chestsMainTab" data-action="setChestMainMode" data-action-event="click" data-arg0="chests">Chests</button>
-<button class="tab" id="topUpBundlesTab" data-action="setChestMainMode" data-action-event="click" data-arg0="topup">Top Up Bundles</button>
+<button class="tab active" data-action="setChestMainMode" data-action-event="click" data-arg0="chests" id="chestsMainTab">Chests</button>
+<button class="tab" data-action="setChestMainMode" data-action-event="click" data-arg0="topup" id="topUpBundlesTab">Top Up Bundles</button>
 </div>
-
 <div class="" id="chestsCombinedPanel">
 <div class="chest-options-row">
 <label class="checkbox-row">
-<input id="showHighRandom" data-action="refreshChestInputs" data-action-event="change" type="checkbox"/>
+<input data-action="refreshChestInputs" data-action-event="change" id="showHighRandom" type="checkbox"/>
 <span>Show Lvl 6-7</span>
 </label>
 </div>
@@ -340,11 +301,9 @@
 <div class="bundle-summary" id="chestsBundleAppliedSummary"></div>
 <div id="chestsChoiceBankRedeem"></div>
 </div>
-
 <div class="hidden" id="topUpBundlesPanel">
 <div id="topUpBundlesContent"></div>
 </div>
-
 <details class="reset-options">
 <summary>Reset Options</summary>
 <div class="button-row reset-options-row">
@@ -365,21 +324,20 @@
 </div>
 <div class="chev">⌄</div>
 </button>
-<label class="hide-chests-toggle results-hide-toggle" data-stop-propagation="true"><input type="checkbox" id="hideChestsUsedToggle" checked data-action="toggleChestsUsedVisibility" data-action-event="change"> Hide chests used</label>
+<label class="hide-chests-toggle results-hide-toggle" data-stop-propagation="true"><input checked="" data-action="toggleChestsUsedVisibility" data-action-event="change" id="hideChestsUsedToggle" type="checkbox"/> Hide chests used</label>
 </div>
 <div class="section-body results-inner">
 <div class="usage-summary hidden" id="chestsUsedSummaryBlocks">
 <div class="usage-box">
-<div class="usage-title-row"><div class="usage-title">Random Chests Used</div><label class="quick-toggle"><input type="checkbox" id="quickAdjustRandom" data-action="setQuickAdjust" data-action-event="change" data-arg0="plan" data-source1="checked"> Quick adjust</label></div>
+<div class="usage-title-row"><div class="usage-title">Random Chests Used</div><label class="quick-toggle"><input data-action="setQuickAdjust" data-action-event="change" data-arg0="plan" data-source1="checked" id="quickAdjustRandom" type="checkbox"/> Quick adjust</label></div>
 <div id="randomUsedSummary"></div>
 </div>
 <div class="usage-box">
-<div class="usage-title-row"><div class="usage-title">Choice Chests Used</div><label class="quick-toggle"><input type="checkbox" id="quickAdjustChoice" data-action="setQuickAdjust" data-action-event="change" data-arg0="guaranteed" data-source1="checked"> Quick adjust</label></div>
+<div class="usage-title-row"><div class="usage-title">Choice Chests Used</div><label class="quick-toggle"><input data-action="setQuickAdjust" data-action-event="change" data-arg0="guaranteed" data-source1="checked" id="quickAdjustChoice" type="checkbox"/> Quick adjust</label></div>
 <div id="choiceUsedSummary"></div>
 </div>
-            </div>
-
-            <div class="result-section-card" data-section-wrap="expectedTable">
+</div>
+<div class="result-section-card" data-section-wrap="expectedTable">
 <div class="result-head">
 <div>
 <div class="section-title">Estimated Target Items From Plan</div>
@@ -388,8 +346,7 @@
 </div>
 <div class="compact-result" id="expectedTable"></div>
 </div>
-
-            <div class="result-section-card" data-section-wrap="itemsNeededTable">
+<div class="result-section-card" data-section-wrap="itemsNeededTable">
 <div class="result-head">
 <div>
 <div class="section-title">Remaining Items Needed</div>
@@ -403,17 +360,15 @@
 <div class="result-head">
 <div>
 <div class="section-title">Remaining Chests Needed <span style="font-size:12px;color:#64748b;font-weight:900;">(Chance Adjusted)</span></div>
-
 </div>
 <label class="inline-check">
-<input id="showHighChestLevels" data-action="renderAll" data-action-event="change" type="checkbox"/>
+<input data-action="renderAll" data-action-event="change" id="showHighChestLevels" type="checkbox">
                 Show Lvl 6–7
-              </label>
+              </input></label>
 </div>
 <div class="result-table cols-5" id="remainingTable"></div>
 </div>
-
-<div class="more-info-card results-more-info-card" id="resultsMoreInfo" data-more-info-section>
+<div class="more-info-card results-more-info-card" data-more-info-section="" id="resultsMoreInfo">
 <button class="more-info-toggle" data-action="toggleResultsMoreInfo" data-action-event="click">
 <div class="more-info-title">More Information</div>
 <div class="chev">⌄</div>
@@ -431,9 +386,8 @@
 <p><span class="side-text-left">Left-side</span> items have a <strong>2/9</strong> drop rate. <span class="side-text-right">Right-side</span> items have a <strong>1/9</strong> drop rate. For example, if you are working on <strong>Attackers Claw</strong>, which is a <span class="side-text-right">right-side</span> item, then <strong>1 Level 5 choice chest</strong> is roughly equal to <strong>9 Level 5 random chests</strong> for that target item.</p>
 </div>
 </div>
-
-</div></div></section>
-<section class="card" id="advancedCard" data-advanced-section>
+</div></section>
+<section class="card" data-advanced-section="" id="advancedCard">
 <button class="section-button" data-action="toggleCard" data-action-event="click" data-arg0="advancedCard">
 <div>
 <div class="section-title">Advanced / Details</div>
@@ -442,7 +396,7 @@
 <div class="chev">⌄</div>
 </button>
 <div class="section-body">
-            <div class="advanced-result-section">
+<div class="advanced-result-section">
 <div class="result-section-card" data-section-wrap="randomSideLeftoverTable">
 <div class="result-head">
 <div>
@@ -451,7 +405,7 @@
 </div>
 </div>
 <div class="compact-result" id="randomSideLeftoverTable"></div>
-<button class="nontarget-breakdown-toggle" id="nontargetBreakdownToggle" type="button" data-action="toggleNontargetSideBreakdown" data-action-event="click">Show side breakdown</button>
+<button class="nontarget-breakdown-toggle" data-action="toggleNontargetSideBreakdown" data-action-event="click" id="nontargetBreakdownToggle" type="button">Show side breakdown</button>
 <div class="nontarget-side-breakdown" id="nontargetSideBreakdown">
 <div class="grouped-side-section" data-section-wrap="sameSideTable">
 <div class="side-card-head">
@@ -473,22 +427,20 @@
 </div>
 </div>
 </div>
-            </div>
-
-            <div class="more-info-card" id="advancedMoreInfo" data-more-info-section>
-              <button class="more-info-toggle" data-action="toggleMoreInfo" data-action-event="click">
-                <div class="more-info-title">More Information</div>
-                <div class="chev">⌄</div>
-              </button>
-              <div class="more-info-body">
-                <p>Random Chests can give both target and non-target items.</p>
-                <p>Target items are shown in <strong>Estimated Target Items From Plan</strong>. Non-target items are shown here.</p>
-                <p>Non-target items are split by side. If the selected item is on the <span class="side-text-left">left</span>, <span class="side-text-left">left-side</span> non-target items are split between the other 2 <span class="side-text-left">left-side</span> items, while <span class="side-text-right">right-side</span> non-target items are split between the 3 <span class="side-text-right">right-side</span> items. If the selected item is on the <span class="side-text-right">right</span>, the logic reverses.</p>
-                <p>Items that can be assigned to a specific Raven item are credited in <strong>New Estimated Inventory</strong>. Items that cannot be logically assigned to a specific item are shown as <strong>Random Items Left Over</strong>.</p>
-                <p><span class="side-text-left">Left-side</span> items have a drop rate of 2/9, while <span class="side-text-right">right-side</span> items have a drop rate of 1/9. So for every 9 random chests that are opened, with a large enough sample size, you would have approximately 2 of each <span class="side-text-left">left-side</span> item and 1 of each <span class="side-text-right">right-side</span> item.</p>
-              </div>
-            </div>
-
+</div>
+<div class="more-info-card" data-more-info-section="" id="advancedMoreInfo">
+<button class="more-info-toggle" data-action="toggleMoreInfo" data-action-event="click">
+<div class="more-info-title">More Information</div>
+<div class="chev">⌄</div>
+</button>
+<div class="more-info-body">
+<p>Random Chests can give both target and non-target items.</p>
+<p>Target items are shown in <strong>Estimated Target Items From Plan</strong>. Non-target items are shown here.</p>
+<p>Non-target items are split by side. If the selected item is on the <span class="side-text-left">left</span>, <span class="side-text-left">left-side</span> non-target items are split between the other 2 <span class="side-text-left">left-side</span> items, while <span class="side-text-right">right-side</span> non-target items are split between the 3 <span class="side-text-right">right-side</span> items. If the selected item is on the <span class="side-text-right">right</span>, the logic reverses.</p>
+<p>Items that can be assigned to a specific Raven item are credited in <strong>New Estimated Inventory</strong>. Items that cannot be logically assigned to a specific item are shown as <strong>Random Items Left Over</strong>.</p>
+<p><span class="side-text-left">Left-side</span> items have a drop rate of 2/9, while <span class="side-text-right">right-side</span> items have a drop rate of 1/9. So for every 9 random chests that are opened, with a large enough sample size, you would have approximately 2 of each <span class="side-text-left">left-side</span> item and 1 of each <span class="side-text-right">right-side</span> item.</p>
+</div>
+</div>
 </div>
 </section>
 </section>
@@ -499,14 +451,14 @@
 <button class="ghost-btn backup-btn" data-action="exportInventory" data-action-event="click">Export Backup</button>
 <button class="ghost-btn backup-btn" data-action="openImportFile" data-action-event="click">Import Backup</button>
 </div>
-<input accept=".json" class="hidden" id="importFile" data-action="importInventory" data-action-event="change" data-source0="event" type="file"/>
+<input accept=".json" class="hidden" data-action="importInventory" data-action-event="change" data-source0="event" id="importFile" type="file">
 <div class="button-row">
 <button class="ghost-btn snapshot-style-btn" data-action="saveCurrentInventorySnapshot" data-action-event="click">Save Current Inventory Snapshot</button>
 <button class="ghost-btn snapshot-style-btn" data-action="openBagScanner" data-action-event="click">Scan Bag Items</button>
 <button class="danger-btn" data-action="resetInventory" data-action-event="click">Reset Active Inventory</button>
 </div>
 <div class="helper">Full backup allows progress to be continued on another device.</div>
-</div>
+</input></div>
 </section>
 <div id="bagScannerMount"></div>
 <section class="card" id="inventoryOwnedCard">
@@ -529,8 +481,7 @@
 </button>
 <div class="section-body" id="upgradedInventoryList"></div>
 </section>
-
-<section class="card" id="inventoryAdvancedDetailsCard" data-advanced-section>
+<section class="card" data-advanced-section="" id="inventoryAdvancedDetailsCard">
 <button class="section-button" data-action="toggleCard" data-action-event="click" data-arg0="inventoryAdvancedDetailsCard">
 <div>
 <div class="section-title">Advanced / Details</div>
@@ -540,30 +491,26 @@
 </button>
 <div class="section-body">
 <div class="inventory-advanced-tabs">
-<button class="active" id="inventoryAdvancedBreakdownTab" data-action="setInventoryAdvancedMode" data-action-event="click" data-arg0="breakdown">Inventory Summary</button>
-<button id="inventoryAdvancedSummaryTab" data-action="setInventoryAdvancedMode" data-action-event="click" data-arg0="summary">Audit View</button>
+<button class="active" data-action="setInventoryAdvancedMode" data-action-event="click" data-arg0="breakdown" id="inventoryAdvancedBreakdownTab">Inventory Summary</button>
+<button data-action="setInventoryAdvancedMode" data-action-event="click" data-arg0="summary" id="inventoryAdvancedSummaryTab">Audit View</button>
 </div>
-
 <div class="inventory-advanced-panel" id="inventoryAdvancedBreakdownPanel">
 <div id="breakdownEstimatedInventoryList"></div>
 </div>
-
 <div class="inventory-advanced-panel hidden" id="inventoryAdvancedSummaryPanel">
 <div id="itemPlanSummaryList"></div>
 </div>
 </div>
-</div>
-</section>
+
 </section>
 </section>
 </section>
 
-<section class="hidden placeholder-page" id="guidesPage"><div class="placeholder-card"><h1>Guides</h1><p>Coming Soon</p></div></section>
-<section class="hidden placeholder-page" id="otherPage"><div class="placeholder-card"><h1>Other</h1><p>Coming Soon</p></div></section>
-<section class="hidden placeholder-page" id="aboutPage"><div class="placeholder-card"><h1>About</h1><p>Coming Soon</p></div></section>
-<section class="hidden placeholder-page" id="faqPage"><div class="placeholder-card"><h1>FAQ</h1><p>Coming Soon</p></div></section>
-<section class="hidden placeholder-page" id="reportBugPage"><div class="placeholder-card"><h1>Report Bug</h1><p>Coming Soon</p></div></section>
-
+<section class="hidden placeholder-page" id="guidesPage"></section>
+<section class="hidden placeholder-page" id="otherPage"></section>
+<section class="hidden placeholder-page" id="aboutPage"></section>
+<section class="hidden placeholder-page" id="faqPage"></section>
+<section class="hidden placeholder-page" id="reportBugPage"></section>
 <section class="hidden" id="settingsPage">
 <div class="top-row">
 <button class="back-btn" data-action="showPage" data-action-event="click" data-arg0="ravenPage">← Raven Gear Calculator</button>
@@ -575,14 +522,14 @@
 </div>
 <div class="settings-page-options">
 <label class="settings-page-option">
-<input type="checkbox" id="hideMoreInformationSetting" data-action="setGlobalSetting" data-action-event="change" data-arg0="moreInfo" data-source1="checked" />
+<input data-action="setGlobalSetting" data-action-event="change" data-arg0="moreInfo" data-source1="checked" id="hideMoreInformationSetting" type="checkbox">
 <span>
 <strong>Hide More Information sections</strong>
 <em>Hides explanatory More Information and Explain this section dropdowns throughout the app.</em>
 </span>
-</label>
+</input></label>
 <label class="settings-page-option">
-<input type="checkbox" id="hideAdvancedSetting" data-action="setGlobalSetting" data-action-event="change" data-arg0="advanced" data-source1="checked" />
+<input data-action="setGlobalSetting" data-action-event="change" data-arg0="advanced" data-source1="checked" id="hideAdvancedSetting" type="checkbox"/>
 <span>
 <strong>Hide Advanced / Details sections</strong>
 <em>Hides advanced breakdown and audit sections on the Calculator and Inventory pages.</em>
@@ -592,5 +539,5 @@
 </div>
 </section>
 </main>
-<script type="module" src="src/main.js?v=1.0.15-split-boot-1"></script>
-</html>
+<script src="src/main.js?v=1.0.26-inventory-split" type="module"></script>
+</body></html>

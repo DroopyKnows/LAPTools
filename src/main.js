@@ -1,5 +1,4 @@
-// App v1.0.15 startup entry.
-
-import { bootApp } from "./app-boot.js";
+// App entrypoint. Kept at src/main.js for index.html compatibility.
+import { bootApp } from "./app/boot/app-boot.js";
 
 bootApp();
