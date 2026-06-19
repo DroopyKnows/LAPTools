@@ -1,0 +1,23 @@
+/* Tool app-level CSS: target-flash animation, empty-state text, hide-unacquired panel. */
+
+    /* target-flash animation (calculator + what-if jumpToTargetLevel). No primitive equivalent. */
+    .target-flash{animation:targetFlash 1.15s ease-out 1;}
+    @keyframes targetFlash{
+      0%{box-shadow:0 0 0 0 rgba(124,58,237,.42);}
+      45%{box-shadow:0 0 0 6px rgba(124,58,237,.16);}
+      100%{box-shadow:0 0 0 0 rgba(124,58,237,0);}
+    }
+
+    /* renderEmptyState title/message inside a notice2--empty. Lives in the tool so
+       empty states style identically in the hub and the standalone tool. */
+    .empty-state-title{
+      font-weight:900;
+      color:var(--c-slate-700);
+      margin-bottom:4px;
+    }
+    .empty-state-message{
+      color:var(--c-slate-500);
+      font-size:13px;
+      line-height:1.35;
+    }
+

@@ -1,0 +1,97 @@
+/* Tool design tokens (:root). Component CSS also hardcodes fallbacks, so these are
+   the source of truth, not a hard dependency. */
+
+:root {
+  /* Foundation colors */
+  --c-white: #ffffff;
+  --c-slate-50: #f8fafc;
+  --c-slate-900: #0f172a;
+  --c-slate-700: #334155;
+  --c-slate-600: #475569;
+  --c-slate-500: #64748b;
+  --c-slate-400: #94a3b8;
+  --c-slate-300: #cbd5e1;
+  --c-slate-200: #e2e8f0;
+  --c-slate-100: #f1f5f9;
+  --c-bluegray-75: #eef2f7;
+  --c-bluegray-100: #edf2f7;
+  --c-bluegray-150: #dbe4ef;
+  --c-bluegray-300: var(--c-slate-300);
+  --c-blue-500: #3b82f6;
+  --c-blue-600: #2563eb;
+  --c-green-600: #16a34a;
+  --c-amber-50: #fffbeb;
+  --c-amber-75: #fff7d6;
+  --c-amber-100: #fef3c7;
+  --c-amber-200: #fde68a;
+  --c-amber-500: #f59e0b;
+  --c-amber-800: #92400e;
+  --c-red-50: #fef2f2;
+  --c-red-100: #fee2e2;
+  --c-red-200: #fecaca;
+  --c-red-700: #b91c1c;
+
+  /* UI aliases */
+  --accent: #7c3aed;
+  --accent2: var(--c-blue-600);
+  --danger: var(--c-red-700);
+  --line: var(--c-bluegray-150);
+  --focus-ring: var(--accent);
+
+  /* Effects */
+  --overlay-modal: rgba(15, 23, 42, .48);
+  --border-modal: rgba(148, 163, 184, .35);
+  --focus-ring-blue: rgba(59, 130, 246, .12);
+  --shadow-value-box: 0 1px 2px rgba(15, 23, 42, .04);
+  --shadow-toggle: 0 1px 3px rgba(15, 23, 42, .15);
+  --shadow-toggle-text: 0 1px 3px rgba(15, 23, 42, .12);
+  --shadow-card: 0 5px 12px rgba(100, 116, 139, .08);
+  --shadow-card-hover: 0 8px 20px rgba(100, 116, 139, .16);
+  --shadow-button-primary: 0 10px 22px rgba(37, 99, 235, .22);
+  --shadow-button-secondary: 0 4px 10px rgba(100, 116, 139, .10);
+  --shadow-tabs: 0 4px 12px rgba(100, 116, 139, .15);
+  --shadow-tabs-primary: 0 6px 14px rgba(37, 99, 235, .18);
+  --shadow-pill-selected: 0 6px 14px rgba(15, 23, 42, .16);
+  --shadow-modal: 0 22px 60px rgba(15, 23, 42, .28);
+
+  /* Pill status and badge tones */
+  --tone-neutral-bg:       var(--c-slate-100);       --tone-neutral-bd:       var(--c-slate-200);    --tone-neutral-tx:       var(--c-slate-900);
+  --tone-positive-bg:      #dcfce7;                --tone-positive-bd:      #86efac;             --tone-positive-tx:      #166534;
+  --tone-warn-bg:          #fff7ed;                --tone-warn-bd:          #fed7aa;             --tone-warn-tx:          #9a3412;
+  --tone-left-bg:          #e0f2fe;                --tone-left-bd:          #bae6fd;             --tone-left-tx:          #0369a1;
+  --tone-right-bg:         #f3e8ff;                --tone-right-bd:         #d8b4fe;             --tone-right-tx:         #6b21a8;
+
+  /* Info tone — identical to --tone-left today, but a separate token so info
+     (export/secondary buttons) can diverge later without touching the pill tone. */
+  --tone-info-bg:          var(--tone-left-bg);     --tone-info-bd:          var(--tone-left-bd);  --tone-info-tx:          var(--tone-left-tx);
+
+  /* Strong-emphasis fills (button2--strong): saturated bg + white text.
+     Only tones rendered strong are defined. */
+  --tone-positive-strong-bg: var(--c-green-600, #16a34a);
+  --tone-info-strong-bg:     var(--c-blue-600, #2563eb);
+  --tone-danger-strong-bg:   var(--c-red-700, #b91c1c);
+
+  /* Choice input source tones */
+  --tone-manual-random-bg: var(--tone-neutral-bg);   --tone-manual-random-bd: var(--tone-neutral-bd); --tone-manual-random-tx: var(--tone-neutral-tx);
+  --tone-manual-choice-bg: #fff7ed;                --tone-manual-choice-bd: #b87333;              --tone-manual-choice-tx: #7c2d12;
+  --tone-top-up-random-bg: #dcfce7;                --tone-top-up-random-bd: #86efac;              --tone-top-up-random-tx: #166534;
+  --tone-top-up-choice-bg: #fef3c7;                --tone-top-up-choice-bd: #fbbf24;              --tone-top-up-choice-tx: #92400e;
+
+  /* level-rarity tones */
+  --tone-lvl-gray-bg:      #f1f5f9; --tone-lvl-gray-bd:   #94a3b8; --tone-lvl-gray-tx:   #334155;
+  --tone-lvl-green-bg:     #dcfce7; --tone-lvl-green-bd:  #4ade80; --tone-lvl-green-tx:  #166534;
+  --tone-lvl-blue-bg:      #dbeafe; --tone-lvl-blue-bd:   #60a5fa; --tone-lvl-blue-tx:   #1e40af;
+  --tone-lvl-purple-bg:    #f3e8ff; --tone-lvl-purple-bd: #a855f7; --tone-lvl-purple-tx: #6b21a8;
+  --tone-lvl-gold-bg:      #fff7ed; --tone-lvl-gold-bd:   #f97316; --tone-lvl-gold-tx:   #7c2d12;
+  --tone-lvl-red-bg:       #fef2f2; --tone-lvl-red-bd:    #f87171; --tone-lvl-red-tx:    #991b1b;
+
+  /* Hero card tones */
+  --hero-card-bg-start:    #0f172a; --hero-card-bg-end:    #111827; --hero-card-fg:        #ffffff;
+  --hero-card-title-start: #c4b5fd; --hero-card-title-mid: #a78bfa; --hero-card-title-end: #60a5fa;
+  --hero-card-glow:        rgba(124, 58, 237, .42);
+  --hero-card-tile-bg:     rgba(255, 255, 255, .10);
+  --hero-card-tile-hover:  rgba(255, 255, 255, .18);
+  --hero-card-tile-bd:     rgba(255, 255, 255, .18);
+  --hero-card-shadow:      rgba(15, 23, 42, .34);
+  --hero-card-tile-shadow: rgba(15, 23, 42, .20);
+}

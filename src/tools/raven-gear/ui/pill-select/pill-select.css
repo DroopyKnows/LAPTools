@@ -1,0 +1,57 @@
+/* Pill-select primitive (pill-select2): segmented option row. Self-contained: `2` suffix, hardcoded token fallbacks. */
+
+.pill-select2 {
+  display: grid;
+  grid-template-columns: repeat(var(--pill-select-cols, 1), minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.pill-select2__option {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid var(--c-slate-200, #e2e8f0);
+  border-radius: 999px;
+  background: var(--c-slate-50, #f8fafc);
+  color: var(--c-slate-700, #334155);
+  font-family: inherit;
+  font-weight: 950;
+  line-height: 1;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease, color .12s ease, box-shadow .12s ease;
+}
+
+.pill-select2__option:focus-visible {
+  outline: 2px solid var(--focus-ring, #7c3aed);
+  outline-offset: 2px;
+}
+
+.pill-select2__option:disabled,
+.pill-select2--disabled {
+  cursor: default;
+  opacity: .5;
+}
+
+.pill-select2--md .pill-select2__option {
+  min-height: 44px;
+  padding: 0 6px;
+  font-size: 15px;
+}
+
+.pill-select2--sm .pill-select2__option {
+  min-height: 34px;
+  padding: 0 5px;
+  font-size: 13px;
+}
+
+.pill-select2__option--selected {
+  border-color: var(--c-slate-900, #0f172a);
+  background: var(--c-slate-900, #0f172a);
+  color: var(--c-white, #ffffff);
+  box-shadow: var(--shadow-pill-selected, 0 6px 14px rgba(15, 23, 42, .16));
+}

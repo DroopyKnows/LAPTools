@@ -1,0 +1,29 @@
+/* State-class bridge — maps the app's JS-toggled .active selection state onto components,
+   plus native [hidden] interop. Card collapse lives in card/card.css. */
+
+/* Preserve native hidden state when component display utilities set display. */
+[hidden] { display: none !important; }
+
+/* Tabs / segmented options: active state is .active (JS), not --active/--selected. */
+.tabs2__tab.active {
+  background: var(--c-white, #ffffff);
+  color: var(--c-slate-900, #0f172a);
+  box-shadow: var(--shadow-tabs, 0 4px 12px rgba(100,116,139,.15));
+}
+.tabs2--primary .tabs2__tab.active {
+  background: var(--c-blue-600, #2563eb);
+  color: var(--c-white, #ffffff);
+  box-shadow: var(--shadow-tabs-primary, 0 6px 14px rgba(37,99,235,.18));
+}
+.pill-select2__option.active {
+  border-color: var(--c-slate-900, #0f172a);
+  background: var(--c-slate-900, #0f172a);
+  color: var(--c-white, #ffffff);
+  box-shadow: var(--shadow-pill-selected, 0 6px 14px rgba(15,23,42,.16));
+}
+.toggle2--text.active .toggle2__label {
+  background: var(--c-white, #ffffff);
+  color: var(--c-slate-900, #0f172a);
+  box-shadow: var(--shadow-toggle-text, 0 1px 3px rgba(15,23,42,.12));
+}
+

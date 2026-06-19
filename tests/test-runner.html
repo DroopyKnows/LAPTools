@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LAPTools Logic Tests</title>
+  <link rel="stylesheet" href="test-style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <h1>LAPTools Logic Tests</h1>
+      <p class="sub">Local test harness for core math, backup normalization, and scanner adapter mapping.</p>
+      <div class="toolbar">
+        <button class="btn" id="rerunTests" type="button">Run Tests</button>
+        <a class="btn secondary" href="../index.html#home">Back to App</a>
+      </div>
+      <div class="summary" id="summary"><span class="pill pending">Loading...</span></div>
+      <div class="test-list" id="results"></div>
+    </section>
+  </main>
+  <script>
+    (function () {
+      const devEnabled = window.location.hash === "#dev";
+      const rerunButton = document.getElementById("rerunTests");
+      const summary = document.getElementById("summary");
+      const results = document.getElementById("results");
+
+      if (!devEnabled) {
+        if (rerunButton) rerunButton.disabled = true;
+        if (summary) summary.innerHTML = '<span class="pill failed">DEV GATE</span>';
+        if (results) {
+          results.innerHTML = `
+            <div class="test-row fail">
+              <strong>Dev tests disabled</strong>
+            </div>
+          `;
+        }
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = "logic-tests.js";
+      document.body.appendChild(script);
+    })();
+  </script>
+</body>
+</html>

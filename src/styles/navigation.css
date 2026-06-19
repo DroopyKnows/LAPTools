@@ -1,0 +1,47 @@
+/* Global topbar, hamburger drawer, and Coming Soon / tool-unavailable cards. */
+
+.global-topbar{
+  width:100%;
+  border:1px solid rgba(255,255,255,.86);
+  border-radius:18px;
+  padding:10px 14px;
+  background:rgba(255,255,255,.86);
+  box-shadow:0 10px 24px rgba(100,116,139,.16);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+  backdrop-filter:blur(12px);
+}
+.menu-scrim{
+  position:fixed;
+  inset:0;
+  z-index:80;
+  background:rgba(15,23,42,.18);
+}
+.global-menu-panel{
+  position:fixed;
+  top:0;
+  right:50%;
+  transform:translateX(calc(50% + 105%));
+  z-index:90;
+  width:min(390px,86vw);
+  min-height:100vh;
+  padding:14px 0;
+  background:rgba(255,255,255,.98);
+  box-shadow:-18px 0 36px rgba(15,23,42,.22);
+  transition:transform .2s ease;
+}
+.global-menu-panel.open{transform:translateX(50%);}
+
+/* Tool-unavailable card composes h-card--center; only these bits are specific to it. */
+.tool-unavailable-card .tool-unavailable-detail{
+  margin-top:8px;
+  color:var(--c-slate-400);
+  font-size:12px;
+  font-weight:800;
+  overflow-wrap:anywhere;
+}
+.tool-unavailable-card .h-btn{
+  margin-top:18px;
+}

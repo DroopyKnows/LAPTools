@@ -1,0 +1,235 @@
+/* Button primitive (button2). Self-contained: `2` suffix, hardcoded token fallbacks.
+   Variants: primary, secondary, ghost, danger, step, step-ghost. Sizes: xs, sm, md. */
+
+/* Shared base */
+.button2 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  font-family: inherit;
+  font-weight: 950;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1;
+  text-decoration: none;
+  transition: filter .12s ease;
+}
+
+.button2:active {
+  filter: brightness(.95);
+}
+
+/* Sizes */
+
+.button2--lg {
+  padding: 12px 14px;
+  border-radius: 15px;
+  font-size: 15px;
+  min-height: 44px;
+}
+
+.button2--md {
+  padding: 12px 14px;
+  border-radius: 15px;
+  font-size: 12px;
+  min-height: 34px;
+}
+
+.button2--sm {
+  padding: 7px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  min-height: 28px;
+}
+
+.button2--xs {
+  padding: 4px 6px;
+  border-radius: 999px;
+  font-size: 9px;
+  min-height: 20px;
+}
+
+/* Primary — gradient fill, white text */
+.button2--primary {
+  color: var(--c-white, #ffffff);
+  background: linear-gradient(145deg, var(--accent, #7c3aed), var(--accent2, #2563eb));
+  box-shadow: var(--shadow-button-primary, 0 10px 22px rgba(37, 99, 235, .22));
+}
+.button2--primary:hover {
+  filter: brightness(1.04);
+}
+
+/* Secondary — outlined, white bg */
+.button2--secondary {
+  background: var(--c-white, #ffffff);
+  color: var(--c-slate-700, #334155);
+  border: 1px solid var(--c-slate-300, #cbd5e1);
+  box-shadow: var(--shadow-button-secondary, 0 4px 10px rgba(100, 116, 139, .10));
+}
+.button2--secondary:hover {
+  background: var(--c-slate-50, #f8fafc);
+}
+
+/* Ghost — subtle fill, no border */
+.button2--ghost {
+  background: var(--c-bluegray-75, #eef2f7);
+  color: var(--c-slate-700, #334155);
+}
+.button2--ghost:hover {
+  background: var(--c-bluegray-100, #edf2f7);
+}
+
+/* Danger — red tones */
+.button2--danger {
+  background: var(--c-red-50, #fef2f2);
+  color: var(--danger, #b91c1c);
+  border: 1px solid var(--c-red-200, #fecaca);
+}
+.button2--danger:hover {
+  background: var(--c-red-100, #fee2e2);
+}
+
+/* Positive — affirmative actions (e.g. import); soft tint, positive tone palette */
+.button2--positive {
+  background: var(--tone-positive-bg, #dcfce7);
+  color: var(--tone-positive-tx, #166534);
+  border: 1px solid var(--tone-positive-bd, #86efac);
+}
+.button2--positive:hover {
+  filter: brightness(.97);
+}
+
+/* Info — neutral-but-distinct actions (e.g. export); soft tint, info tone */
+.button2--info {
+  background: var(--tone-info-bg, #e0f2fe);
+  color: var(--tone-info-tx, #0369a1);
+  border: 1px solid var(--tone-info-bd, #bae6fd);
+}
+.button2--info:hover {
+  filter: brightness(.97);
+}
+
+/* Choice Chest Bank Buttons */
+.button2--choice {
+  background: var(--c-amber-50, #fffbeb);
+  color: var(--c-amber-800, #92400e);
+  border: 1px solid var(--c-amber-200, #fde68a);
+  box-shadow: none;
+}
+.button2--choice:hover {
+  background: var(--c-amber-100, #fef3c7);
+  filter: none;
+}
+
+/* Strong — emphasis modifier, orthogonal to tone: layers a saturated fill + white
+   text over any tone with a *-strong-bg token. Tones stay soft unless --strong is added. */
+.button2--strong {
+  color: var(--c-white, #ffffff);
+  border-color: transparent;
+}
+
+.button2--positive.button2--strong {
+  background: var(--tone-positive-strong-bg, #16a34a);
+}
+
+.button2--info.button2--strong {
+  background: var(--tone-info-strong-bg, #2563eb);
+}
+
+.button2--danger.button2--strong {
+  background: var(--tone-danger-strong-bg, #b91c1c);
+}
+
+.button2--strong:hover {
+  filter: brightness(1.04);
+}
+
+/* Step — square +/- buttons */
+.button2--step {
+  background: var(--c-white, #ffffff);
+  color: var(--c-slate-900, #0f172a);
+  border: 1px solid var(--c-slate-300, #cbd5e1);
+  border-radius: 10px;
+  font-weight: 950;
+}
+
+.button2--step.button2--md {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 16px;
+}
+
+.button2--step.button2--sm {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 14px;
+}
+
+.button2--step.button2--xs {
+  width: 22px;
+  height: 22px;
+  min-height: 22px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 11px;
+}
+
+.button2--step:active {
+  background: var(--c-slate-100, #f1f5f9);
+}
+
+.button2--step-ghost {
+  background: transparent;
+  color: var(--c-slate-500, #64748b);
+  border: 0;
+  border-radius: 10px;
+  font-weight: 950;
+  box-shadow: none;
+}
+
+.button2--step-ghost.button2--md {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 16px;
+}
+
+.button2--step-ghost.button2--sm {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 14px;
+}
+
+.button2--step-ghost.button2--xs {
+  width: 22px;
+  height: 22px;
+  min-height: 22px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 11px;
+}
+
+.button2--step-ghost:active {
+  background: var(--c-slate-100, #f1f5f9);
+}
+
+/* Disabled */
+.button2[disabled],
+.button2--disabled {
+  opacity: .45;
+  pointer-events: none;
+  cursor: default;
+}
+
+/* Icon slot */
+.button2__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 1em;
+  line-height: 1;
+}

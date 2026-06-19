@@ -1,0 +1,104 @@
+/* Pill primitive (pill2): level/qty/tone matrix. Self-contained: `2` suffix, hardcoded token fallbacks. */
+
+.pill2-unit {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.pill2 {
+  box-sizing: border-box;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+  padding: 6px 12px;
+  background: var(--tone-bg, var(--c-slate-100, #f1f5f9));
+  border: 1px solid var(--tone-bd, var(--c-slate-200, #e2e8f0));
+  color: var(--c-slate-900, #0f172a);
+}
+
+/* level INSIDE: small label on top of the body */
+.pill2__level           { font-size: 9px; color: var(--tone-lvl-tx, var(--c-slate-500, #64748b)); }
+/* level ABOVE: floats over the body, outside it */
+.pill2__level--above    { font-size: 10px; color: var(--tone-lvl-tx, var(--c-slate-500, #64748b)); }
+
+.pill2__qty             { font-size: 14px; }
+.pill2--sm .pill2__qty   { font-size: 11px; }
+.pill2--sm .pill2__level { font-size: 9px; }
+
+.pill2__caption         { font-size: 9px; font-weight: 800; opacity: 0.9; }
+
+.pill2--compact {
+  min-width: 34px;
+  min-height: 34px;
+  padding: 4px 7px;
+  border-radius: 10px;
+  gap: 2px;
+  line-height: 1;
+}
+
+.pill2--compact .pill2__level {
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.pill2--compact .pill2__qty {
+  font-size: 12px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+/* Tones: background and border only; text stays slate. TU = Top Up, M = manual. */
+.pill2--tone-neutral     { --tone-bg: var(--tone-neutral-bg, #f1f5f9);       --tone-bd: var(--tone-neutral-bd, #e2e8f0);       --tone-tx:     var(--tone-neutral-tx, #0f172a); }
+.pill2--tone-choiceM     { --tone-bg: var(--tone-manual-choice-bg, #fff7ed); --tone-bd: var(--tone-manual-choice-bd, #b87333); --tone-tx:     var(--tone-manual-choice-tx, #7c2d12); }
+.pill2--tone-randomM     { --tone-bg: var(--tone-manual-random-bg, #f1f5f9); --tone-bd: var(--tone-manual-random-bd, #e2e8f0); --tone-tx:     var(--tone-manual-random-tx, #0f172a); }
+.pill2--tone-randomTU    { --tone-bg: var(--tone-top-up-random-bg, #dcfce7); --tone-bd: var(--tone-top-up-random-bd, #86efac); --tone-tx:     var(--tone-top-up-random-tx, #166534); }
+.pill2--tone-choiceTU    { --tone-bg: var(--tone-top-up-choice-bg, #fef3c7); --tone-bd: var(--tone-top-up-choice-bd, #fbbf24); --tone-tx:     var(--tone-top-up-choice-tx, #92400e); }
+.pill2--tone-levelGray   { --tone-bg: var(--tone-lvl-gray-bg, #f1f5f9);      --tone-bd: var(--tone-lvl-gray-bd, #94a3b8);      --tone-lvl-tx: var(--tone-lvl-gray-tx, #334155); }
+.pill2--tone-levelGreen  { --tone-bg: var(--tone-lvl-green-bg, #dcfce7);     --tone-bd: var(--tone-lvl-green-bd, #4ade80);     --tone-lvl-tx: var(--tone-lvl-green-tx, #166534); }
+.pill2--tone-levelBlue   { --tone-bg: var(--tone-lvl-blue-bg, #dbeafe);      --tone-bd: var(--tone-lvl-blue-bd, #60a5fa);      --tone-lvl-tx: var(--tone-lvl-blue-tx, #1e40af); }
+.pill2--tone-levelPurple { --tone-bg: var(--tone-lvl-purple-bg, #f3e8ff);    --tone-bd: var(--tone-lvl-purple-bd, #a855f7);    --tone-lvl-tx: var(--tone-lvl-purple-tx, #6b21a8); }
+.pill2--tone-levelGold   { --tone-bg: var(--tone-lvl-gold-bg, #fff7ed);      --tone-bd: var(--tone-lvl-gold-bd, #f97316);      --tone-lvl-tx: var(--tone-lvl-gold-tx, #7c2d12); }
+.pill2--tone-levelRed    { --tone-bg: var(--tone-lvl-red-bg, #fef2f2);       --tone-bd: var(--tone-lvl-red-bd, #f87171);       --tone-lvl-tx: var(--tone-lvl-red-tx, #991b1b); }
+.pill2--tone-positive    { --tone-bg: var(--tone-positive-bg, #dcfce7);      --tone-bd: var(--tone-positive-bd, #86efac);      --tone-tx:     var(--tone-positive-tx, #166534); }
+.pill2--tone-warn        { --tone-bg: var(--tone-warn-bg, #fff7ed);          --tone-bd: var(--tone-warn-bd, #fed7aa);          --tone-tx:     var(--tone-warn-tx, #9a3412); }
+.pill2--tone-left        { --tone-bg: var(--tone-left-bg, #e0f2fe);          --tone-bd: var(--tone-left-bd, #bae6fd);          --tone-tx:     var(--tone-left-tx, #0369a1); }
+.pill2--tone-right       { --tone-bg: var(--tone-right-bg, #f3e8ff);         --tone-bd: var(--tone-right-bd, #d8b4fe);         --tone-tx:     var(--tone-right-tx, #6b21a8); }
+
+/* Badge mode: compact single-label pill; tone affects text color. */
+.pill2--badge {
+  display: inline-flex;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: .02em;
+  color: var(--tone-tx, var(--c-slate-700, #334155));
+}
+
+.pill2--badge.pill2--xs {
+  padding: 2px 6px;
+  font-size: 9px;
+}
+
+.pill2--badge.pill2--sm {
+  padding: 3px 7px;
+  font-size: 10px;
+}
+
+.pill2--badge.pill2--md {
+  padding: 3px 8px;
+  font-size: 11px;
+}
+
+.pill2--badge.pill2--lg {
+  padding: 4px 10px;
+  font-size: 12px;
+}

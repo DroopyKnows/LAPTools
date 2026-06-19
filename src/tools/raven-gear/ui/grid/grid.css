@@ -1,0 +1,126 @@
+/* Grid primitive (grid2). Self-contained: `2` suffix, hardcoded token fallbacks. */
+
+.grid2 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--grid-gap, 6px);
+  width: 100%;
+  text-align: center;
+}
+
+/* Minimum item width */
+.grid2--min-sm { --grid-min: 44px; }
+.grid2--min-md { --grid-min: 54px; }
+.grid2--min-lg { --grid-min: 62px; }
+/* --min-wide: for cells with variable-width composite content (e.g. "L: n / R: n"
+   leftover tables); 86px reserves enough for the common single/double-digit case. */
+.grid2--min-wide { --grid-min: 86px; }
+
+/* Gap */
+.grid2--gap-sm { --grid-gap: 6px; }
+.grid2--gap-md { --grid-gap: 11px; }
+
+.grid2__row {
+  display: flex;
+  gap: var(--grid-gap, 6px);
+  width: 100%;
+}
+
+.grid2--align-left .grid2__row { justify-content: flex-start; }
+.grid2--align-center .grid2__row { justify-content: center; }
+.grid2--align-right .grid2__row { justify-content: flex-end; }
+
+.grid2__item {
+  box-sizing: border-box;
+  min-width: var(--grid-min, 54px);
+}
+
+.grid2--fill .grid2__item {
+  flex: 1 1 0;
+}
+
+.grid2--hug .grid2__item {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.grid2--fill .grid2__item > .pill2-unit,
+.grid2--fill .grid2__item > .pill2-unit > .pill2 {
+  width: 100%;
+}
+
+.grid2--fill .grid2__item > .button2 {
+  width: 100%;
+}
+
+.grid2--hug .grid2__item > .pill2-unit,
+.grid2--hug .grid2__item > .pill2-unit > .pill2 {
+  width: auto;
+}
+
+/* Value boxes inside grid items */
+.grid2--fill .grid2__item .value-box2 {
+  width: 100%;
+}
+
+.grid2--hug .grid2__item .value-box2 {
+  width: auto;
+}
+
+/* Caption */
+.grid2__caption {
+  margin-top: 2px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 850;
+  color: var(--c-slate-500, #64748b);
+}
+
+/* Labeled rows — each row has a left label, all bodies start at the same x.
+   Labels can be stacked spans for explicit line breaks. */
+.grid2--labeled-rows {
+  --grid2-label-col: 64px;
+  --grid2-label-gap: 8px;
+  --grid2-row-gap: 6px;
+  display: grid;
+  grid-template-columns: var(--grid2-label-col, 64px) minmax(0, 1fr);
+  column-gap: var(--grid2-label-gap, 8px);
+  row-gap: var(--grid2-row-gap, 6px);
+  align-items: center;
+}
+
+.grid2__row-label {
+  justify-self: end;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  text-align: right;
+  color: var(--c-slate-500, #64748b);
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.grid2__row-label > span {
+  display: block;
+}
+
+.grid2__row-body {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--grid-gap, 6px);
+  text-align: left;
+}
+
+.grid2--labeled-rows.grid2--align-left .grid2__row-body { justify-content: flex-start; }
+.grid2--labeled-rows.grid2--align-center .grid2__row-body { justify-content: center; }
+.grid2--labeled-rows.grid2--align-right .grid2__row-body { justify-content: flex-end; }
+
+.grid2--labeled-rows .grid2__row-body > .pill2-unit,
+.grid2--labeled-rows .grid2__row-body > .pill2-unit > .pill2 {
+  flex: 0 0 auto;
+}

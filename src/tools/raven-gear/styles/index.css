@@ -1,0 +1,5 @@
+/* Tool style manifest. components.css is unlayered + first so its tokens load ahead
+   of the layer(components) shell imports below. */
+@import url("../ui/components.css");
+@import url("./shell-base.css") layer(components);
+@import url("./shell-chrome.css") layer(components);

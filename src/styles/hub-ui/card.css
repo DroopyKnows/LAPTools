@@ -1,0 +1,103 @@
+/* Hub card primitive (h-card). Hub-private, h- namespace; token-driven with
+   hardcoded fallbacks (renders standalone without tokens.css).
+   Two axes: layout (--media | --center) and size (default compact | --lg). */
+
+/* Base surface + default (compact) tokens. Defaults here so later size modifiers win the var cascade. */
+.h-card {
+  box-sizing: border-box;
+  width: 100%;
+  --hcard-border: 0;
+  --hcard-radius: 18px;
+  --hcard-pad: 14px;
+  --hcard-icon-size: 54px;
+  --hcard-gap: 12px;
+  --hcard-shadow: 0 10px 24px rgba(100, 116, 139, .14);
+  border: var(--hcard-border);
+  border-radius: var(--hcard-radius);
+  padding: var(--hcard-pad);
+  background: var(--hcard-bg, var(--card, rgba(255, 255, 255, .92)));
+  color: var(--hcard-fg, var(--c-slate-900, #0f172a));
+  box-shadow: var(--hcard-shadow);
+  text-align: left;
+}
+
+/* LAYOUT — media: icon | copy | trailing action */
+.h-card--media {
+  display: grid;
+  grid-template-columns: var(--hcard-icon-size) 1fr auto;
+  gap: var(--hcard-gap);
+  align-items: center;
+}
+
+/* LAYOUT — center: stacked + centered panel. Overrides surface tokens to panel chrome. */
+.h-card--center {
+  --hcard-border: 1px solid rgba(255, 255, 255, .78);
+  --hcard-radius: 24px;
+  --hcard-pad: 28px 18px;
+  --hcard-shadow: var(--shadow, 0 14px 32px rgba(100, 116, 139, .28));
+  margin-top: 14px;
+  text-align: center;
+}
+
+/* SIZE — roomier feature card. Declared after base so it wins. */
+.h-card--lg {
+  --hcard-radius: 24px;
+  --hcard-pad: 20px;
+  --hcard-icon-size: 76px;
+  --hcard-gap: 18px;
+  --hcard-shadow: 0 14px 32px rgba(100, 116, 139, .18);
+}
+
+/* STATE */
+.h-card--interactive { cursor: pointer; }
+.h-card--static { cursor: default; }
+
+/* SLOTS */
+.h-card__icon {
+  width: var(--hcard-icon-size);
+  height: var(--hcard-icon-size);
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  background: linear-gradient(145deg, rgba(124, 58, 237, .14), rgba(37, 99, 235, .09));
+}
+.h-card--lg .h-card__icon { border-radius: 22px; font-size: 36px; }
+
+.h-card__icon--blue {
+  color: var(--c-blue-600, #2563eb);
+  background: linear-gradient(145deg, rgba(219, 234, 254, .9), rgba(237, 233, 254, .8));
+}
+
+.h-card__icon svg { display: block; }
+.h-card__icon--svg svg { width: 30px; height: 30px; }
+
+.h-card__copy { min-width: 0; }
+
+.h-card__title {
+  color: var(--c-slate-900, #0f172a);
+  font-size: var(--hcard-title-size, 18px);
+  line-height: 1.1;
+  font-weight: 950;
+  letter-spacing: -.035em;
+}
+.h-card--lg .h-card__title { font-size: 23px; }
+
+.h-card__sub {
+  margin-top: 5px;
+  color: var(--c-slate-600, #475569);
+  font-size: var(--hcard-sub-size, 13px);
+  line-height: 1.35;
+}
+.h-card--lg .h-card__sub { margin-top: 9px; font-size: 15px; }
+
+.h-card__action { display: flex; align-items: center; flex-shrink: 0; }
+
+/* center-layout heading sizes */
+.h-card--center .h-card__title { font-size: 24px; letter-spacing: -.04em; }
+.h-card--center .h-card__sub {
+  margin-top: 10px;
+  color: var(--c-slate-500, #64748b);
+  font-size: 15px;
+  font-weight: 900;
+}

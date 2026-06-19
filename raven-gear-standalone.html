@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Raven Gear — Standalone</title>
+<link href="LAPHub.ico" rel="icon" type="image/x-icon"/>
+<!--
+  Standalone harness for the Raven Gear tool — runs the tool with NO hub.
+
+  It provides exactly what the hub provides: a `root` element and a `host`, then
+  calls the tool's own `mountTool({ root, host })`. Nothing else differs from the
+  hub. This proves the Stage 2/3 contract: the tool owns its markup + styles and
+  imports zero hub paths.
+
+  What the standalone `host` must provide (the tool's mount contract):
+    - exposeAppBridge(api)        : copy api's defined keys onto a global target
+    - exposeTestExports(api)      : same, for test-only exports (no-op-safe here)
+    - exposeActionRegistry(target): install a LAP_ACTIONS registry used by the
+                                    tool's delegated data-action dispatch
+    - createSharedUiRuntimeModule : the REAL shared UI runtime (imported below)
+    - navigation                  : hub-shell hooks the tool reads via host.navigation.
+                                    Standalone has no hub pages, so these are stubs:
+                                    empty page route/hash/id tables, no-op active-page
+                                    setter, and no-op home hooks. The tool's OWN
+                                    sub-page nav (page tabs) works without them.
+
+  CSS: the design tokens + base primitives are loaded below in the same cascade
+  layers the hub declares; the tool injects its own stylesheet on mount. (Stage 7
+  will repoint these to src/shared/styles so only shared CSS is needed.)
+-->
+<style>
+@layer tokens, base, components, overrides;
+@import url("src/shared/styles/tokens.css") layer(tokens);
+@import url("src/shared/styles/base.css") layer(base);
+</style>
+<style>
+  body{ margin:0; }
+  .app{ width:min(460px,100%); min-height:100vh; margin:0 auto; padding:16px 16px 34px; }
+</style>
+</head>
+<body>
+<main class="app">
+<div id="raven-root"></div>
+</main>
+<script type="module">
+import { createSharedUiRuntimeModule } from "./src/tools/raven-gear/shared/ui/ui-runtime.js";
+import { mountTool } from "./src/tools/raven-gear/raven-gear-runtime.js";
+
+// --- minimal, self-contained stubs (no hub code imported) ---
+
+function exposeAppBridge(api){
+  if(!api || typeof api !== "object") return;
+  Object.keys(api).forEach(name => { if(api[name] !== undefined) window[name] = api[name]; });
+}
+
+function exposeTestExports(api){
+  if(!api || typeof api !== "object") return;
+  Object.keys(api).forEach(name => { if(api[name] !== undefined) window[name] = api[name]; });
+}
+
+function exposeActionRegistry(target = window){
+  const actions = new Map();
+  const registerAction = (name, handler) => { if(name && typeof handler === "function") actions.set(name, handler); };
+  const registerActions = map => { if(map && typeof map === "object") Object.keys(map).forEach(n => registerAction(n, map[n])); };
+  const registerWindowAction = name => registerAction(name, ({args}) => {
+    const fn = window[name] || globalThis[name];
+    if(typeof fn === "function") return fn(...(Array.isArray(args) ? args : []));
+  });
+  const registerWindowActions = names => { if(Array.isArray(names)) names.forEach(registerWindowAction); };
+  const LAP_ACTIONS = {
+    registerAction, registerActions, registerWindowAction, registerWindowActions,
+    hasAction: name => actions.has(name),
+    runAction: (name, context) => { const h = actions.get(name); if(typeof h !== "function") return false; h(context || {}); return true; }
+  };
+  if(target) target.LAP_ACTIONS = LAP_ACTIONS;
+  return LAP_ACTIONS;
+}
+
+// Standalone has no hub pages: empty routing tables + no-op hooks.
+const navigation = {
+  getHubPageRoutes: () => ({}),
+  getHubPageHashes: () => ({}),
+  getHubPageIds: () => [],
+  setHubActivePageId: () => {},
+  initializeHubHomeContent: () => {},
+  setHubHomeCategory: () => {}
+};
+
+const host = {
+  exposeAppBridge,
+  exposeTestExports,
+  exposeActionRegistry,
+  createSharedUiRuntimeModule,
+  navigation
+};
+
+mountTool({ root: document.getElementById("raven-root"), host })
+  .catch(err => { console.error("Raven Gear standalone failed to mount:", err); });
+</script>
+</body>
+</html>
