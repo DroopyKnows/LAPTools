@@ -1,0 +1,24 @@
+/* Hub pill/badge primitive (h-pill). Hub-private, h- namespace.
+   Minimal by design: one inline labelled pill, not the tool's level/qty/tone matrix. */
+
+.h-pill {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 14px;
+  border: 1px solid var(--hpill-bd, rgba(196, 181, 253, .35));
+  background: var(--hpill-bg, rgba(30, 41, 59, .68));
+  color: var(--hpill-fg, var(--c-slate-300, #cbd5e1));
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+/* leading accent glyph (e.g. the skull) */
+.h-pill__lead {
+  color: var(--hpill-lead, var(--c-purple-300, #d8b4fe));
+  font-size: 15px;
+  line-height: 1;
+}

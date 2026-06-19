@@ -1,0 +1,31 @@
+/* Notice / empty-state primitive (notice2). Self-contained: `2` suffix, hardcoded token fallbacks. */
+
+.notice2 {
+  border-radius: 18px;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 850;
+  text-align: center;
+  background: var(--notice-bg, var(--tone-positive-bg, #dcfce7));
+  border: 1px solid var(--notice-bd, var(--tone-positive-bd, #86efac));
+  color: var(--notice-fg, var(--tone-positive-tx, #166534));
+}
+
+/* Tone includes message text color. */
+.notice2--positive { --notice-bg: var(--tone-positive-bg, #dcfce7); --notice-bd: var(--tone-positive-bd, #86efac); --notice-fg: var(--tone-positive-tx, #166534); }
+.notice2--warn     { --notice-bg: var(--tone-warn-bg, #fff7ed);     --notice-bd: var(--tone-warn-bd, #fed7aa);     --notice-fg: var(--tone-warn-tx, #9a3412); }
+
+/* Dashed empty state. */
+.notice2--empty {
+  --notice-bg: transparent;
+  --notice-bd: var(--c-slate-300, #cbd5e1);
+  --notice-fg: var(--c-slate-500, #64748b);
+  border-style: dashed;
+}
+
+/* Compact: tight inline empty marker (e.g. a "None" cell in a snapshot row). */
+.notice2--compact {
+  padding: 6px 8px;
+  border-radius: 12px;
+}

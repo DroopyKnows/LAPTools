@@ -1,0 +1,100 @@
+/* Shared foundation: reset, layout, base card / pill / form / button primitives. */
+
+/* Base / Reset */
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Arial,Helvetica,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(124,58,237,.16), transparent 35%),
+        radial-gradient(circle at top right, rgba(37,99,235,.16), transparent 35%),
+        linear-gradient(180deg,var(--bg1),var(--bg2));
+    }
+
+    button,input,select{font-family:inherit}
+
+    /* Layout / Utilities */
+    .app{
+      width:min(460px,100%);
+      min-height:100vh;
+      margin:0 auto;
+      padding:16px 16px 34px;
+    }
+
+    .hidden{display:none!important}
+    h1,h2,h3,p{margin:0}
+    h1{
+      position:relative;z-index:1;
+      margin-top:6px;
+      font-size:31px;
+      line-height:1;
+      letter-spacing:-.04em;
+    }
+
+    /* Cards */
+    .card{
+      margin-top:14px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.78);
+      border-radius:24px;
+      background:var(--card);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+    }
+    .pill{
+      box-sizing:border-box;
+      min-width:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      font-weight:950;
+      line-height:1.1;
+      text-align:center;
+    }
+
+    /* Forms */
+    label{
+      display:block;
+      margin-bottom: 0px;
+      color:var(--c-slate-600);
+      font-size:12px;
+      font-weight:950;
+    }
+    select,input[type="number"],input[type="text"]{
+      width:100%;
+      min-height:44px;
+      border:1px solid var(--line);
+      border-radius:15px;
+      outline:none;
+      background:white;
+      color:var(--ink);
+      padding:11px 12px;
+      font-weight:850;
+    }
+
+    .notice{
+      margin-top:12px;
+      border:1px solid var(--c-orange-200);
+      border-radius:18px;
+      background:var(--c-orange-50);
+      color:var(--c-orange-800);
+      padding:12px;
+      font-size:12px;
+      line-height:1.4;
+      font-weight:850;
+    }
+
+    /* Buttons */
+    .primary-btn,.ghost-btn{
+      border:0;
+      border-radius:15px;
+      padding:12px 14px;
+      font-weight:950;
+      cursor:pointer;
+    }
+    .primary-btn{color:var(--c-white);background:linear-gradient(145deg,var(--accent),var(--accent2))}
+    .ghost-btn{background:var(--c-bluegray-75);color:var(--c-slate-700)}

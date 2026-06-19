@@ -1,0 +1,373 @@
+/* Value-box primitive (value-box2). Self-contained: `2` suffix, hardcoded token fallbacks.
+   Interactions: input, stepper, modal, readonly, readonly-badge, readonly-strip, select.
+   Label placement: above, inline, hidden; label variant: main. */
+
+.value-box2-unit {
+  width: 100%;
+  min-width: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+}
+
+/* Fill — in a stretch row, the unit grows so controls in sibling units share a box
+   height. Pair a label-less control with --label--spacer to reserve its label row. */
+.value-box2-unit--fill > .value-box2,
+.value-box2-unit--fill > .button2 { flex: 1 1 auto; }
+
+.value-box2 {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid var(--c-bluegray-150, #dbe4ef);
+  background: var(--c-white, #ffffff);
+  color: var(--c-slate-900, #0f172a);
+  box-shadow: var(--shadow-value-box, 0 1px 2px rgba(15, 23, 42, .04));
+  font-family: inherit;
+  font-weight: 950;
+  text-align: center;
+}
+
+.value-box2--sm {
+  min-height: 34px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.value-box2--md {
+  min-height: 44px;
+  border-radius: 15px;
+  font-size: 15px;
+}
+
+.value-box2--stepper {
+  --value-box-step-width-default: 30px;
+  grid-template-columns:
+    var(--value-box-step-width, var(--value-box-step-width-default))
+    minmax(0, 1fr)
+    var(--value-box-step-width, var(--value-box-step-width-default));
+}
+
+.value-box2__content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.value-box2__label {
+  display: block;
+  margin: 0;
+  color: var(--c-slate-500, #64748b);
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.value-box2__label--above {
+  text-align: center;
+}
+
+.value-box2__label--main {
+  text-align: left;
+  padding-inline-start: 5px;
+}
+
+.value-box2__label--size-10 {
+  font-size: 10px;
+}
+
+.value-box2__label--size-12 {
+  font-size: 12px;
+}
+
+.value-box2__label--size-13 {
+  font-size: 13px;
+}
+
+.value-box2__label--size-14 {
+  font-size: 14px;
+}
+
+.value-box2__label--hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Spacer — empty label reserving one label row (1lh) so a label-less control's box
+   aligns with a labeled sibling's. Tracks whatever label size class is applied. */
+.value-box2__label--spacer {
+  visibility: hidden;
+  min-height: 1lh;
+}
+
+.value-box2__label--inline {
+  flex: 0 0 auto;
+  font-size: inherit;
+  line-height: 1;
+}
+
+.value-box2-unit--inline .value-box2__content,
+.value-box2-unit--inline .value-box2--readonly,
+.value-box2-unit--inline .value-box2--readonly-badge,
+.value-box2-unit--inline .value-box2--modal {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+}
+
+.value-box2-unit--inline .value-box2__content {
+  display: grid;
+}
+
+.value-box2-unit--inline .value-box2__label--inline {
+  justify-self: end;
+  text-align: end;
+}
+
+.value-box2-unit--inline .value-box2__input,
+.value-box2-unit--inline .value-box2__value {
+  grid-column: 2;
+  justify-self: center;
+}
+
+.value-box2-unit--inline .value-box2__value {
+  display: inline;
+  padding-inline: 0;
+}
+
+.value-box2__input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  /* Armor against the hub base.css `min-height:44px` on number/text inputs: the
+     component sets no competing min-height, so the hub rule would inflate sm boxes. */
+  min-height: inherit;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0 6px;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  font-weight: 950;
+  line-height: 1;
+  text-align: center;
+  box-shadow: none;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.value-box2__input::-webkit-outer-spin-button,
+.value-box2__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Free-text content (names/notes): left-align + normal weight so it reads like a text
+   field, keeping the value-box shell. Pair with --label--main for a left-aligned label. */
+.value-box2--text .value-box2__input {
+  text-align: left;
+  font-weight: 700;
+  padding-inline: 12px;
+}
+
+.value-box2__select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: inherit;
+  height: 100%;
+  border: 0;
+  /* Reset the native control so the select sizes to the box min-height, then draw our
+     own chevron in the reserved right padding. */
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: transparent;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%2364748b' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M3 4.5 6 7.5 9 4.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px 12px;
+  padding: 0 30px 0 12px;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  font-weight: 950;
+  line-height: 1.1;
+  text-align: left;
+  outline: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.value-box2__select:disabled {
+  cursor: not-allowed;
+}
+
+.value-box2__value {
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  padding: 6px;
+}
+
+.value-box2--readonly,
+.value-box2--readonly-badge,
+.value-box2--readonly-strip,
+.value-box2--select,
+.value-box2--modal {
+  grid-auto-flow: row;
+  justify-items: stretch;
+}
+
+/* .value-box2--manual is intentionally unstyled (keeps the white bg); --derived gets
+   slate to read as output. The class stays in markup as the semantic source marker. */
+.value-box2--derived {
+  background: var(--c-slate-50, #f8fafc);
+}
+
+.value-box2--tone-neutral { --value-box-tone-bg: var(--tone-neutral-bg, #f1f5f9);  --value-box-tone-bd: var(--tone-neutral-bd, #e2e8f0);  --value-box-tone-tx: var(--tone-neutral-tx, #0f172a); }
+.value-box2--tone-positive { --value-box-tone-bg: var(--tone-positive-bg, #dcfce7); --value-box-tone-bd: var(--tone-positive-bd, #86efac); --value-box-tone-tx: var(--tone-positive-tx, #166534); }
+.value-box2--tone-warn { --value-box-tone-bg: var(--tone-warn-bg, #fff7ed); --value-box-tone-bd: var(--tone-warn-bd, #fed7aa); --value-box-tone-tx: var(--tone-warn-tx, #9a3412); }
+.value-box2--tone-left { --value-box-tone-bg: var(--tone-left-bg, #e0f2fe); --value-box-tone-bd: var(--tone-left-bd, #bae6fd); --value-box-tone-tx: var(--tone-left-tx, #0369a1); }
+.value-box2--tone-right { --value-box-tone-bg: var(--tone-right-bg, #f3e8ff); --value-box-tone-bd: var(--tone-right-bd, #d8b4fe); --value-box-tone-tx: var(--tone-right-tx, #6b21a8); }
+.value-box2--tone-levelGray { --value-box-tone-bg: var(--tone-lvl-gray-bg, #f1f5f9); --value-box-tone-bd: var(--tone-lvl-gray-bd, #94a3b8); --value-box-tone-tx: var(--tone-lvl-gray-tx, #334155); }
+.value-box2--tone-levelGreen { --value-box-tone-bg: var(--tone-lvl-green-bg, #dcfce7); --value-box-tone-bd: var(--tone-lvl-green-bd, #4ade80); --value-box-tone-tx: var(--tone-lvl-green-tx, #166534); }
+.value-box2--tone-levelBlue { --value-box-tone-bg: var(--tone-lvl-blue-bg, #dbeafe); --value-box-tone-bd: var(--tone-lvl-blue-bd, #60a5fa); --value-box-tone-tx: var(--tone-lvl-blue-tx, #1e40af); }
+.value-box2--tone-levelPurple { --value-box-tone-bg: var(--tone-lvl-purple-bg, #f3e8ff); --value-box-tone-bd: var(--tone-lvl-purple-bd, #a855f7); --value-box-tone-tx: var(--tone-lvl-purple-tx, #6b21a8); }
+.value-box2--tone-levelGold { --value-box-tone-bg: var(--tone-lvl-gold-bg, #fff7ed); --value-box-tone-bd: var(--tone-lvl-gold-bd, #f97316); --value-box-tone-tx: var(--tone-lvl-gold-tx, #7c2d12); }
+.value-box2--tone-levelRed { --value-box-tone-bg: var(--tone-lvl-red-bg, #fef2f2); --value-box-tone-bd: var(--tone-lvl-red-bd, #f87171); --value-box-tone-tx: var(--tone-lvl-red-tx, #991b1b); }
+
+
+.value-box2--readonly-strip {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  background: var(--value-box-tone-bg, var(--c-white, #ffffff));
+  border-color: var(--value-box-tone-bd, var(--c-bluegray-150, #dbe4ef));
+}
+
+.value-box2--sm.value-box2--readonly-strip {
+  min-height: 24px;
+  border-radius: 9px;
+  font-size: 11px;
+}
+
+.value-box2--md.value-box2--readonly-strip {
+  min-height: 40px;
+  border-radius: 11px;
+  font-size: 12px;
+}
+
+.value-box2__strip-label,
+.value-box2__strip-main,
+.value-box2__strip-meta {
+  min-width: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.value-box2__strip-label {
+  justify-self: start;
+  overflow: hidden;
+  color: var(--c-slate-500, #64748b);
+  font-weight: 900;
+  text-align: left;
+  text-overflow: ellipsis;
+}
+
+.value-box2__strip-main {
+  justify-self: center;
+  color: var(--value-box-tone-tx, var(--c-slate-900, #0f172a));
+  font-weight: 950;
+  text-align: center;
+}
+
+.value-box2__strip-meta {
+  justify-self: end;
+  overflow: hidden;
+  color: var(--c-slate-900, #0f172a);
+  font-weight: 950;
+  text-align: right;
+  text-overflow: ellipsis;
+}
+
+.value-box2--readonly-badge {
+  place-items: center;
+  padding: 6px 10px;
+  background: var(--value-box-tone-bg, var(--c-slate-50, #f8fafc));
+  border-color: var(--value-box-tone-bd, var(--c-bluegray-150, #dbe4ef));
+  color: var(--value-box-tone-tx, var(--c-slate-900, #0f172a));
+}
+
+.value-box2--readonly-badge .value-box2__value {
+  padding: 0;
+}
+
+.value-box2--select {
+  align-items: stretch;
+  background: var(--c-white, #ffffff);
+}
+
+.value-box2--select:focus-within {
+  border-color: var(--focus-ring, #7c3aed);
+  box-shadow: 0 0 0 3px var(--focus-ring-blue, rgba(59, 130, 246, .12));
+}
+
+.value-box2--stepper > .button2 {
+  width: 100%;
+  height: auto;
+  min-height: 100%;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+.value-box2--stepper > .button2--step {
+  border: 0;
+}
+
+.value-box2--md.value-box2--stepper {
+  --value-box-step-width-default: 36px;
+}
+
+.value-box2--stepper > .button2--step:first-child {
+  border-inline-end: 1px solid var(--c-bluegray-150, #dbe4ef);
+}
+
+.value-box2--stepper > .button2--step:last-child {
+  border-inline-start: 1px solid var(--c-bluegray-150, #dbe4ef);
+}
+
+.value-box2--modal > .button2 {
+  width: 100%;
+  min-height: inherit;
+  border: 0;
+  border-radius: 0;
+  padding: 6px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.value-box2--disabled {
+  opacity: .5;
+  pointer-events: none;
+}
+
+/* iOS zoom guard: 16px on the real input/select stops mobile Safari from
+   auto-zooming the page when a field is focused. */
+.value-box2__input,
+.value-box2__select {
+  font-size: 16px;
+}

@@ -1,0 +1,9 @@
+/* Shell chrome — settings-driven section-visibility toggles (body classes set by
+   app-navigation-runtime). Bulk-hides marked sections; no primitive equivalent. */
+
+body.hide-more-info-sections [data-more-info-section]{
+  display:none!important;
+}
+body.hide-advanced-sections [data-advanced-section]{
+  display:none!important;
+}

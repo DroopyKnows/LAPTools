@@ -1,0 +1,8 @@
+/* Manifest for the hub's private h- primitive layer (not in shared/, so tools can't depend on it).
+   Load order mirrors dependency: layout/atoms before composites. */
+
+@import url("./stack.css");
+@import url("./button.css");
+@import url("./pill.css");
+@import url("./tabs.css");
+@import url("./card.css");

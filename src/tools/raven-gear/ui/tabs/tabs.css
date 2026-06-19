@@ -1,0 +1,152 @@
+/* Tabs primitive (tabs2). Self-contained: `2` suffix, hardcoded token fallbacks.
+   A row of mutually-exclusive buttons, one active. Columns default to the tab count.
+   Sizes: xl, lg, md, sm, xs, inline. */
+
+/* Shell */
+.tabs2 {
+  display: grid;
+  grid-template-columns: repeat(var(--tabs-cols, 1), minmax(0, 1fr));
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid var(--line, #dbe4ef);
+  border-radius: 16px;
+  background: var(--c-bluegray-100, #edf2f7);
+}
+
+/* Optional labeled tab unit. .tabs2 remains label-free by default. */
+.tabs2-unit {
+  display: inline-flex;
+}
+
+.tabs2-unit--label-above {
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* above-label unit: align the label like valueBox labels; pair with --label-above */
+.tabs2-unit--label-align-left .tabs2__label {
+  text-align: left;
+  padding-inline-start: 5px;
+}
+
+.tabs2-unit--label-left {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 6px;
+  width: 100%;
+}
+.tabs2-unit--label-left .tabs2 {
+  min-width: 0;
+}
+
+.tabs2__label {
+  display: block;
+  margin: 0;
+  color: var(--c-slate-500, #64748b);
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+}
+
+
+.tabs2-unit--label-left .tabs2__label {
+  align-self: center;
+  text-align: end;
+  padding-inline-end: 5px;
+}
+
+.tabs2__label--size-10 { font-size: 10px; }
+.tabs2__label--size-12 { font-size: 12px; }
+.tabs2__label--size-13 { font-size: 13px; }
+.tabs2__label--size-14 { font-size: 14px; }
+
+/* Extra-large, large, and medium */
+.tabs2--xl { gap: 7px; padding: 6px; border-radius: 20px; }
+.tabs2--xl .tabs2__tab { padding: 12px 8px; font-size: 13px; border-radius: 15px; }
+
+.tabs2--lg { gap: 7px; padding: 6px; border-radius: 20px; }
+.tabs2--lg .tabs2__tab { padding: 12px 8px; font-size: 13px; border-radius: 15px; }
+
+.tabs2--md { gap: 6px; padding: 5px; border-radius: 17px; }
+.tabs2--md .tabs2__tab { padding: 10px 8px; font-size: 12px; border-radius: 13px; }
+
+/* Small */
+.tabs2--sm { gap: 4px; padding: 3px; border-radius: 13px; }
+.tabs2--sm .tabs2__tab { padding: 7px 6px; font-size: 11px; border-radius: 10px; }
+
+/* Extra-small inline range toggle */
+.tabs2--xs { gap: 2px; padding: 2px; border-radius: 999px; }
+.tabs2--xs .tabs2__tab { padding: 4px 6px; font-size: 9px; border-radius: 999px; }
+.tabs2--xs { cursor: pointer; }
+
+/* Inline field-control tabs — keeps the normal track chrome but compresses
+   the inner buttons so total height matches valueBox/button rows. */
+.tabs2--inline { gap: 4px; border-radius: 14px; }
+.tabs2--inline .tabs2__tab { min-height: 22px; padding: 0 8px; font-size: 11px; line-height: 1; border-radius: 10px; }
+
+@media (max-width: 420px) {
+  .tabs2--xl .tabs2__tab { padding: 11px 5px; font-size: 12px; }
+}
+
+/* Sticky modifier — keeps a tab set visible while scrolling longer surfaces. */
+.tabs2--sticky {
+  position: sticky;
+  top: 8px;
+  z-index: 8;
+  margin: 14px 0;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 24px rgba(100, 116, 139, .2);
+}
+
+/* Fill modifier — lets the tab bar grow to fill a flex row next to a label
+   (e.g. "Filter:" rows). Inert outside a flex parent. */
+.tabs2--fill { flex: 1; min-width: 0; }
+
+.tabs2-unit--fill {
+  width: 100%;
+  min-width: 0;
+  align-items: stretch;
+}
+
+.tabs2-unit--fill > .tabs2 {
+  flex: 1 1 auto;
+}
+
+/* Tab button */
+.tabs2__tab {
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--c-slate-500, #64748b);
+  padding: 10px 8px;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 950;
+  cursor: pointer;
+  line-height: 1.1;
+  text-align: center;
+  transition: background .12s ease, color .12s ease, box-shadow .12s ease;
+}
+
+.tabs2__tab:focus-visible {
+  outline: 2px solid var(--focus-ring, #7c3aed);
+  outline-offset: 1px;
+}
+
+/* Active tab */
+.tabs2__tab--active {
+  background: var(--c-white, #ffffff);
+  color: var(--c-slate-900, #0f172a);
+  box-shadow: var(--shadow-tabs, 0 4px 12px rgba(100, 116, 139, .15));
+}
+
+/* .tabs2--neutral is intentionally unstyled — neutral is the base look; the class
+   stays in markup as the semantic variant marker. Only --primary overrides. */
+
+.tabs2--primary .tabs2__tab--active {
+  background: var(--c-blue-600, #2563eb);
+  color: var(--c-white, #ffffff);
+  box-shadow: var(--shadow-tabs-primary, 0 6px 14px rgba(37, 99, 235, .18));
+}

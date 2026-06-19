@@ -1,0 +1,106 @@
+/* Hub button primitive (h-btn). Hub-private, h- namespace.
+   Variants: brand, icon, menu, menu-child, back, chip, pillish. */
+
+.h-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-weight: 950;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter .12s ease, background .12s ease;
+}
+.h-btn:active { filter: brightness(.96); }
+.h-btn[disabled] { opacity: .45; pointer-events: none; cursor: default; }
+
+/* Brand wordmark in the topbar */
+.h-btn--brand {
+  color: var(--c-blue-500, #1563dc);
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: -.04em;
+  padding: 4px 0;
+}
+
+/* Square icon button (hamburger) */
+.h-btn--icon {
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(21, 99, 220, .22);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .72);
+  color: var(--c-blue-500, #1563dc);
+  font-size: 24px;
+}
+
+/* Full-width left-aligned drawer item (top level). Block-level (not the .h-btn
+   inline-flex) so the drawer can shrink-wrap to the widest item via max-content. */
+.h-btn--menu {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  color: var(--c-slate-700, #334155);
+  padding: 14px 20px;
+  font-size: 15px;
+}
+.h-btn--menu:hover {
+  background: var(--c-slate-50, #f8fafc);
+  color: var(--c-blue-500, #1563dc);
+}
+
+/* Nested (child) drawer item — indented, with an elbow marker. */
+.h-btn--menu-child {
+  position: relative;
+  padding: 11px 20px 11px 42px;
+  font-size: 14px;
+  font-weight: 850;
+  color: var(--c-slate-600, #475569);
+}
+.h-btn--menu-child::before {
+  content: "";
+  position: absolute;
+  left: 25px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-left: 2px solid var(--c-slate-300, #cbd5e1);
+  border-bottom: 2px solid var(--c-slate-300, #cbd5e1);
+  transform: translateY(-60%);
+  border-radius: 0 0 0 2px;
+}
+
+/* Drawer "Back" item — keeps teal on hover (does not take the menu hover tint). */
+.h-btn--back {
+  color: var(--c-teal-700, #0f766e);
+  font-weight: 950;
+  border-bottom: var(--hairline, 1px solid var(--c-slate-200, #e2e8f0));
+}
+.h-btn--back:hover { color: var(--c-teal-700, #0f766e); }
+
+/* Inline chip action (card mini-actions) */
+.h-btn--chip {
+  border: 1px solid var(--c-slate-300, #cbd5e1);
+  border-radius: 12px;
+  background: var(--c-white, #fff);
+  color: var(--c-blue-450, #0969e8);
+  padding: 7px 9px;
+  font-size: 12px;
+}
+
+/* Pill-shaped neutral action */
+.h-btn--pillish {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .88);
+  box-shadow: 0 8px 20px rgba(100, 116, 139, .22);
+  color: var(--ink, #101827);
+  padding: 10px 14px;
+}
+
+/* Icon slot inside a button */
+.h-btn__icon { display: inline-flex; flex-shrink: 0; line-height: 1; }

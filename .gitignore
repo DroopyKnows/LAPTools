@@ -1,0 +1,18 @@
+*.zip
+*.claude
+*.diff
+*.bundle
+*.PATCH
+*.log
+*.pyc
+node_modules/
+dist/
+.bundle/
+*[Aa][Gg][Ee][Nn][Tt]*
+*REPORT*
+HANDOFF.md
+
+# App source — exempt from the *REPORT* / *AGENT* junk-file ignores above
+# (core.ignorecase=true makes *REPORT* match the lowercase report-bug page).
+!src/pages/report-bug/
+!src/pages/report-bug/report-bug-page.js

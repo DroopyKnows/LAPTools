@@ -1,0 +1,20 @@
+/* Hub flex layout primitive (h-stack). Hub-private, h- namespace.
+   Trimmed to the gaps/alignments the hub uses; gap names mirror the tool's scale. */
+
+.h-stack { display: flex; }
+
+.h-stack--row { flex-direction: row; }
+.h-stack--column { flex-direction: column; }
+.h-stack--wrap { flex-wrap: wrap; }
+
+.h-stack--gap-2 { gap: 6px; }
+.h-stack--gap-3 { gap: 8px; }
+.h-stack--gap-5 { gap: 12px; }
+.h-stack--gap-6 { gap: 16px; }
+.h-stack--gap-7 { gap: 20px; }
+
+.h-stack--align-center { align-items: center; }
+.h-stack--align-start { align-items: flex-start; }
+
+.h-stack--justify-between { justify-content: space-between; }
+.h-stack--justify-center { justify-content: center; }

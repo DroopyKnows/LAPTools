@@ -1,0 +1,194 @@
+/* Card primitive (card2). Self-contained: `2` suffix, hardcoded token fallbacks. */
+
+.card2 {
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+  padding: var(--card-padding-block) var(--card-padding-inline);
+  border-radius: var(--card-radius);
+  background: var(--card-bg, var(--c-white, #ffffff));
+  border: var(--card-border, 1px solid var(--c-slate-200, #e2e8f0));
+  color: var(--card-fg, var(--c-slate-900, #0f172a));
+  box-shadow: var(--card-shadow, none);
+}
+
+/* SIZE */
+.card2--xs {
+  --card-padding-block: 7px;
+  --card-padding-inline: 10px;
+  --card-radius: 12px;
+  --card-title-size: 10px;
+  --card-body-size: 10px;
+  --card-row-gap: 8px;
+  --card-chevron-size: 10px;
+  --card-chevron-box: 12px;
+}
+.card2--sm {
+  --card-padding-block: 9px;
+  --card-padding-inline: 9px;
+  --card-radius: 14px;
+  --card-title-size: 11px;
+  --card-body-size: 10px;
+  --card-row-gap: 8px;
+  --card-chevron-size: 12px;
+  --card-chevron-box: 14px;
+}
+.card2--md {
+  --card-padding-block: 12px;
+  --card-padding-inline: 12px;
+  --card-radius: 18px;
+  --card-title-size: 14px;
+  --card-body-size: 11px;
+  --card-row-gap: 10px;
+  --card-chevron-size: 16px;
+  --card-chevron-box: 18px;
+}
+.card2--lg {
+  --card-padding-block: 16px;
+  --card-padding-inline: 16px;
+  --card-radius: 24px;
+  --card-title-size: 16px;
+  --card-body-size: 12px;
+  --card-row-gap: 12px;
+  --card-chevron-size: 18px;
+  --card-chevron-box: 20px;
+}
+
+/* TONE */
+.card2--white      { --card-bg: var(--c-white, #ffffff);    --card-border: 1px solid var(--c-slate-200, #e2e8f0); --card-shadow: var(--shadow-card, 0 5px 12px rgba(100, 116, 139, .08)); }
+.card2--muted      { --card-bg: var(--c-slate-50, #f8fafc); --card-border: 1px solid var(--c-slate-200, #e2e8f0); }
+.card2--amber      { --card-bg: var(--c-amber-50, #fffbeb); --card-border: 1px solid var(--c-amber-200, #fde68a); --card-fg: var(--c-amber-800, #92400e); }
+.card2--amber-soft { --card-bg: var(--c-amber-75, #fff7d6); --card-border: 1px solid var(--c-amber-200, #fde68a); --card-fg: var(--c-amber-800, #92400e); }
+
+/* TITLE TONES */
+.card2__title--muted {
+  color: var(--c-slate-600, #475569);
+}
+
+/* INTERACTIVE */
+.card2--interactive { cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; }
+.card2--interactive:hover { transform: translateY(-1px); box-shadow: var(--shadow-card-hover, 0 8px 20px rgba(100, 116, 139, .16)); }
+.card2--interactive:focus-visible {
+  outline: 2px solid var(--focus-ring, #7c3aed);
+  outline-offset: 4px;
+}
+
+/* CONTENT SLOTS */
+.card2__header { width: 100%; }
+/* A header aside control (e.g. the chest Show Lvl toggle) keeps its width and never
+   wraps; the title block absorbs any squeeze instead. */
+.card2__header > .toggle2 { flex-shrink: 0; }
+.card2__header > .toggle2 .toggle2__label { white-space: nowrap; }
+.card2__heading { display: flex; gap: var(--card-row-gap); align-items: center; width: 100%; }
+.card2__custom-header { min-width: 0; flex: 1 1 auto; }
+.card2__default-header { min-width: 0; flex: 1 1 auto; }
+.card2__icon  { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; font-size: 28px; background: var(--c-slate-100, #f1f5f9); }
+.card2__text { min-width: 0; flex: 1 1 auto; }
+.card2__default-header .card2__text { flex-basis: 180px; }
+.card2__text--left { text-align: left; }
+.card2__text--center { text-align: center; }
+.card2__text--right { text-align: right; }
+.card2__title { font-weight: 950; font-size: var(--card-title-size); line-height: 1.15; }
+.card2__body  { font-size: var(--card-body-size); line-height: 1.35; color: var(--c-slate-500, #64748b); margin-top: 2px; }
+.card2__chev  {
+  width: var(--card-chevron-box);
+  height: var(--card-chevron-box);
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: flex-start;
+  justify-content: center;
+  flex: 0 0 var(--card-chevron-box);
+  font-size: var(--card-chevron-size);
+  line-height: 1;
+  color: var(--c-slate-400, #94a3b8);
+}
+.card2__action { display: flex; align-items: center; flex-shrink: 0; }
+.card2__default-header .card2__action { margin-inline-start: auto; }
+.card2__content { margin-top: 0; }
+.card2__content--after-header { margin-top: 6px; }
+
+/* COLLAPSIBLE */
+.card2__header--toggle { cursor: pointer; }
+.card2__collapse-toggle {
+  border: 0;
+  padding: 0;
+  display: block;
+  background: transparent;
+  font: inherit;
+  line-height: 0;
+  color: inherit;
+  cursor: pointer;
+  text-align: start;
+}
+.card2__collapse-toggle:focus-visible {
+  outline: 2px solid var(--focus-ring, #7c3aed);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.card2__chev { transition: transform .15s ease; }
+
+/* Collapsed = arrow points north/up; expanded/open = arrow points south/down. */
+.card2--collapsible:not(.card2--open) > .card2__header .card2__chev {
+  transform: rotate(180deg);
+}
+.card2--collapsible.card2--open > .card2__header .card2__chev {
+  transform: rotate(0deg);
+}
+
+.card2--collapsible:not(.card2--open) .card2__content {
+  display: none;
+}
+
+/* HEADER EXTRA (e.g. collapsed snapshot preview) */
+.card2__header-extra { display: none; margin-top: 8px; line-height: normal; }
+.card2--collapsible:not(.card2--open) .card2__header-extra {
+  display: block;
+}
+.card2--collapsible.card2--open .card2__header-extra {
+  display: none;
+}
+
+/* VISIBILITY HELPERS */
+.card2--collapsible:not(.card2--open) .card2__body--expanded-only,
+.card2--collapsible:not(.card2--open) .card2__expanded-only {
+  display: none;
+}
+.card2:not(.card2--collapsible:not(.card2--open)) .card2__collapsed-only {
+  display: none;
+}
+
+/* Native details card support. Two collapse mechanisms coexist by design:
+     - JS .card2--collapsible + .card2--open (toggleCard): when collapsed is app state
+       (persisted, re-render-controlled, or swaps in a snapshot preview).
+     - native details.card2: a self-contained disclosure (e.g. chest "Reset Options"),
+       free open/close + a11y, no JS. Don't use it to fake app-state behavior.
+   These rules re-skin <details> as a card2: strip the marker, rotate .card2__chev off [open]. */
+details.card2 > summary.card2__header {
+  display: block;
+  list-style: none;
+}
+details.card2 > summary.card2__header::-webkit-details-marker {
+  display: none;
+}
+details.card2:not([open]) > summary .card2__chev {
+  transform: rotate(180deg);
+}
+details.card2[open] > summary .card2__chev {
+  transform: rotate(0deg);
+}
+
+/* global: parent .hide-subtext2 hides all card subtext */
+.hide-subtext2 .card2__body { display: none; }
+/* per-card override: show subtext even when global hide is on */
+.hide-subtext2 .card2__body--force { display: block; }
+
+/* Half padding — for headerless snapshot cards; halves whatever size is in play. */
+.card2--pad-half { padding: calc(var(--card-padding-block) / 2) calc(var(--card-padding-inline) / 2); }
+
+/* `snapshots` setting (body class from applyGlobalDisplaySettings; "on" = no class).
+   A snapshot has two slots: collapsed = .card2__header-extra, open = .card2__snapshot-open.
+   "on" needs no rule — both already show in their state. */
+body.snapshots-off .card2__header-extra,
+body.snapshots-off .card2__snapshot-open { display: none !important; }
+body.snapshots-only-closed .card2__snapshot-open { display: none !important; }
+body.snapshots-only-open .card2--collapsible:not(.card2--open) .card2__header-extra { display: none !important; }

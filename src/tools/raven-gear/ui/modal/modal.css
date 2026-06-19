@@ -1,0 +1,157 @@
+/* Modal primitive (modal2). Self-contained: `2` suffix, hardcoded token fallbacks. */
+
+.modal2 {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: 18px;
+}
+
+.modal2__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay-modal, rgba(15, 23, 42, .48));
+  backdrop-filter: blur(2px);
+}
+
+.modal2__panel {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+  padding: 18px;
+  border: 1px solid var(--border-modal, rgba(148, 163, 184, .35));
+  border-radius: 22px;
+  background: var(--c-white, #ffffff);
+  color: var(--c-slate-900, #0f172a);
+  box-shadow: var(--shadow-modal, 0 22px 60px rgba(15, 23, 42, .28));
+}
+
+.modal2__panel--sm { max-width: 340px; }
+.modal2__panel--md { max-width: 420px; }
+.modal2__panel--lg { max-width: 520px; }
+
+.modal2__header {
+  margin-bottom: 16px;
+}
+
+.modal2__title {
+  margin: 0;
+  color: var(--c-slate-900, #0f172a);
+  font-size: 18px;
+  font-weight: 950;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+}
+
+.modal2__message {
+  /* Body text for NOTICE / CONFIRM modals — it IS the content, so no own margin;
+     the content stack's gap-2 spaces anything below. */
+  margin: 0;
+  color: var(--c-slate-600, #475569);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* Secondary text under the title for INTERACTIVE / FORM modals; 2px below, like card2 title→body. */
+.modal2__subtitle {
+  margin-top: 2px;
+  color: var(--c-slate-600, #475569);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* After-header content region (6px, like card2). Holds body text (notice/confirm) or
+   controls (interactive/form). Carry stack2--gap-2 in markup for internal rhythm. */
+.modal2__content {
+  margin-top: 6px;
+  min-width: 0;
+}
+
+.modal2__actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  /* No own top margin: the stack's gap sets the space above this last child. */
+}
+
+.modal2__actions--stacked {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+
+.modal2__actions--stacked > .button2 {
+  width: 100%;
+}
+
+/* INTERACTIVE / FORM action rows: min-width (not a hard basis) so short labels stay
+   compact and long ones grow; stays end-aligned. */
+.modal2__actions--input > .button2 {
+  flex: 0 0 auto;
+  min-width: 20%;
+}
+
+.modal2__field-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.modal2__field {
+  display: grid;
+  gap: 6px;
+  color: var(--c-slate-500, #64748b);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.modal2__text-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--c-bluegray-300, #cbd5e1);
+  border-radius: 14px;
+  outline: none;
+  background: var(--c-slate-50, #f8fafc);
+  color: var(--c-slate-900, #0f172a);
+  font: inherit;
+  font-size: 16px; /* iOS zoom guard: prevents Safari auto-zoom on focus */
+  font-weight: 800;
+}
+
+.modal2__text-input:focus {
+  border-color: var(--c-blue-500, #3b82f6);
+  box-shadow: 0 0 0 3px var(--focus-ring-blue, rgba(59, 130, 246, .12));
+}
+
+.modal2__tech-form {
+  display: grid;
+  gap: 12px;
+}
+
+.modal2__value-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.modal2__value-grid--stacked {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (max-width: 360px) {
+  .modal2 {
+    padding: 12px;
+  }
+
+  .modal2__panel {
+    max-height: calc(100vh - 24px);
+    padding: 16px;
+  }
+}

@@ -1,0 +1,18 @@
+/* Layout parity: restores the 14px top margin for top-level card2 surfaces
+   (card2 has no external margin, and 14px isn't on the stack2 gap scale). Additive only. */
+
+#whatIfSubPage > .card2,
+#whatIfScenarioPanel > .card2,
+#whatIfSavedPanel > .card2,
+#inventorySubPage > .card2,
+#calculatorSubPage > .card2 {
+  margin-top: 14px;
+}
+
+/* Nested results inset parity — .results-inner adds its own 16px h-padding, but
+   card2--lg already supplies it; zero the duplicate so the inset isn't 32px. */
+#whatIfResultsCard > .card2__content.results-inner,
+#resultsCard > .card2__content.results-inner {
+  padding-left: 0;
+  padding-right: 0;
+}

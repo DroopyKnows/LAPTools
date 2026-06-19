@@ -1,0 +1,13 @@
+/* Scanner status text (scanner-status2). Self-contained, hardcoded token fallbacks.
+   State modifiers stay the bare `loading` / `ok` / `error` tokens that scanner-render.js sets. */
+
+.scanner-status2 {
+  min-height: 18px;
+  color: var(--c-slate-500, #64748b);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.scanner-status2.loading { color: var(--c-violet-700, #6d28d9); }
+.scanner-status2.ok      { color: var(--c-emerald-700, #047857); }
+.scanner-status2.error   { color: var(--c-red-700, #b91c1c); }

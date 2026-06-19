@@ -1,0 +1,26 @@
+/* The single stylesheet the tool injects on mount; imports every 2 primitive + bridges. */
+
+@import url("./_tokens/tokens.css");
+
+@import url("./stack/stack.css");
+@import url("./button/button.css");
+@import url("./pill/pill.css");
+@import url("./notice/notice.css");
+@import url("./card/card.css");
+@import url("./text/text.css");
+@import url("./tabs/tabs.css");
+@import url("./toggle/toggle.css");
+@import url("./grid/grid.css");
+@import url("./hero-card/hero-card.css");
+@import url("./modal/modal.css");
+@import url("./pill-select/pill-select.css");
+@import url("./progress-bar/progress-bar.css");
+@import url("./file-picker/file-picker.css");
+@import url("./value-box/value-box.css");
+
+/* State-class bridge — adapts selection state and native hidden interop. */
+@import url("./_bridge/state-bridge.css");
+
+/* Layout parity — legacy spacing rhythm for top-level card2 surfaces. */
+@import url("./_bridge/layout-parity.css");
+@import url("./scanner-status/scanner-status.css");

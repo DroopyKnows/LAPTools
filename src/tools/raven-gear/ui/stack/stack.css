@@ -1,0 +1,103 @@
+/* Flex container primitive (stack2). Self-contained: `2` suffix, hardcoded token fallbacks.
+   Uses logical properties (margin-inline, gap) for RTL safety. */
+
+.stack2 {
+  display: flex;
+}
+
+/* Direction */
+.stack2--row    { flex-direction: row; }
+.stack2--column { flex-direction: column; }
+
+/* Wrap */
+.stack2--wrap   { flex-wrap: wrap; }
+.stack2--nowrap { flex-wrap: nowrap; }
+
+/* Gap scale (gap for RTL safety) */
+.stack2--gap-0  { gap: 0; }
+.stack2--gap-0\.5 { gap: 3px; }
+.stack2--gap-1  { gap: 4px; }
+.stack2--gap-2  { gap: 6px; }
+.stack2--gap-3  { gap: 8px; }
+.stack2--gap-4  { gap: 10px; } /* common split-row gap */
+.stack2--gap-5  { gap: 12px; }
+.stack2--gap-6  { gap: 16px; }
+.stack2--gap-7  { gap: 20px; }
+.stack2--gap-8  { gap: 24px; }
+
+/* Cross-axis alignment */
+.stack2--align-start    { align-items: flex-start; }
+.stack2--align-center   { align-items: center; }
+.stack2--align-end      { align-items: flex-end; }
+.stack2--align-stretch  { align-items: stretch; }
+.stack2--align-baseline { align-items: baseline; }
+
+/* Main-axis alignment */
+.stack2--justify-start   { justify-content: flex-start; }
+.stack2--justify-center  { justify-content: center; }
+.stack2--justify-end     { justify-content: flex-end; }
+.stack2--justify-between { justify-content: space-between; }
+.stack2--justify-around  { justify-content: space-around; }
+.stack2--justify-evenly  { justify-content: space-evenly; }
+
+/* Inline */
+.stack2--inline { display: inline-flex; }
+
+/* Fill */
+.stack2--fill > * { flex: 1; }
+
+/* content + trailing action cluster - assumes child 1 can fill all available space */
+.stack2--fill-hug > :nth-child(1) {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.stack2--fill-hug > :nth-child(2) {
+  flex: 0 0 auto;
+}
+
+/* leading pair + single end action */
+.stack2--start-end > :nth-child(1) {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.stack2--start-end > :nth-child(2),
+.stack2--start-end > :nth-child(3) {
+  flex: 0 0 auto;
+}
+.stack2--start-end > :nth-child(3) {
+  margin-inline-start: auto;
+}
+
+/* assumes child 1 can fill all available space. Child 2/3 hug and don't shrink. */
+.stack2--fill-end > :nth-child(1) {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.stack2--fill-end > :nth-child(2),
+.stack2--fill-end > :nth-child(3) {
+  flex: 0 0 auto;
+}
+
+/* content split options — assumes exactly two children, each filling available space. */
+.stack2--split {
+  --stack2-split-a: 5;
+  --stack2-split-b: 5;
+  /* slot mapping; flip swaps it */
+  --stack2-split-1: var(--stack2-split-a);
+  --stack2-split-2: var(--stack2-split-b);
+}
+.stack2--split.stack2--split-flip {
+  --stack2-split-1: var(--stack2-split-b);
+  --stack2-split-2: var(--stack2-split-a);
+}
+.stack2--split > :nth-child(1) {
+  flex: var(--stack2-split-1) 1 0;
+  min-width: 0;
+}
+.stack2--split > :nth-child(2) {
+  flex: var(--stack2-split-2) 1 0;
+  min-width: 0;
+}
+.stack2--split-75-25 { --stack2-split-a: 75; --stack2-split-b: 25; }
+.stack2--split-70-30 { --stack2-split-a: 70; --stack2-split-b: 30; }
+.stack2--split-60-40 { --stack2-split-a: 60; --stack2-split-b: 40; }

@@ -1,0 +1,144 @@
+/* Design tokens: colour palette + semantic vars. Lowest cascade layer — referenced, never overridden. */
+:root{
+  --c-white:#fff;
+
+  --c-slate-900:#0f172a;
+  --c-slate-800:#1e293b;
+  --c-slate-700:#334155;
+  --c-slate-600:#475569;
+  --c-slate-500:#64748b;
+  --c-slate-400:#94a3b8;
+  --c-slate-300:#cbd5e1;
+  --c-slate-200:#e2e8f0;
+  --c-slate-100:#f1f5f9;
+  --c-slate-50:#f8fafc;
+
+  --c-ink-900:#101827;
+
+  --c-bluegray-300:#dbe3ef;
+  --c-bluegray-250:#dbe4ef;
+  --c-bluegray-225:#dbe4f0;
+  --c-bluegray-200:#dbe5f2;
+  --c-bluegray-150:#dbe7f6;
+  --c-bluegray-100:#edf2f7;
+  --c-bluegray-75:#eef2f7;
+  --c-bluegray-50:#eef3fb;
+  --c-bluegray-25:#fbfdff;
+  --c-bluegray-wash:#eaf0f7;
+
+  --c-gray-900:#111827;
+
+  --c-green-800:#166534;
+  --c-green-600:#16a34a;
+  --c-green-200:#bbf7d0;
+  --c-green-100:#dcfce7;
+  --c-green-50:#f0fdf4;
+
+  --c-amber-800:#92400e;
+  --c-amber-200:#fde68a;
+  --c-amber-50:#fffbeb;
+
+  /* Extended palette */
+
+  --c-blue-800:#1e40af;
+  --c-blue-700:#1d4ed8;
+  --c-blue-600:#2563eb;
+  --c-blue-550:#155bd6;
+  --c-blue-500:#1563dc;
+  --c-blue-450:#0969e8;
+  --c-blue-400:#60a5fa;
+  --c-blue-350:#93c5fd;
+  --c-blue-300:#0b76ff;
+  --c-blue-250:#255de8;
+  --c-blue-225:#235df5;
+  --c-blue-200:#bfdbfe;
+  --c-blue-100:#dbeafe;
+  --c-blue-50:#eff6ff;
+
+  --c-teal-700:#0f766e;
+
+  --c-sky-700:#0369a1;
+  --c-sky-200:#bae6fd;
+  --c-sky-100:#e0f2fe;
+
+  --c-indigo-900:#312e81;
+  --c-indigo-800:#3730a3;
+  --c-indigo-300:#a5b4fc;
+  --c-indigo-200:#c7d2fe;
+  --c-indigo-50:#eef2ff;
+
+  --c-violet-700:#6d28d9;
+  --c-violet-400:#a78bfa;
+  --c-violet-300:#c4b5fd;
+  --c-violet-200:#ddd6fe;
+  --c-violet-50:#f5f3ff;
+
+  --c-fuchsia-300:#f0abfc;
+
+  --c-hero-navy-900:#071426;
+  --c-hero-navy-800:#111a36;
+  --c-hero-purple-800:#3b1679;
+  --c-brand-violet-600:#7c2df2;
+  --c-soft-blue-top:#f8fbff;
+  --c-soft-blue-bottom:#eef5ff;
+
+  --c-purple-800:#6b21a8;
+  --c-purple-700:#7e22ce;
+  --c-purple-500:#a855f7;
+  --c-purple-300:#d8b4fe;
+  --c-purple-200:#e9d5ff;
+  --c-purple-100:#f3e8ff;
+  --c-purple-50:#faf5ff;
+
+  --c-green-300:#86efac;
+
+  --c-emerald-700:#047857;
+
+  --c-amber-400:#fbbf24;
+  --c-amber-100:#fef3c7;
+
+  --c-orange-900:#7c2d12;
+  --c-orange-800:#9a3412;
+  --c-orange-500:#f97316;
+  --c-orange-200:#fed7aa;
+  --c-orange-50:#fff7ed;
+
+  --c-red-800:#991b1b;
+  --c-red-700:#b91c1c;
+  --c-red-200:#fecaca;
+  --c-red-50:#fef2f2;
+
+  --c-bronze-500:#b87333;
+
+  /* Semantic pill tones — category colours (bg / border / text); each pill variant references one. */
+  --tone-random-bg:var(--c-green-50);     --tone-random-bd:var(--c-green-200);   --tone-random-tx:var(--c-green-800);
+  --tone-choice-bg:var(--c-amber-50);     --tone-choice-bd:var(--c-amber-200);   --tone-choice-tx:var(--c-amber-800);
+  --tone-bank-bg:var(--c-purple-50);      --tone-bank-bd:var(--c-purple-200);    --tone-bank-tx:var(--c-violet-700);
+  --tone-nontarget-bg:var(--c-blue-50);   --tone-nontarget-bd:var(--c-blue-200); --tone-nontarget-tx:var(--c-blue-700);
+  --tone-neutral-bg:var(--c-slate-100);   --tone-neutral-bd:var(--c-slate-200);  --tone-neutral-tx:var(--c-slate-900);
+  --tone-final-bg:var(--c-indigo-50);     --tone-final-bd:var(--c-indigo-200);   --tone-final-tx:var(--c-indigo-800);
+  --tone-warn-bg:var(--c-orange-50);      --tone-warn-bd:var(--c-orange-200);    --tone-warn-tx:var(--c-orange-800);
+  --tone-positive-bg:var(--c-green-100);  --tone-positive-bd:var(--c-green-300); --tone-positive-tx:var(--c-green-800);
+  --tone-muted-bg:var(--c-slate-50);      --tone-muted-bd:var(--c-slate-300);    --tone-muted-tx:var(--c-slate-700);
+  --tone-requirement-bg:var(--c-blue-50); --tone-requirement-bd:var(--c-blue-200);--tone-requirement-tx:var(--c-blue-800);
+  --tone-left-bg:var(--c-sky-100);        --tone-left-bd:var(--c-sky-200);       --tone-left-tx:var(--c-sky-700);
+  --tone-right-bg:var(--c-purple-100);    --tone-right-bd:var(--c-purple-300);   --tone-right-tx:var(--c-purple-800);
+}
+
+/* Semantic tokens */
+:root{
+      --bg1:var(--c-bluegray-75);
+      --bg2:var(--c-bluegray-250);
+      --ink:var(--c-ink-900);
+      --muted:var(--c-slate-500);
+      --soft:var(--c-slate-50);
+      --card:rgba(255,255,255,.94);
+      --line:var(--c-bluegray-250);
+      --dark:var(--c-slate-900);
+      --accent:#7c3aed;
+      --accent2:var(--c-blue-600);
+      --orange:var(--c-orange-500);
+      --danger:var(--c-red-700);
+      --shadow:0 14px 32px rgba(100,116,139,.28);
+      --hairline:1px solid var(--c-slate-200);
+}
