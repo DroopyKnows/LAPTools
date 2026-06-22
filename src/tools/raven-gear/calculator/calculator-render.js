@@ -711,9 +711,9 @@ export function createCalculatorRenderModule(runtime){
       if(!el) return;
 
       if(env.isManual()){
-        el.textContent="Items that were earned from random chests, but weren&rsquo;t duplicates of the manual item in mind.";
+        el.textContent="Items that were earned from random chests, but weren’t duplicates of the manual item in mind.";
       }else{
-        el.textContent=`Items that were earned from random chests, but weren&rsquo;t duplicates of the ${env.itemLabel()}.`;
+        el.textContent=`Items that were earned from random chests, but weren’t duplicates of the ${env.itemLabel()}.`;
       }
     }
 
