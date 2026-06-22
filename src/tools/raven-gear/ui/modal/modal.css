@@ -26,7 +26,9 @@
   padding: 18px;
   border: 1px solid var(--border-modal, rgba(148, 163, 184, .35));
   border-radius: 22px;
-  background: var(--c-white, #ffffff);
+  background: var(--modal-panel-bg, rgba(255, 255, 255, .90));
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   color: var(--c-slate-900, #0f172a);
   box-shadow: var(--shadow-modal, 0 22px 60px rgba(15, 23, 42, .28));
 }
@@ -118,7 +120,7 @@
   border: 1px solid var(--c-bluegray-300, #cbd5e1);
   border-radius: 14px;
   outline: none;
-  background: var(--c-slate-50, #f8fafc);
+  background: var(--vbox-well-bg, rgba(15, 23, 42, .03));
   color: var(--c-slate-900, #0f172a);
   font: inherit;
   font-size: 16px; /* iOS zoom guard: prevents Safari auto-zoom on focus */

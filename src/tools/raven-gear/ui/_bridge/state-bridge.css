@@ -6,9 +6,9 @@
 
 /* Tabs / segmented options: active state is .active (JS), not --active/--selected. */
 .tabs2__tab.active {
-  background: var(--c-white, #ffffff);
+  background: var(--control-active-bg, rgba(241, 245, 253, .96));
   color: var(--c-slate-900, #0f172a);
-  box-shadow: var(--shadow-tabs, 0 4px 12px rgba(100,116,139,.15));
+  box-shadow: inset 0 0 0 1px var(--control-active-border, rgba(15, 23, 42, .16)), var(--shadow-tabs, 0 4px 12px rgba(100,116,139,.15));
 }
 .tabs2--primary .tabs2__tab.active {
   background: var(--c-blue-600, #2563eb);
@@ -22,8 +22,8 @@
   box-shadow: var(--shadow-pill-selected, 0 6px 14px rgba(15,23,42,.16));
 }
 .toggle2--text.active .toggle2__label {
-  background: var(--c-white, #ffffff);
+  background: var(--control-active-bg, rgba(241, 245, 253, .96));
   color: var(--c-slate-900, #0f172a);
-  box-shadow: var(--shadow-toggle-text, 0 1px 3px rgba(15,23,42,.12));
+  box-shadow: inset 0 0 0 1px var(--control-active-border, rgba(15, 23, 42, .16)), var(--shadow-toggle-text, 0 1px 3px rgba(15,23,42,.12));
 }
 

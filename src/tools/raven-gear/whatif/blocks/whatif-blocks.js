@@ -43,6 +43,19 @@ export const WHATIF_NONTARGET_OPTIONS={
   subtext:"Non-target items estimated from this scenario.",
   actions:{ toggleSideBreakdown:"toggleNontargetSideBreakdown" }
 };
+// Inventory Change Summary block options for What If. The id / contentId are pinned to the
+// original hardcoded ids so the committed CSS (violet strong-row override + the
+// #whatIfSummaryCard grid-alignment rule in ui/_bridge/layout-parity.css) keeps matching, and
+// the markup stays identical to the pre-refactor inline section. The What-If row DATA is still
+// built by whatif-results.js (scenario-aware: baseline toggle, top-up-folded plan), rendered
+// into #whatIfChangeSummary via renderStateRows — only the card chrome moved into the block.
+export const WHATIF_CHANGE_SUMMARY_OPTIONS={
+  id:"whatIfSummaryCard",
+  contentId:"whatIfChangeSummary",
+  title:"Inventory Change Summary",
+  subtext:"Current Inventory, Combined Inventory baseline, and scenario result.",
+  open:true
+};
 
 export function createWhatIfBlocks(runtime){
   const state=runtime.state;
@@ -65,7 +78,7 @@ export function createWhatIfBlocks(runtime){
     probability: () => runtime.whatIfProbability(),
     targetLevel: () => Math.max(1, Math.min(MAX_ITEM_LEVEL, Number(state.whatIf.current.targetLevel||7))),
     ownedObject: baseOwned,
-    planObject: () => state.whatIf.current.random || {},
+    randomObject: () => state.whatIf.current.random || {},
     guaranteedObject: () => state.whatIf.current.choice || {},
     // Bank off: top-up choice folds directly into the item's choice total.
     totalChoiceObject: () => runtime.levelObjectPlus(state.whatIf.current.choice || {}, bundleTotalsFor().choice || {}),
@@ -80,8 +93,8 @@ export function createWhatIfBlocks(runtime){
       setBundleQty:"setWhatIfBundleQty",
       adjustBundleQty:"adjustWhatIfBundleQty"
     },
-    showHighRandom: () => !!(runtime.byId(prefix+"showHighRandom") && runtime.byId(prefix+"showHighRandom").checked),
-    showHighChests: () => !!(runtime.byId(prefix+"showHighChestLevels") && runtime.byId(prefix+"showHighChestLevels").checked),
+    showHighRandom: () => !!state.whatIf.current.showHigh,
+    showHighChests: () => !!state.whatIf.current.showHighChests,
     side: () => runtime.whatIfItem().side,
     subjectLabel: () => runtime.whatIfItem().name,
     isManual: () => false,
@@ -111,6 +124,8 @@ export function createWhatIfBlocks(runtime){
     set(prefix+"topUpBundlesPanel","hidden",chestActive);
     const hi=runtime.byId(prefix+"showHighRandom");
     if(hi) hi.checked=!!state.whatIf.current.showHigh;
+    const hiChests=runtime.byId(prefix+"showHighChestLevels");
+    if(hiChests) hiChests.checked=!!state.whatIf.current.showHighChests;
   }
 
   const chest={

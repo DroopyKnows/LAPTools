@@ -1,7 +1,7 @@
 // Inventory rendering and view helpers.
 // External helpers/data/state are read from runtime at call time; internal helpers call lexically.
 
-import { allItemLevels, chestLevels, ravenItems } from "../metadata/item-metadata.js";
+import { allItemLevels, chestLevels, ravenItems, MANUAL_HIGH_LEVEL_KEY } from "../metadata/item-metadata.js";
 import { createInventoryPillRenderers } from "../shared/ui/inventory-pill-renderers.js";
 import { renderInventoryItemCard, renderSingleCompactRow } from "./inventory-ui-renderers.js";
 import { pill2SourceClassName, pill2SourceCaption } from "../ui/pill/pill.js";
@@ -61,7 +61,9 @@ export function createInventoryRenderModule(runtime){
     }
 
     function highLevelForItem(itemName){
-      const values=(runtime.state.inventory && runtime.state.inventory.active && runtime.state.inventory.active[itemName]) || {};
+      // Manual mode keeps its equipped high level in the manual owned object (like a real item
+      // keeps it in active[name]); other items read their active map.
+      const values=(itemName===MANUAL_HIGH_LEVEL_KEY ? runtime.state.manualOwned : (runtime.state.inventory && runtime.state.inventory.active && runtime.state.inventory.active[itemName])) || {};
       for(let level=12;level>=8;level--){
         if(Number(values[level]||0)>0) return level;
       }
@@ -69,14 +71,14 @@ export function createInventoryRenderModule(runtime){
     }
 
     function techPointsForItem(itemName){
+      if(itemName===MANUAL_HIGH_LEVEL_KEY) return Math.max(0,Math.floor(Number(runtime.state.manualTechPoints||0)));
       const map=runtime.state.inventoryTechPointsByItem || {};
       return Math.max(0,Math.floor(Number(map[itemName]||0)));
     }
 
     function requiredTechPointsForLevel(level){
-      const current=Number(level||0);
-      if(current>=8 && current<=11) return Math.pow(3,current)-Math.pow(3,current-1);
-      return 0;
+      // Canonical research-cost formula lives in the pure math layer (levels.js).
+      return runtime.requiredTechPointsForLevel(Number(level||0));
     }
 
     function getInventoryItemDisplayModel(itemName,values,options={}){
@@ -313,11 +315,14 @@ export function createInventoryRenderModule(runtime){
     function renderActiveInvCell(itemName,level,values){
       const safeName=runtime.uiEscapeAttr(itemName);
       const value=(values||{})[level]||"";
+      // Soft "ghost" fill keyed to the item's drop side (blue=left, purple=right).
+      const side=(ravenItems.find(item=>item.name===itemName)||{}).side;
+      const srcClass=side==="right" ? "value-box2--src-owned-right" : "value-box2--src-owned-left";
       // value-box2 sm stepper with step-ghost buttons, label above. setInventory/adjustInventory wiring.
       return `
         <span class="value-box2-unit value-box2-unit--above">
           <span class="value-box2__label value-box2__label--above">L${level}</span>
-          <div class="value-box2 value-box2--sm value-box2--manual value-box2--stepper">
+          <div class="value-box2 value-box2--sm value-box2--manual value-box2--stepper ${srcClass}">
             <button type="button" class="button2 button2--sm button2--step-ghost" data-action="adjustInventory" data-action-event="click" data-arg0="${safeName}" data-arg1="${level}" data-arg2="-1" data-arg2-type="number">&minus;</button>
             <span class="value-box2__content"><input class="value-box2__input" data-input-key="inventory-${safeName}-${level}" type="number" min="0" step="1" inputmode="numeric" value="${value}" placeholder="0" data-action="setInventory" data-action-event="input" data-arg0="${safeName}" data-arg1="${level}" data-source2="value" /></span>
             <button type="button" class="button2 button2--sm button2--step-ghost" data-action="adjustInventory" data-action-event="click" data-arg0="${safeName}" data-arg1="${level}" data-arg2="1" data-arg2-type="number">+</button>
@@ -374,7 +379,7 @@ export function createInventoryRenderModule(runtime){
       // the JS-toggled .active (state-bridge), setInventoryHighLevel wiring.
       return `
         <div class="stack2 stack2--column stack2--gap-3">
-          <div class="pill-select2 pill-select2--sm" style="--pill-select-cols:5" role="radiogroup" aria-label="Current high level for ${runtime.uiEscapeAttr(itemName)}">
+          <div class="pill-select2 pill-select2--sm pill-select2--tone-level" style="--pill-select-cols:5" role="radiogroup" aria-label="Current high level for ${runtime.uiEscapeAttr(itemName)}">
             ${[12,11,10,9,8].map(level=>`
               <button type="button" class="pill-select2__option ${selected===level ? "active" : ""}" data-action="setInventoryHighLevel" data-action-event="click" data-arg0="${runtime.uiEscapeAttr(itemName)}" data-arg1="${level}" aria-pressed="${selected===level ? "true" : "false"}">L${level}</button>
             `).join("")}
@@ -664,14 +669,17 @@ export function createInventoryRenderModule(runtime){
             ? calculated
             : runtime.combinedInventoryForItem(item.name);
 
-          const simplified=runtime.simplifyUpByLevel(sourceObject);
-          if(!runtime.levelObjectHasValues(simplified)) return;
+          // High-level items consume their duplicates into research progress; the rest fuse.
+          const banked=(runtime.state.inventoryTechPointsByItem||{})[item.name]||0;
+          const research=runtime.consumeDuplicatesIntoResearch(sourceObject,banked);
+          const displayObject=research.isResearch ? research.displayObject : runtime.simplifyUpByLevel(sourceObject);
+          if(!runtime.levelObjectHasValues(displayObject)) return;
 
           const upCard=document.createElement("div");
           upCard.innerHTML=renderInventoryItemCard({
             title:item.name,
             side:item.side,
-            bodyHtml:renderCompactLevelBoxes(simplified,allItemLevels,{itemName:item.name,levelValue:true})
+            bodyHtml:renderCompactLevelBoxes(displayObject,allItemLevels,{itemName:item.name,levelValue:true,techPoints:research.isResearch?research.techPoints:undefined})
           });
           sideSection.appendChild(upCard.firstElementChild);
           renderedCount++;

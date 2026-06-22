@@ -172,6 +172,11 @@ const RAVEN_ITEM_SOURCES={
 
 const MAX_ITEM_LEVEL=12;
 const MAX_CHEST_LEVEL=7;
+// Sentinel "item name" for manual mode's high-level/tech state. Manual mode has no real item,
+// so the shared high-level UI/handlers are wired with this key, which the high-level readers
+// and setters route to the manual state slices (manualOwned + manualTechPoints) instead of the
+// per-item maps. It is intentionally NOT a member of RAVEN_ITEMS, so item enumerations never see it.
+const MANUAL_HIGH_LEVEL_KEY="__manual__";
 const ITEM_LEVELS=[12,11,10,9,8,7,6,5,4,3,2,1];
 const CHEST_LEVELS=[7,6,5,4,3,2,1];
 const DEFAULT_CHEST_LEVELS=[5,4,3,2,1];
@@ -266,6 +271,7 @@ export {
   CHEST_LEVELS,
   DEFAULT_CHEST_LEVELS,
   ITEM_LEVELS,
+  MANUAL_HIGH_LEVEL_KEY,
   MAX_CHEST_LEVEL,
   MAX_ITEM_LEVEL,
   RAVEN_ITEM_ID_BY_NAME,

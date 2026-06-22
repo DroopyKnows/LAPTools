@@ -10,7 +10,7 @@ export function createRavenGearBundlesModule(runtime){
     }
 
     function activeRandomPlanObject(){
-      return runtime.levelObjectPlus(runtime.currentPlanObject(),bundleRandomTotals());
+      return runtime.levelObjectPlus(runtime.currentRandomObject(),bundleRandomTotals());
     }
 
     function bundleTotalsForObject(bundleObj){

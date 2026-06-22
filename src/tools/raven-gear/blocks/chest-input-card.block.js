@@ -25,7 +25,7 @@ export const CHEST_DEFAULT_ACTIONS={
 // "Show Lvl 6–7" toggle beside the collapse button.
 function chestHeaderAside(prefix,actions){
   return `<label class="toggle2 toggle2--text card2__expanded-only">
-<input class="toggle2__input" data-action="${actions.refreshInputs}" data-action-event="change" id="${prefix}showHighRandom" type="checkbox"/>
+<input class="toggle2__input" data-action="${actions.refreshInputs}" data-action-event="change" data-source0="checked" id="${prefix}showHighRandom" type="checkbox"/>
 <span class="toggle2__label">Show Lv. 6+</span>
 </label>`;
 }

@@ -22,7 +22,7 @@ export function createRavenGearBootstrapModule(runtime) {
     levelObjectHasValues, renderCompactInventoryRows, renderCompactLevelBoxes,
     renderEmptyState, renderInventorySnapshotBlock, roundNice, uiEscapeAttr,
     // calc/inv-events render entry points (called inside renderAll)
-    renderOwnedInputs, renderPlanInputs, renderGuaranteedInputs,
+    renderOwnedInputs, renderRandomInputs, renderGuaranteedInputs,
     calculateResults, renderInventory, renderInventoryRandomTables,
     ensureBankObjects,
     // defensively typeof-guarded — destructure to undefined if absent on runtime
@@ -146,9 +146,18 @@ export function createRavenGearBootstrapModule(runtime) {
   }
 
   function renderAll(){
+    // Reflect the persisted target item onto the <select> (state is the source of truth,
+    // so a reloaded non-default selection shows correctly instead of the first option).
+    const targetSelect=byId("targetItem");
+    if(targetSelect && targetSelect.value!==runtime.state.targetItem) targetSelect.value=runtime.state.targetItem;
+    const levelSelect=byId("targetLevel");
+    if(levelSelect && levelSelect.value!==String(runtime.state.targetLevel)) levelSelect.value=String(runtime.state.targetLevel);
+    const hiRandom=byId("showHighRandom");
+    if(hiRandom && hiRandom.checked!==!!runtime.state.showHighRandom) hiRandom.checked=!!runtime.state.showHighRandom;
+    const hiChests=byId("showHighChestLevels");
+    if(hiChests && hiChests.checked!==!!runtime.state.showHighChests) hiChests.checked=!!runtime.state.showHighChests;
     const activeInfo=captureActiveInputState();
     if(typeof applyGlobalDisplaySettings==="function") applyGlobalDisplaySettings();
-    applyLevel8NoticeVisibility();
     renderOwnedInputs();
     // Calculator chest reset options: 4 (this item / all items) in specific mode,
     // 2 (plans / top ups) in manual mode — manual is a sandbox-style environment.
@@ -164,9 +173,10 @@ export function createRavenGearBootstrapModule(runtime) {
       blocks.chest.render();
       const model=runtime.computeResults();
       blocks.results.render(model);
+      if(blocks.changeSummary) blocks.changeSummary.render(model);
       blocks.nontarget.render(model);
     }else{
-      renderPlanInputs();
+      renderRandomInputs();
       renderGuaranteedInputs();
       calculateResults();
     }
@@ -177,23 +187,6 @@ export function createRavenGearBootstrapModule(runtime) {
     initAllGrids(runtime.root || document);
     save();
     restoreActiveInputState(activeInfo);
-  }
-
-  // "Level 8+ logic unfinished" page notice — dismissal persisted in
-  // state.settings.dismissedMessages (cleared by Reset Do Not Show Again).
-  function level8NoticeDismissed(){
-    return !!(state.settings && state.settings.dismissedMessages && state.settings.dismissedMessages.level8Logic);
-  }
-  function applyLevel8NoticeVisibility(){
-    const el=byId("level8Notice");
-    if(el) el.hidden=level8NoticeDismissed();
-  }
-  function dismissLevel8Notice(){
-    state.settings=state.settings || {};
-    state.settings.dismissedMessages=state.settings.dismissedMessages || {};
-    state.settings.dismissedMessages.level8Logic=true;
-    save();
-    applyLevel8NoticeVisibility();
   }
 
   return {
@@ -208,6 +201,5 @@ export function createRavenGearBootstrapModule(runtime) {
     captureActiveInputState,
     restoreActiveInputState,
     renderAll,
-    dismissLevel8Notice,
   };
 }

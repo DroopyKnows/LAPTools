@@ -88,9 +88,15 @@ export function createRavenGearBackupRuntimeModule(runtime){
     });
   }
 
-  function exportInventory(){
+  async function exportInventory(){
+    // Offer an editable filename before downloading; default is date-stamped so repeat
+    // backups don't overwrite each other. Cancelling the modal aborts the export.
+    const defaultName=`raven_gear_backup_${new Date().toISOString().slice(0,10)}.json`;
+    const filename=await runtime.showExportBackupModal({ defaultName, fallbackName:defaultName });
+    if(!filename) return;
     runtime.RavenGearBackupIO.exportRavenGearBackup({
-      buildBackupPayload:buildFullBackupPayload
+      buildBackupPayload:buildFullBackupPayload,
+      filename
     });
   }
 

@@ -1,0 +1,63 @@
+/* Tool global primitives — curated from the former shared base.css (Phase A isolation).
+   PURE element/utility primitives only. Component styles (cards, pills, notices, buttons)
+   live under ui/* in the `2`-suffix system and are intentionally NOT duplicated here, so the
+   tool stays a clean primitive set with no hub component contamination.
+
+   The 3 foundation tokens the body primitive needs are defined locally (concrete values) so
+   they resolve at page load — the tool's ui/_tokens/tokens.css is injected only on mount, and
+   the <body> paints before that. --c-slate-600 / --line (used by label + form inputs) come
+   from _tokens and resolve fine, because those elements only exist after mount. */
+
+:root{
+  --ink: #101827;   /* former shared --c-ink-900     */
+  --bg1: #eef2f7;   /* former shared --c-bluegray-75  */
+  --bg2: #dbe4ef;   /* former shared --c-bluegray-250 */
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Arial,Helvetica,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(60% 55% at 0% 0%,    rgba(124,58,237,.40), transparent 70%),
+    radial-gradient(60% 55% at 100% 0%,  rgba(37,99,235,.38),  transparent 70%),
+    radial-gradient(75% 55% at 50% 100%, rgba(45,212,191,.28), transparent 72%),
+    linear-gradient(180deg,#c2cee0,#9eafc7);
+  background-attachment: fixed;
+}
+
+button,input,select{ font-family:inherit; }
+
+/* Layout / Utilities */
+.hidden{ display:none!important; }
+h1,h2,h3,p{ margin:0; }
+h1{
+  position:relative; z-index:1;
+  margin-top:6px;
+  font-size:31px;
+  line-height:1;
+  letter-spacing:-.04em;
+}
+
+/* Forms */
+label{
+  display:block;
+  margin-bottom:0px;
+  color:var(--c-slate-600);
+  font-size:12px;
+  font-weight:950;
+}
+select,input[type="number"],input[type="text"]{
+  width:100%;
+  min-height:44px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  outline:none;
+  background:white;
+  color:var(--ink);
+  padding:11px 12px;
+  font-weight:850;
+}

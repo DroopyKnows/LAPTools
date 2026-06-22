@@ -21,14 +21,43 @@ export function createCalculatorEventsModule(runtime){
       runtime.renderAll();
     }
 
-    function onTargetItemChange(){
+    function onTargetItemChange(value){
+      // Controlled input: the change handler receives the selected value (data-source0),
+      // writes it to state (source of truth), persists, then re-renders. The compute path
+      // reads state.targetItem, never the DOM — ports to React as
+      // onChange={e=>onTargetItemChange(e.target.value)}.
+      runtime.state.targetItem=value;
+      runtime.save();
       runtime.renderAll();
     }
 
-    function setHighestOwned(value){
-      const next=Number(value||0);
-      if(next>=12) runtime.state.highestGlobalOwned=12;
-      else runtime.state.highestGlobalOwned=next>=8 ? 8 : Math.max(1,Math.min(7,next||7));
+    function onTargetLevelChange(value){
+      // Controlled input: receives the selected level (data-source0); coerces, writes to
+      // state, persists, re-renders.
+      runtime.state.targetLevel=Number(value)||7;
+      runtime.save();
+      runtime.renderAll();
+    }
+
+    function setCalcShowHighRandom(checked){
+      // Controlled input: "show high" random-chest-input toggle. Receives the checkbox
+      // state (data-source0="checked"), persists, re-renders.
+      runtime.state.showHighRandom=!!checked;
+      runtime.save();
+      runtime.renderAll();
+    }
+
+    function setCalcShowHighChests(checked){
+      // Controlled input: "Show Lvl 6-7" results toggle. Receives the checkbox state
+      // (data-source0="checked"), persists, re-renders.
+      runtime.state.showHighChests=!!checked;
+      runtime.save();
+      runtime.renderAll();
+    }
+
+    function setOwnedItemsFilter(value){
+      // Owned Items Filter tabs: "low" (7-), "high" (8+), "all".
+      runtime.state.ownedItemsFilter=(value==="all"||value==="high") ? value : "low";
       runtime.save();
       runtime.renderAll();
     }
@@ -120,7 +149,7 @@ export function createCalculatorEventsModule(runtime){
 
     function getGroupObject(group){
       if(group==="owned") return runtime.currentOwnedObject();
-      if(group==="plan") return runtime.currentPlanObject();
+      if(group==="random") return runtime.currentRandomObject();
       if(group==="guaranteed") return runtime.currentGuaranteedObject();
       return {};
     }
@@ -265,7 +294,7 @@ export function createCalculatorEventsModule(runtime){
       syncChoiceBankFromDerived();
       runtime.save();
       runtime.renderTopUpBundles();
-      runtime.renderPlanInputs();
+      runtime.renderRandomInputs();
       runtime.renderAll();
     }
 
@@ -292,7 +321,7 @@ export function createCalculatorEventsModule(runtime){
         return;
       }
       runtime.save();
-      runtime.renderPlanInputs();
+      runtime.renderRandomInputs();
       runtime.renderTopUpBundles();
       runtime.renderAll();
     }
@@ -310,7 +339,7 @@ export function createCalculatorEventsModule(runtime){
         return;
       }
       runtime.save();
-      runtime.renderPlanInputs();
+      runtime.renderRandomInputs();
       runtime.renderTopUpBundles();
       runtime.renderAll();
     }
@@ -336,7 +365,7 @@ export function createCalculatorEventsModule(runtime){
       syncChoiceBankFromDerived();
       runtime.save();
       runtime.renderTopUpBundles();
-      runtime.renderPlanInputs();
+      runtime.renderRandomInputs();
       runtime.renderAll();
     }
 
@@ -369,7 +398,7 @@ export function createCalculatorEventsModule(runtime){
       syncChoiceBankFromDerived();
       runtime.save();
       runtime.renderTopUpBundles();
-      runtime.renderPlanInputs();
+      runtime.renderRandomInputs();
       runtime.renderAll();
     }
 
@@ -377,7 +406,7 @@ export function createCalculatorEventsModule(runtime){
       syncChoiceBankFromDerived();
       runtime.save();
       runtime.renderTopUpBundles();
-      runtime.renderPlanInputs();
+      runtime.renderRandomInputs();
       runtime.renderAll();
     }
 
@@ -405,7 +434,7 @@ export function createCalculatorEventsModule(runtime){
       }
       runtime.save();
       runtime.renderTopUpBundles();
-      runtime.renderPlanInputs();
+      runtime.renderRandomInputs();
       runtime.renderAll();
     }
 
@@ -419,12 +448,12 @@ export function createCalculatorEventsModule(runtime){
         const level=Number(levelKey);
         const amount=Math.floor(Number(totals.random[levelKey]||0));
         if(amount>0){
-          const plan=runtime.currentPlanObject();
+          const plan=runtime.currentRandomObject();
           plan[level]=(Number(plan[level]||0)+amount);
         }
       });
       runtime.save();
-      runtime.renderPlanInputs();
+      runtime.renderRandomInputs();
       runtime.renderAll();
     }
 
@@ -480,7 +509,10 @@ export function createCalculatorEventsModule(runtime){
     setMode,
     setManualSide,
     onTargetItemChange,
-    setHighestOwned,
+    onTargetLevelChange,
+    setCalcShowHighRandom,
+    setCalcShowHighChests,
+    setOwnedItemsFilter,
     setGroupValue,
     adjustGroup,
     getGroupObject,

@@ -16,3 +16,43 @@
   padding-left: 0;
   padding-right: 0;
 }
+
+/* Comparison / audit lists (What-If preview + summary + saved scenarios, Upgraded Owned,
+   and the Inventory Summary / Item Plan audit lists): left-align grid rows so per-level values
+   line up row-to-row. Centering each row independently leaves nothing aligned. Lives here (an
+   UNLAYERED bridge) on purpose: grid.css ships unlayered, so a layered override can't beat it —
+   here the #id specificity wins. Engine grids expose .grid2__row; labeled-rows .grid2__row-body. */
+#whatIfSetupPreviewCard .grid2--align-center .grid2__row,
+#whatIfSetupPreviewCard .grid2--align-center .grid2__row-body,
+#whatIfSummaryCard .grid2--align-center .grid2__row,
+#whatIfSummaryCard .grid2--align-center .grid2__row-body,
+#changeSummaryCard .grid2--align-center .grid2__row,
+#changeSummaryCard .grid2--align-center .grid2__row-body,
+#savedWhatIfScenarios .grid2--align-center .grid2__row,
+#savedWhatIfScenarios .grid2--align-center .grid2__row-body,
+#upgradedOwnedCard .grid2--align-center .grid2__row,
+#upgradedOwnedCard .grid2--align-center .grid2__row-body,
+#breakdownEstimatedInventoryList .grid2--align-center .grid2__row,
+#breakdownEstimatedInventoryList .grid2--align-center .grid2__row-body,
+#itemPlanSummaryList .grid2--align-center .grid2__row,
+#itemPlanSummaryList .grid2--align-center .grid2__row-body {
+  justify-content: flex-start;
+}
+
+/* Kept centered (higher specificity wins): the breakdown T-chart's side-by-side Left/Right
+   inventory cards, the composite "L: / R:" leftover grid (--min-wide), and the fixed-column
+   Balance Check audit grid (the only grid here built from value boxes). */
+#breakdownEstimatedInventoryList .stack2--row .grid2--align-center .grid2__row,
+#itemPlanSummaryList .grid2--align-center.grid2--min-wide .grid2__row,
+#itemPlanSummaryList .grid2--align-center:has(.value-box2) .grid2__row {
+  justify-content: center;
+}
+
+/* Change-summary snapshots (collapsed header-extra + open) are compact centered previews,
+   not comparison lists — keep their grids centered despite the section-wide left-align above. */
+#changeSummaryCard .card2__header-extra .grid2--align-center .grid2__row,
+#changeSummaryCard .card2__snapshot-open .grid2--align-center .grid2__row,
+#whatIfSummaryCard .card2__header-extra .grid2--align-center .grid2__row,
+#whatIfSummaryCard .card2__snapshot-open .grid2--align-center .grid2__row {
+  justify-content: center;
+}

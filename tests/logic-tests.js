@@ -491,7 +491,7 @@ function getTests(win){
         assertEqual(backup.state.inventory.archives[0].inventory["Tail of Wind"], {5:3});
         assertEqual(backup.state.whatIf.current.random, {5:2});
         assertEqual(backup.state.whatIf.saved[0].scenario.choice, {2:1});
-        assertEqual(backup.state.settings, {hideMoreInformationSections:true,hideAdvancedSections:true,snapshotMode:"on"});
+        assertEqual(backup.state.settings, {hideMoreInformationSections:true,hideAdvancedSections:true,snapshotMode:"on",allowZoom:false});
         assertEqual(backup.state.ui, {bagScanner:{status:"Scan complete.",reviewOpen:true},customFlag:"keep"});
       }
     },

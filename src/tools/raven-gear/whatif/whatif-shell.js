@@ -3,13 +3,15 @@
 // toggle / badge chrome wears the `2` component classes (card2 / tabs2 / button2 /
 // toggle2 / pill2), with card collapse driven by the app's JS-toggled `.open` class.
 //
-// The What If Results and Advanced / Details cards are now MOUNTED from the shared
-// calculator blocks (results-card / nontarget-card) via an environment-parameterized
-// `whatIf` prefix — see whatif/blocks/whatif-blocks.js. They are two views over one
-// computeResults(whatIfEnv) pass, the same drop-rate math the calculator uses.
+// The What If Results, Inventory Change Summary, and Advanced / Details cards are now MOUNTED
+// from the shared calculator blocks (results-card / change-summary-card / nontarget-card) via an
+// environment-parameterized `whatIf` prefix — see whatif/blocks/whatif-blocks.js. Results /
+// Non-target are two views over one computeResults(whatIfEnv) pass; the Change Summary card's
+// chrome comes from the block (pinned to id whatIfSummaryCard / content whatIfChangeSummary)
+// while its scenario-aware row DATA is still filled by whatif-results.js.
 //
 // The Scenario Setup card establishes the owned base (Starting vs Combined Inventory)
-// before chests. Chest Inputs and Inventory Change Summary remain authored here.
+// before chests.
 //
 // Do NOT edit ids / data-action / data-arg / data-source attributes, or the
 // .open / .active / .hidden state classes — behavior runs on them.
@@ -17,7 +19,8 @@
 import { renderChestInputCardMarkup } from "../blocks/chest-input-card.block.js";
 import { renderResultsCardMarkup } from "../blocks/results-card.block.js";
 import { renderNontargetCardMarkup } from "../blocks/nontarget-card.block.js";
-import { WHATIF_CHEST_OPTIONS, WHATIF_RESULTS_OPTIONS, WHATIF_NONTARGET_OPTIONS } from "./blocks/whatif-blocks.js";
+import { renderChangeSummaryCardMarkup } from "../blocks/change-summary-card.block.js";
+import { WHATIF_CHEST_OPTIONS, WHATIF_RESULTS_OPTIONS, WHATIF_NONTARGET_OPTIONS, WHATIF_CHANGE_SUMMARY_OPTIONS } from "./blocks/whatif-blocks.js";
 
 export const WHATIF_SHELL_MARKUP=`<section class="hidden" id="whatIfSubPage">
 <section class="card2 card2--white card2--lg">
@@ -94,20 +97,7 @@ export const WHATIF_SHELL_MARKUP=`<section class="hidden" id="whatIfSubPage">
 </section>
 ${renderChestInputCardMarkup(WHATIF_CHEST_OPTIONS)}
 ${renderResultsCardMarkup(WHATIF_RESULTS_OPTIONS)}
-<section class="card2 card2--white card2--lg card2--collapsible card2--open" id="whatIfSummaryCard">
-<button class="card2__header card2__header--toggle card2__collapse-toggle" data-action="toggleCard" data-action-event="click" data-arg0="whatIfSummaryCard" type="button">
-<div class="card2__heading">
-<div class="stack2 stack2--row stack2--gap-2 stack2--align-start stack2--wrap card2__default-header">
-<div class="card2__text">
-<div class="card2__title">Inventory Change Summary</div>
-<div class="card2__body">Current Inventory, Combined Inventory baseline, and scenario result.</div>
-</div>
-</div>
-<div class="card2__chev">⌄</div>
-</div>
-</button>
-<div class="card2__content card2__content--after-header" id="whatIfChangeSummary"></div>
-</section>
+${renderChangeSummaryCardMarkup(WHATIF_CHANGE_SUMMARY_OPTIONS)}
 ${renderNontargetCardMarkup(WHATIF_NONTARGET_OPTIONS)}
 </div>
 <div class="hidden" id="whatIfSavedPanel">

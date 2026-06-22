@@ -6,19 +6,38 @@
 .h-card {
   box-sizing: border-box;
   width: 100%;
-  --hcard-border: 0;
+  position: relative;
+  /* Glass surface — mirrors the Raven Gear tool's large-card treatment. Values are hardcoded
+     (the tool is isolated, so its tokens can't be shared/imported here). Translucent fill +
+     backdrop blur reveal the page background; lift comes from a deep shadow + bright top edge,
+     not a heavy border. */
+  --hcard-bg: rgba(255, 255, 255, .70);
+  --hcard-border: 1px solid rgba(15, 23, 42, .10);
   --hcard-radius: 18px;
   --hcard-pad: 14px;
   --hcard-icon-size: 54px;
   --hcard-gap: 12px;
-  --hcard-shadow: 0 10px 24px rgba(100, 116, 139, .14);
+  --hcard-shadow: 0 12px 30px rgba(15, 23, 42, .14), inset 0 1px 0 rgba(255, 255, 255, .9);
   border: var(--hcard-border);
   border-radius: var(--hcard-radius);
   padding: var(--hcard-pad);
-  background: var(--hcard-bg, var(--card, rgba(255, 255, 255, .92)));
+  background: var(--hcard-bg, rgba(255, 255, 255, .70));
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
   color: var(--hcard-fg, var(--c-slate-900, #0f172a));
   box-shadow: var(--hcard-shadow);
   text-align: left;
+}
+
+/* Diagonal sheen behind content (z-index:-1, above the translucent fill) so text stays crisp. */
+.h-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .45) 0%, rgba(255, 255, 255, 0) 45%);
+  pointer-events: none;
 }
 
 /* LAYOUT — media: icon | copy | trailing action */
@@ -31,10 +50,10 @@
 
 /* LAYOUT — center: stacked + centered panel. Overrides surface tokens to panel chrome. */
 .h-card--center {
-  --hcard-border: 1px solid rgba(255, 255, 255, .78);
+  --hcard-border: 1px solid rgba(15, 23, 42, .10);
   --hcard-radius: 24px;
   --hcard-pad: 28px 18px;
-  --hcard-shadow: var(--shadow, 0 14px 32px rgba(100, 116, 139, .28));
+  --hcard-shadow: 0 16px 36px rgba(15, 23, 42, .16), inset 0 1px 0 rgba(255, 255, 255, .9);
   margin-top: 14px;
   text-align: center;
 }
@@ -45,7 +64,7 @@
   --hcard-pad: 20px;
   --hcard-icon-size: 76px;
   --hcard-gap: 18px;
-  --hcard-shadow: 0 14px 32px rgba(100, 116, 139, .18);
+  --hcard-shadow: 0 16px 36px rgba(15, 23, 42, .16), inset 0 1px 0 rgba(255, 255, 255, .9);
 }
 
 /* STATE */

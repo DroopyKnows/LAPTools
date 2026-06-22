@@ -2,14 +2,14 @@
 
 export function createDelegatedActionRuntimeModule(context = {}){
   const delegatedActionNames = [
-    "showPage","closeGlobalMenu","openGlobalMenu","setHomeCategory","setRavenSubPage","showRavenSettings","closeRavenSettings","setWhatIfTab",
+    "showPage","setRavenSubPage","showRavenSettings","closeRavenSettings","setWhatIfTab",
     "setWhatIfItem","setWhatIfTargetLevel","setWhatIfShowHigh","setWhatIfChestValue","resetWhatIfScenario",
     "setWhatIfBaselineSource","setWhatIfShowHighChests","jumpToWhatIfTargetLevel",
     "setWhatIfGroupValue","adjustWhatIfGroup","setWhatIfBundleQty","adjustWhatIfBundleQty",
     "setWhatIfChestMainMode","refreshWhatIfChestInputs","resetWhatIfPlan","resetWhatIfTopUps",
     "toggleWhatIfSetupPreview","toggleWhatIfNontargetSideBreakdown","saveWhatIfScenario","toggleSavedScenarioSnapshot",
-    "loadWhatIfScenario","deleteWhatIfScenario","setMode","setManualSide","onTargetItemChange","renderAll",
-    "setHighestOwned","toggleCard","setChestMainMode","renderRandomInputs","renderGuaranteedInputs",
+    "loadWhatIfScenario","deleteWhatIfScenario","setMode","setManualSide","onTargetItemChange","onTargetLevelChange","setCalcShowHighRandom","setCalcShowHighChests","renderAll",
+    "setOwnedItemsFilter","toggleCard","setChestMainMode","renderRandomInputs","renderGuaranteedInputs",
     "resetTopUpsForCurrentItem","resetTopUpsForAllItems","resetCurrentPlan","resetAllPlans",
     "jumpToTargetLevel","toggleNontargetSideBreakdown",
     "exportInventory","importInventory","saveCurrentInventorySnapshot","resetInventory","setInventoryArchiveMode",
@@ -18,7 +18,7 @@ export function createDelegatedActionRuntimeModule(context = {}){
     "toggleInventoryArchiveSnapshot","loadInventorySnapshot","deleteInventorySnapshot","openBagScanner","closeBagScanner","setBagScannerFiles","runBagScanner","clearBagScannerReview","purgeBagScannerData","replaceActiveInventoryFromBagScan","setGlobalSetting",
     "toggleBreakdownSource","adjustGroup","setGroupValue","adjustBundleQty",
     "setBundleQty","toggleChoiceBankCollapse","redeemChoiceFromBank","adjustRedeemedChoice","setRedeemedChoice",
-    "removeAllRedeemedChoice","resetDoNotShowAgainMessages","dismissLevel8Notice"
+    "removeAllRedeemedChoice","resetDoNotShowAgainMessages"
   ];
 
   function getActionRegistry(){
@@ -41,16 +41,6 @@ export function createDelegatedActionRuntimeModule(context = {}){
       openImportFile({event,element}){
         const input=document.getElementById('importFile');
         if(input) input.click();
-      },
-      navigateAndCloseMenu({event,element}){
-        const page=element && element.dataset ? element.dataset.page : "";
-        const category=element && element.dataset ? element.dataset.category : "";
-        const showPage=getActionFunction("showPage");
-        const setHomeCategory=getActionFunction("setHomeCategory");
-        const closeGlobalMenu=getActionFunction("closeGlobalMenu");
-        if(page && typeof showPage==="function") showPage(page);
-        if(category && typeof setHomeCategory==="function") setHomeCategory(category);
-        if(typeof closeGlobalMenu==="function") closeGlobalMenu();
       },
       refreshChestInputs(){
         const renderRandomInputs=getActionFunction("renderRandomInputs");

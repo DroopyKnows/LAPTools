@@ -72,13 +72,15 @@
   background: var(--c-slate-50, #f8fafc);
 }
 
-/* Ghost — subtle fill, no border */
+/* Ghost — quiet tertiary action. Defined fill + border (no shadow) so it still reads against
+   the frosted glass cards, where the old borderless near-white fill blended in. */
 .button2--ghost {
-  background: var(--c-bluegray-75, #eef2f7);
+  background: var(--c-bluegray-150, #dbe4ef);
   color: var(--c-slate-700, #334155);
+  border: 1.5px solid var(--c-slate-400, #94a3b8);
 }
 .button2--ghost:hover {
-  background: var(--c-bluegray-100, #edf2f7);
+  background: var(--c-bluegray-300, #cbd5e1);
 }
 
 /* Danger — red tones */

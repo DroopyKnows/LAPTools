@@ -73,7 +73,7 @@ function resetWhatIfScenario(){
       const item=state.whatIf.current.item || "Heart of Wisdom";
       const targetLevel=state.whatIf.current.targetLevel || 7;
       const baselineSource=state.whatIf.current.baselineSource || "combined";
-      state.whatIf.current={item,targetLevel,random:{},choice:{},topUpBundles:{daily1:0,daily2:0,weekly:0},chestMainMode:"chests",showHigh:!!state.whatIf.current.showHigh,baselineMode:"current",baselineSource,savedBaseline:null,previewOpen:!!state.whatIf.current.previewOpen,nontargetBreakdownOpen:false};
+      state.whatIf.current={item,targetLevel,random:{},choice:{},topUpBundles:{daily1:0,daily2:0,weekly:0},chestMainMode:"chests",showHigh:!!state.whatIf.current.showHigh,showHighChests:!!state.whatIf.current.showHighChests,baselineMode:"current",baselineSource,savedBaseline:null,previewOpen:!!state.whatIf.current.previewOpen,nontargetBreakdownOpen:false};
       save();
       runtime.renderWhatIfPreserve();
     }
@@ -87,9 +87,12 @@ function setWhatIfBaselineSource(value){
       runtime.renderWhatIfPreserve();
     }
 
-// Results-level "Show Lvl 6–7": read live from the checkbox by the env on render
-// (matches the calculator, which does not persist it), so just re-render.
-function setWhatIfShowHighChests(){
+// Results-level "Show Lvl 6–7": controlled input — receives the checkbox state
+// (data-source0="checked") into the scenario state (DOM-free engine), persist, re-render.
+function setWhatIfShowHighChests(checked){
+      if(typeof runtime.ensureWhatIfState==="function") runtime.ensureWhatIfState();
+      state.whatIf.current.showHighChests=!!checked;
+      save();
       runtime.renderWhatIfPreserve();
     }
 
@@ -158,10 +161,11 @@ function setWhatIfChestMainMode(next){
       save();
     }
 
-function refreshWhatIfChestInputs(){
+function refreshWhatIfChestInputs(checked){
+      // Chest-level "Show Lv 6+": receives the checkbox state (data-source0="checked")
+      // into the scenario state, persist, re-render.
       if(typeof runtime.ensureWhatIfState==="function") runtime.ensureWhatIfState();
-      const cb=runtime.byId("whatIfshowHighRandom");
-      state.whatIf.current.showHigh=!!(cb && cb.checked);
+      state.whatIf.current.showHigh=!!checked;
       save();
       runtime.renderWhatIfPreserve();
     }

@@ -2,7 +2,7 @@
 // Note: `mode` is locally shadowed in three places (two params + one let in openTechPointsModal);
 // those bodies use the local, not runtime.mode.
 
-import { ravenItems } from "../metadata/item-metadata.js";
+import { ravenItems, MANUAL_HIGH_LEVEL_KEY } from "../metadata/item-metadata.js";
 
 export function createInventoryEventsModule(runtime){
     function setInventoryArchiveMode(mode){
@@ -121,20 +121,34 @@ export function createInventoryEventsModule(runtime){
       setInventoryLevelRange(itemName,current==="8-12" ? "1-7" : "8-12");
     }
 
+    // Owned-level store for a high-level key. Manual mode (MANUAL_HIGH_LEVEL_KEY) keeps its
+    // equipped level in the manual owned object; a real item uses its active map entry. `create`
+    // ensures the container exists for writes.
+    function highLevelOwnedStore(itemName,create){
+      if(itemName===MANUAL_HIGH_LEVEL_KEY){
+        if(create) runtime.state.manualOwned=runtime.state.manualOwned || {};
+        return runtime.state.manualOwned || {};
+      }
+      if(create){
+        runtime.state.inventory.active=runtime.state.inventory.active || {};
+        runtime.state.inventory.active[itemName]=runtime.state.inventory.active[itemName] || {};
+      }
+      return (runtime.state.inventory.active||{})[itemName] || {};
+    }
+
     function inventoryHasLevelsOneToSeven(itemName){
-      const values=(runtime.state.inventory.active||{})[itemName] || {};
+      const values=highLevelOwnedStore(itemName,false);
       return [1,2,3,4,5,6,7].some(level=>Number(values[level]||0)>0);
     }
 
     function clearInventoryLevelsOneToSeven(itemName){
       if(!itemName) return;
-      runtime.state.inventory.active=runtime.state.inventory.active || {};
-      runtime.state.inventory.active[itemName]=runtime.state.inventory.active[itemName] || {};
-      [1,2,3,4,5,6,7].forEach(level=>{ delete runtime.state.inventory.active[itemName][level]; });
+      const values=highLevelOwnedStore(itemName,true);
+      [1,2,3,4,5,6,7].forEach(level=>{ delete values[level]; });
     }
 
     function activeHighLevelForItem(itemName){
-      const values=(runtime.state.inventory && runtime.state.inventory.active && runtime.state.inventory.active[itemName]) || {};
+      const values=highLevelOwnedStore(itemName,false);
       for(let level=12;level>=8;level--){
         if(Number(values[level]||0)>0) return level;
       }
@@ -201,6 +215,7 @@ export function createInventoryEventsModule(runtime){
 
     function clearInventoryTechPointsForItem(itemName){
       if(!itemName) return;
+      if(itemName===MANUAL_HIGH_LEVEL_KEY){ runtime.state.manualTechPoints=0; return; }
       runtime.state.inventory=runtime.state.inventory || {};
       runtime.state.inventory.techPointsByItem=runtime.state.inventory.techPointsByItem || {};
       delete runtime.state.inventory.techPointsByItem[itemName];
@@ -212,9 +227,7 @@ export function createInventoryEventsModule(runtime){
     async function setInventoryHighLevel(itemName,level){
       const nextLevel=Number(level||0);
       if(nextLevel<8 || nextLevel>12) return;
-      runtime.state.inventory.active=runtime.state.inventory.active || {};
-      runtime.state.inventory.active[itemName]=runtime.state.inventory.active[itemName] || {};
-      const values=runtime.state.inventory.active[itemName];
+      const values=highLevelOwnedStore(itemName,true);
       const currentLevel=activeHighLevelForItem(itemName);
       if(currentLevel===nextLevel){
         [8,9,10,11,12].forEach(l=>{ delete values[l]; });
@@ -243,12 +256,16 @@ export function createInventoryEventsModule(runtime){
 
     function setInventoryTechPoints(itemName,value){
       const nextValue=Math.max(0,Math.floor(Number(value||0)));
-      runtime.state.inventoryTechPointsByItem=runtime.state.inventoryTechPointsByItem || {};
-      runtime.state.inventoryTechPointsByItem[itemName]=nextValue;
+      if(itemName===MANUAL_HIGH_LEVEL_KEY){
+        runtime.state.manualTechPoints=nextValue;
+      }else{
+        runtime.state.inventoryTechPointsByItem=runtime.state.inventoryTechPointsByItem || {};
+        runtime.state.inventoryTechPointsByItem[itemName]=nextValue;
+      }
       runtime.save();
 
       const selected=activeHighLevelForItem(itemName);
-      const required=(selected>=8 && selected<=11) ? Math.pow(3,selected)-Math.pow(3,selected-1) : 0;
+      const required=runtime.requiredTechPointsForLevel(selected);
       const left=Math.max(required-nextValue,0);
       const percent=required>0 ? Math.min(100,Math.floor((nextValue/required)*100)) : (selected===12 ? 100 : 0);
       const format=amount=>typeof runtime.roundNice==='function' ? runtime.roundNice(amount) : String(amount);
@@ -270,10 +287,14 @@ export function createInventoryEventsModule(runtime){
 
     function openTechPointsModal(itemName,initialMode){
       const selected=activeHighLevelForItem(itemName);
-      const required=(selected>=8 && selected<=11) ? Math.pow(3,selected)-Math.pow(3,selected-1) : 0;
+      const required=runtime.requiredTechPointsForLevel(selected);
       if(!required) return;
       const format=amount=>typeof runtime.roundNice==='function' ? runtime.roundNice(amount) : String(amount);
-      const current=Number((runtime.state.inventoryTechPointsByItem || {})[itemName] || 0);
+      // Manual mode reads/writes its tech points from the manual slice; real items use the map.
+      const techPointsForKey=name=> name===MANUAL_HIGH_LEVEL_KEY
+        ? Math.max(0,Math.floor(Number(runtime.state.manualTechPoints||0)))
+        : Number((runtime.state.inventoryTechPointsByItem || {})[name] || 0);
+      const current=techPointsForKey(itemName);
       const currentPercent=required>0 ? Math.min(100,Math.max(0,Math.round((current/required)*100))) : 0;
       const host=runtime.ensureModalHost();
       let mode=initialMode==="percent" ? "percent" : "points";
@@ -287,7 +308,7 @@ export function createInventoryEventsModule(runtime){
         const level=activeHighLevelForItem(name);
         return (level>=8 && level<=11) ? Math.pow(3,level)-Math.pow(3,level-1) : 0;
       };
-      const currentPointsFor=name=>Number((runtime.state.inventoryTechPointsByItem || {})[name] || 0);
+      const currentPointsFor=name=>techPointsForKey(name);
       const currentPercentFor=name=>{
         const req=requiredTechPointsForModal(name);
         if(!req) return 0;
@@ -295,6 +316,7 @@ export function createInventoryEventsModule(runtime){
       };
       const render=()=>{
         const activeLevel=activeHighLevelForItem(activeItem);
+        const activeName=activeItem===MANUAL_HIGH_LEVEL_KEY ? "Manual" : activeItem;
         const activeRequired=requiredTechPointsForModal(activeItem);
         const activePoints=currentPointsFor(activeItem);
         const activePercent=currentPercentFor(activeItem);
@@ -303,7 +325,7 @@ export function createInventoryEventsModule(runtime){
           <div class="modal2__scrim" data-modal-scrim></div>
           <div class="modal2__panel modal2__panel--md" role="dialog" aria-modal="true" aria-labelledby="appModalTitle">
             <div class="modal2__title" id="appModalTitle">Enter Tech Points</div>
-            <div class="modal2__subtitle">${activeItem} L${activeLevel} research progress.</div>
+            <div class="modal2__subtitle">${activeName} L${activeLevel} research progress.</div>
             <div class="modal2__content stack2 stack2--column stack2--gap-2">
               <div class="tabs2 tabs2--sm tabs2--neutral" style="--tabs-cols:2" role="tablist" aria-label="Tech Points input mode">
                 <button type="button" class="tabs2__tab ${mode==="points" ? "tabs2__tab--active" : ""}" data-tech-mode="points">Tech Points</button>

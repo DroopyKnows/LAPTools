@@ -11,10 +11,6 @@
 // come from the shared app-navigation runtime the tool already instantiates.
 
 export const SETTINGS_SUBPAGE_MARKUP=`<section class="hidden stack2 stack2--column stack2--gap-5" id="ravenSettingsSubPage">
-<div class="stack2 stack2--row stack2--gap-2 stack2--align-center">
-<button class="button2 button2--md button2--primary" data-action="closeRavenSettings" data-action-event="click" type="button">← Raven Gear Calculator</button>
-</div>
-<div class="card2 card2--white card2--lg stack2 stack2--column stack2--gap-5">
 <div class="hero-card2 card2">
 <div class="hero-card2__layout">
 <div class="hero-card2__copy">
@@ -23,6 +19,10 @@ export const SETTINGS_SUBPAGE_MARKUP=`<section class="hidden stack2 stack2--colu
 </div>
 </div>
 </div>
+<div class="stack2 stack2--row stack2--gap-2 stack2--align-center">
+<button class="button2 button2--md button2--primary" data-action="closeRavenSettings" data-action-event="click" type="button">← Raven Gear Calculator</button>
+</div>
+<div class="card2 card2--white card2--lg stack2 stack2--column stack2--gap-5">
 <div class="stack2 stack2--column stack2--gap-3">
 <label class="toggle2 toggle2--card">
 <input class="toggle2__input" data-action="setGlobalSetting" data-action-event="change" data-arg0="moreInfo" data-source1="checked" id="hideMoreInformationSetting" type="checkbox"/>
@@ -60,6 +60,17 @@ export const SETTINGS_SUBPAGE_MARKUP=`<section class="hidden stack2 stack2--colu
 <button class="tabs2__tab" data-action="setGlobalSetting" data-action-event="click" data-arg0="snapshots" data-arg1="off" id="snapshotSetting-off" type="button">Off</button>
 <button class="tabs2__tab" data-action="setGlobalSetting" data-action-event="click" data-arg0="snapshots" data-arg1="onlyClosed" id="snapshotSetting-onlyClosed" type="button">Only<br>closed</button>
 <button class="tabs2__tab" data-action="setGlobalSetting" data-action-event="click" data-arg0="snapshots" data-arg1="onlyOpen" id="snapshotSetting-onlyOpen" type="button">Only<br>open</button>
+</div>
+</div>
+<div class="card2 card2--muted card2--md stack2 stack2--column stack2--gap-3">
+<div class="card2__text card2__text--left">
+<div class="card2__title">Card title subtext</div>
+<div class="card2__body">Show the small description under card titles always, never, or only when the card is expanded.</div>
+</div>
+<div class="tabs2 tabs2--sm tabs2--neutral" style="--tabs-cols:3">
+<button class="tabs2__tab" data-action="setGlobalSetting" data-action-event="click" data-arg0="subtext" data-arg1="on" id="subtextSetting-on" type="button">On</button>
+<button class="tabs2__tab" data-action="setGlobalSetting" data-action-event="click" data-arg0="subtext" data-arg1="off" id="subtextSetting-off" type="button">Off</button>
+<button class="tabs2__tab" data-action="setGlobalSetting" data-action-event="click" data-arg0="subtext" data-arg1="onlyOpen" id="subtextSetting-onlyOpen" type="button">Only<br>open</button>
 </div>
 </div>
 <label class="toggle2 toggle2--card">

@@ -11,7 +11,7 @@ import { createInventoryMathModule } from "../inventory/inventory-math.js";
 import { createInventoryRenderModule } from "../inventory/inventory-render.js";
 import { createInventoryEventsModule } from "../inventory/inventory-events.js";
 import { createCalculatorRenderModule } from "../calculator/calculator-render.js";
-import { createCalculatorInventoryBreakdownModule } from "../calculator/inventory-breakdown-render.js";
+import { createInventoryBreakdownModule } from "../inventory/inventory-breakdown-render.js";
 import { createCalculatorBlocks } from "../calculator/calculator-blocks.js";
 import { createCalculatorEventsModule } from "../calculator/calculator-events.js";
 import { createWhatIfModule } from "../whatif/whatif-runtime.js";
@@ -52,8 +52,8 @@ export function wireRavenGearFeatureModules(ravenRuntimeDeps){
   // helpers off the runtime (makeFilteredResultTable, renderTopUpCompactDetailPill,
   // renderDualDetailCompactPill, levelPillGridMarkup), so it is wired right after
   // the calculator render module and before bootstrap (which drives it).
-  const calculatorBreakdownRuntime=createCalculatorInventoryBreakdownModule(ravenRuntimeDeps);
-  Object.assign(ravenRuntimeDeps, calculatorBreakdownRuntime);
+  const inventoryBreakdownRuntime=createInventoryBreakdownModule(ravenRuntimeDeps);
+  Object.assign(ravenRuntimeDeps, inventoryBreakdownRuntime);
 
   // Calculator card blocks depend on the render module's view fns (computeResults
   // / renderResultsView / renderNontargetView) being present on the runtime, so
@@ -83,8 +83,8 @@ export function wireRavenGearFeatureModules(ravenRuntimeDeps){
     save:backupRuntime.save,
     renderInventory:inventoryRenderRuntime.renderInventory,
     updateInventoryAdvancedTabs:inventoryRenderRuntime.updateInventoryAdvancedTabs,
-    renderBreakdownEstimatedInventory:calculatorBreakdownRuntime.renderBreakdownEstimatedInventory,
-    renderItemPlanSummary:calculatorBreakdownRuntime.renderItemPlanSummary,
+    renderBreakdownEstimatedInventory:inventoryBreakdownRuntime.renderBreakdownEstimatedInventory,
+    renderItemPlanSummary:inventoryBreakdownRuntime.renderItemPlanSummary,
     renderWhatIf:whatIfRuntime.renderWhatIf,
     loadSavedAppState:ravenGearBootstrapRuntime.loadSavedAppState,
     bootScannerRuntime:ravenGearBootstrapRuntime.bootScannerRuntime,

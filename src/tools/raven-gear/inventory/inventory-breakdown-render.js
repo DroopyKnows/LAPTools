@@ -1,18 +1,18 @@
-// Inventory Summary (breakdown) + Item Plan audit render surfaces.
-// Extracted from calculator-render.js (Phase 2). These render inventory-tab DOM
-// (#breakdownEstimatedInventoryList, #itemPlanSummaryList, #inventoryRandom*Table),
-// not calculator cards — see helper TOOL-CONTRACT.md §2. Pure view layer over the
-// runtime.* math. Shared pill/grid primitives (makeFilteredResultTable,
-// renderTopUpCompactDetailPill, renderDualDetailCompactPill, levelPillGridMarkup)
-// are read off the runtime, so this module is wired AFTER createCalculatorRenderModule.
+// Inventory page "Advanced / Details" render surfaces: the Inventory Summary (breakdown)
+// panel and the Item Plan audit view. These render inventory-tab DOM
+// (#breakdownEstimatedInventoryList, #itemPlanSummaryList, #inventoryRandom*Table) — which is
+// why this lives under inventory/, not calculator/ (it renders no calculator cards). Pure view
+// layer over the runtime.* math. Shared pill/grid primitives (makeFilteredResultTable,
+// renderTopUpCompactDetailPill, renderDualDetailCompactPill, levelPillGridMarkup) are read off
+// the runtime, so this module is wired AFTER createCalculatorRenderModule.
 
 import { allItemLevels, chestLevels, ravenItems } from "../metadata/item-metadata.js";
-import { renderLargeDropdown } from "./calculator-ui-renderers.js";
+import { renderLargeDropdown } from "../calculator/calculator-ui-renderers.js";
 import { initAllGrids } from "../ui/grid/grid.js";
 import { renderPill2 } from "../ui/pill/pill.js";
 import { uiLevelTone } from "../shared/ui/ui-helpers.js";
 
-export function createCalculatorInventoryBreakdownModule(runtime){
+export function createInventoryBreakdownModule(runtime){
     function renderInventoryRandomTables(){
       const leftTotals={};
       const rightTotals={};

@@ -64,11 +64,6 @@ export function renderActionAttrs(action,eventType){
   if(source==="document.getElementById('importFile').click()" || source==='document.getElementById("importFile").click()'){
     return ` data-action="openImportFile" data-action-event="${evt}"`;
   }
-  const showClose=source.match(/^showPage\((.*)\);\s*closeGlobalMenu\(\)$/);
-  if(showClose){
-    const page=showClose[1].trim().replace(/^['"`]|['"`]$/g,"");
-    return ` data-action="navigateAndCloseMenu" data-action-event="${evt}" data-page="${uiEscapeAttr(page)}"`;
-  }
   const match=source.match(/^([A-Za-z_$][\w$]*)\((.*)\)$/);
   if(match){
     const name=match[1];

@@ -1,7 +1,8 @@
 // Inventory projection/allocation math and raw audit model helpers.
 // Runtime helpers + the mutable `state` are read from runtime at call time.
 
-import { chestLevels, getRavenItemByName, getRavenItemNamesBySide, getRavenItems, ravenItems } from "../metadata/item-metadata.js";
+import { chestLevels, getRavenItemByName, getRavenItems, ravenItems } from "../metadata/item-metadata.js";
+import { itemsBySide, otherItemsOnSide, allocatePoolToItems, computeRandomPlanAuditDomain } from "./random-generation-ledger-domain.js";
 
 export function createInventoryMathModule(runtime){
 
@@ -11,15 +12,6 @@ export function createInventoryMathModule(runtime){
 
     function ravenItemList(){
       return typeof getRavenItems==="function" ? getRavenItems() : ravenItems;
-    }
-
-    function itemsBySide(side){
-      if(typeof getRavenItemNamesBySide==="function") return getRavenItemNamesBySide(side);
-      return ravenItems.filter(item=>item.side===side).map(item=>item.name);
-    }
-
-    function otherItemsOnSide(side, selectedName){
-      return itemsBySide(side).filter(name=>name!==selectedName);
     }
 
     function buildAllocatedLeftoverObjects(plan, selectedSideValue){
@@ -59,32 +51,6 @@ export function createInventoryMathModule(runtime){
       return { leftBuckets:oppositeBuckets, rightBuckets:sameBuckets };
     }
 
-    function allocatePoolToItems(pool,itemNames){
-      const allocatedByItem={};
-      const leftover={};
-      const divisor=Math.max(1,itemNames.length);
-
-      itemNames.forEach(name=>allocatedByItem[name]={});
-
-      Object.keys(pool||{}).forEach(levelKey=>{
-        const level=Number(levelKey);
-        const value=Math.floor(Number(pool[levelKey]||0));
-        if(value<=0) return;
-
-        const each=Math.floor(value/divisor);
-        const rem=value % divisor;
-
-        if(each>0){
-          itemNames.forEach(name=>{
-            allocatedByItem[name][level]=(allocatedByItem[name][level]||0)+each;
-          });
-        }
-        if(rem>0) leftover[level]=(leftover[level]||0)+rem;
-      });
-
-      return {allocatedByItem,leftover};
-    }
-
     function getCombinedRandomChests(rawPlan){
       if(!rawPlan || !rawPlan.randomChests) return {};
       return runtime.addLevelObjects(rawPlan.randomChests.manual || {}, rawPlan.randomChests.topUp || {});
@@ -103,6 +69,14 @@ export function createInventoryMathModule(runtime){
       return runtime.rawTargetFromRandomPlan(getCombinedRandomChests(rawPlan),p);
     }
 
+    // Plan-level random-chest audit — the pure helper computeRandomPlanAuditDomain, with this
+    // module's own (runtime) level-object/planning helpers injected as the math bag so the output
+    // is exactly what it was when the audit lived inline here. computeRawItemPlan and the
+    // calculation engine both call the same domain helper — one source of truth, no re-derivation.
+    function computeRandomPlanAudit(randomCombined, side, selectedName){
+      return computeRandomPlanAuditDomain(randomCombined, side, selectedName, runtime);
+    }
+
     function computeRawItemPlan(itemName){
       const item=itemMetaForName(itemName) || ravenItems.find(x=>x.name===itemName);
       if(!item){
@@ -118,48 +92,17 @@ export function createInventoryMathModule(runtime){
       const choiceManual=runtime.cloneLevelObject((runtime.state.guaranteed && runtime.state.guaranteed[itemName]) || {});
       const choiceRedeemed=runtime.cloneLevelObject((runtime.state.choiceBankRedeemed && runtime.state.choiceBankRedeemed[itemName]) || {});
 
-      const p=item.side==="left" ? 2/9 : 1/9;
-
-      const randomTargetTotal=runtime.rawTargetFromRandomPlan(randomCombined,p);
+      // The random→generated→nontarget→allocated→leftover chain + audit is the shared,
+      // roster-only computation (also used by the math inspector).
+      const planAudit=computeRandomPlanAudit(randomCombined,item.side,itemName);
+      const randomTargetTotal=planAudit.randomTargetTotal;
+      const oppositeSide=planAudit.oppositeSide;
 
       const targetDuplicates={
         random:randomTargetTotal,
         choiceManual:runtime.rawChoiceObject(choiceManual),
         choiceRedeemed:runtime.rawChoiceObject(choiceRedeemed)
       };
-
-      const randomSideGenerated=runtime.deterministicSideTotalsFromRandomPlan(randomCombined);
-
-      const nontargetPools={
-        left:item.side==="left" ? runtime.subtractLevelObjects(randomSideGenerated.left,randomTargetTotal) : runtime.cloneLevelObject(randomSideGenerated.left),
-        right:item.side==="right" ? runtime.subtractLevelObjects(randomSideGenerated.right,randomTargetTotal) : runtime.cloneLevelObject(randomSideGenerated.right)
-      };
-
-      const sameSideItemNames=otherItemsOnSide(item.side,itemName);
-      const oppositeSide=item.side==="left" ? "right" : "left";
-      const oppositeSideItemNames=itemsBySide(oppositeSide);
-
-      const sameAllocation=allocatePoolToItems(nontargetPools[item.side] || {},sameSideItemNames);
-      const oppositeAllocation=allocatePoolToItems(nontargetPools[oppositeSide] || {},oppositeSideItemNames);
-
-      const randomItemsLeftover={left:{},right:{}};
-      randomItemsLeftover[item.side]=sameAllocation.leftover || {};
-      randomItemsLeftover[oppositeSide]=oppositeAllocation.leftover || {};
-
-      const assignedNontargetByItem={};
-      Object.keys(sameAllocation.allocatedByItem||{}).forEach(name=>{
-        assignedNontargetByItem[name]=runtime.addLevelObjects(assignedNontargetByItem[name]||{},sameAllocation.allocatedByItem[name]);
-      });
-      Object.keys(oppositeAllocation.allocatedByItem||{}).forEach(name=>{
-        assignedNontargetByItem[name]=runtime.addLevelObjects(assignedNontargetByItem[name]||{},oppositeAllocation.allocatedByItem[name]);
-      });
-
-      const rawRandomChestCount=runtime.levelObjectTotalCount(randomCombined);
-      const generatedCount=runtime.levelObjectTotalCount(randomSideGenerated.left)+runtime.levelObjectTotalCount(randomSideGenerated.right);
-      const targetRandomCount=runtime.levelObjectTotalCount(randomTargetTotal);
-      const nontargetCount=runtime.levelObjectTotalCount(nontargetPools.left)+runtime.levelObjectTotalCount(nontargetPools.right);
-      const allocatedCount=Object.values(assignedNontargetByItem).reduce((sum,obj)=>sum+runtime.levelObjectTotalCount(obj),0);
-      const leftoverCount=runtime.levelObjectTotalCount(randomItemsLeftover.left)+runtime.levelObjectTotalCount(randomItemsLeftover.right);
 
       return {
         sourceItem:itemName,
@@ -174,33 +117,25 @@ export function createInventoryMathModule(runtime){
           redeemed:choiceRedeemed
         },
         targetDuplicates,
-        randomSideGenerated,
-        nontargetPools,
+        randomSideGenerated:planAudit.randomSideGenerated,
+        nontargetPools:planAudit.nontargetPools,
         allocation:{
           sameSide:{
             side:item.side,
-            appliesTo:sameSideItemNames,
-            allocatedByItem:sameAllocation.allocatedByItem || {},
-            leftover:sameAllocation.leftover || {}
+            appliesTo:planAudit.sameSideItemNames,
+            allocatedByItem:planAudit.sameAllocation.allocatedByItem || {},
+            leftover:planAudit.sameAllocation.leftover || {}
           },
           oppositeSide:{
             side:oppositeSide,
-            appliesTo:oppositeSideItemNames,
-            allocatedByItem:oppositeAllocation.allocatedByItem || {},
-            leftover:oppositeAllocation.leftover || {}
+            appliesTo:planAudit.oppositeSideItemNames,
+            allocatedByItem:planAudit.oppositeAllocation.allocatedByItem || {},
+            leftover:planAudit.oppositeAllocation.leftover || {}
           }
         },
-        assignedNontargetByItem,
-        randomItemsLeftover,
-        audit:{
-          randomChestCount:rawRandomChestCount,
-          generatedCount,
-          targetRandomCount,
-          nontargetCount,
-          allocatedCount,
-          leftoverCount,
-          balances:rawRandomChestCount===generatedCount && generatedCount===(targetRandomCount+nontargetCount) && nontargetCount===(allocatedCount+leftoverCount)
-        }
+        assignedNontargetByItem:planAudit.assignedNontargetByItem,
+        randomItemsLeftover:planAudit.randomItemsLeftover,
+        audit:planAudit.audit
       };
     }
 
@@ -362,6 +297,7 @@ export function createInventoryMathModule(runtime){
     otherItemsOnSide,
     buildAllocatedLeftoverObjects,
     allocatePoolToItems,
+    computeRandomPlanAudit,
     getCombinedRandomChests,
     getCombinedChoiceChests,
     getRandomTargetDuplicatesForPlan,

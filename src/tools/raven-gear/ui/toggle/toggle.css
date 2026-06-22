@@ -112,9 +112,9 @@
 
 .toggle2--text .toggle2__input:checked + .toggle2__label,
 .toggle2--text.toggle2--active .toggle2__label {
-  background: var(--c-white, #ffffff);
+  background: var(--control-active-bg, rgba(241, 245, 253, .96));
   color: var(--c-slate-900, #0f172a);
-  box-shadow: var(--shadow-toggle-text, 0 1px 3px rgba(15, 23, 42, .12));
+  box-shadow: inset 0 0 0 1px var(--control-active-border, rgba(15, 23, 42, .16)), var(--shadow-toggle-text, 0 1px 3px rgba(15, 23, 42, .12));
 }
 
 /* xs text toggle — used by the non-target side-breakdown toggle */
@@ -161,7 +161,7 @@
 }
 
 .toggle2--card .toggle2__input:checked + .toggle2__card {
-  --card-bg: var(--c-white, #ffffff);
+  --card-bg: var(--control-active-bg, rgba(255, 255, 255, .72));
   --card-border: 1px solid var(--accent, #7c3aed);
   box-shadow: var(--shadow-toggle-text, 0 1px 3px rgba(15, 23, 42, .12));
 }

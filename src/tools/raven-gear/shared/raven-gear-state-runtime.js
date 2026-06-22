@@ -17,7 +17,11 @@ export function createRavenGearStateRuntimeModule({
   const DEFAULT_STATE={
     schemaVersion:CURRENT_STATE_SCHEMA_VERSION,
     calculator:{
-      highestGlobalOwned:5,
+      targetItem:"Heart of Wisdom",
+      targetLevel:7,
+      showHighRandom:false,
+      showHighChests:false,
+      ownedItemsFilter:"low",
       plans:{},
       guaranteed:{},
       manualPlan:{},
@@ -32,6 +36,7 @@ export function createRavenGearStateRuntimeModule({
     inventory:{
       active:{},
       manualOwned:{},
+      manualTechPoints:0,
       inputFilter:"all",
       upgradedFilter:"all",
       upgradedViewMode:"combined",
@@ -48,7 +53,7 @@ export function createRavenGearStateRuntimeModule({
     },
     whatIf:{
       activeTab:"scenarios",
-      current:{item:"Heart of Wisdom",targetLevel:7,random:{},choice:{},showHigh:false,baselineMode:"current",savedBaseline:null,previewOpen:false,nontargetBreakdownOpen:false},
+      current:{item:"Heart of Wisdom",targetLevel:7,random:{},choice:{},showHigh:false,showHighChests:false,baselineMode:"current",savedBaseline:null,previewOpen:false,nontargetBreakdownOpen:false},
       saved:[],
       expandedSnapshots:{}
     },
@@ -56,6 +61,7 @@ export function createRavenGearStateRuntimeModule({
       hideMoreInformationSections:false,
       hideAdvancedSections:false,
       snapshotMode:"on",
+      subtextMode:"onlyOpen",
       dismissedMessages:{},
       allowZoom:false
     },
@@ -169,6 +175,7 @@ export function createRavenGearStateRuntimeModule({
       random:normalizeLevelObject(src.random, chestLevels),
       choice:normalizeLevelObject(src.choice, chestLevels),
       showHigh:toBoolean(src.showHigh),
+      showHighChests:toBoolean(src.showHighChests),
       baselineMode:src.baselineMode==="saved" ? "saved" : "current",
       savedBaseline:baseline,
       previewOpen:toBoolean(src.previewOpen),
@@ -226,7 +233,11 @@ export function createRavenGearStateRuntimeModule({
     const bankSource=isPlainObject(src.choiceBank) ? src.choiceBank : (isPlainObject(legacy.choiceBank) ? legacy.choiceBank : legacy.choiceChestBank);
     const choiceBank=normalizeChoiceBankObject(bankSource);
     return {
-      highestGlobalOwned:toSafeInteger(src.highestGlobalOwned ?? legacy.highestGlobalOwned,DEFAULT_STATE.calculator.highestGlobalOwned,1,maxItemLevel),
+      targetItem:validRavenItemName(src.targetItem ?? legacy.targetItem),
+      targetLevel:toSafeInteger(src.targetLevel ?? legacy.targetLevel,DEFAULT_STATE.calculator.targetLevel,1,maxItemLevel),
+      showHighRandom:toBoolean(src.showHighRandom ?? legacy.showHighRandom),
+      showHighChests:toBoolean(src.showHighChests ?? legacy.showHighChests),
+      ownedItemsFilter:normalizeFilter(src.ownedItemsFilter,["low","high","all"],"low"),
       plans:normalizeItemLevelMap(src.plans ?? legacy.plans, chestLevels),
       guaranteed:normalizeItemLevelMap(src.guaranteed ?? legacy.guaranteed, chestLevels),
       manualPlan:normalizeLevelObject(src.manualPlan ?? legacy.manualPlan, chestLevels),
@@ -283,6 +294,7 @@ export function createRavenGearStateRuntimeModule({
     return {
       active,
       manualOwned:normalizeLevelObject(src.manualOwned ?? legacy.manualOwned, allItemLevels),
+      manualTechPoints:toSafeInteger(src.manualTechPoints ?? legacy.manualTechPoints,0,0),
       inputFilter:normalizeFilter(src.inputFilter ?? legacy.inventoryInputFilter,["all","left","right"],DEFAULT_STATE.inventory.inputFilter),
       upgradedFilter:normalizeFilter(src.upgradedFilter ?? legacy.upgradedOwnedFilter,["all","left","right"],DEFAULT_STATE.inventory.upgradedFilter),
       upgradedViewMode:normalizeFilter(src.upgradedViewMode ?? legacy.upgradedOwnedViewMode,["combined","calculated"],DEFAULT_STATE.inventory.upgradedViewMode),
@@ -304,6 +316,12 @@ export function createRavenGearStateRuntimeModule({
     return ["on","off","onlyClosed","onlyOpen"].includes(value) ? value : "on";
   }
 
+  // Card title subtext visibility: on (always) | off (never) | onlyOpen (only when expanded).
+  // Defaults to onlyOpen — collapsed cards show just their title, expanded cards show subtext.
+  function normalizeSubtextMode(value){
+    return ["on","off","onlyOpen"].includes(value) ? value : "onlyOpen";
+  }
+
   function normalizeSettingsState(source){
     const src=isPlainObject(source) ? source : {};
     const legacy=source && !source.settings ? source : {};
@@ -311,6 +329,7 @@ export function createRavenGearStateRuntimeModule({
       hideMoreInformationSections:toBoolean(src.hideMoreInformationSections ?? legacy.hideMoreInformationSections),
       hideAdvancedSections:toBoolean(src.hideAdvancedSections ?? legacy.hideAdvancedSections),
       snapshotMode:normalizeSnapshotMode(src.snapshotMode ?? legacy.snapshotMode),
+      subtextMode:normalizeSubtextMode(src.subtextMode ?? legacy.subtextMode),
       dismissedMessages:normalizeBooleanMap(src.dismissedMessages ?? legacy.dismissedMessages),
       allowZoom:toBoolean(src.allowZoom ?? legacy.allowZoom)
     };
@@ -363,7 +382,11 @@ export function createRavenGearStateRuntimeModule({
     if(!isPlainObject(target.settings)) target.settings=cloneDefaultState().settings;
     if(!isPlainObject(target.ui)) target.ui={};
 
-    defineAlias(target,"highestGlobalOwned",()=>target.calculator.highestGlobalOwned,value=>target.calculator.highestGlobalOwned=toSafeInteger(value,5,1,maxItemLevel));
+    defineAlias(target,"targetItem",()=>target.calculator.targetItem,value=>target.calculator.targetItem=validRavenItemName(value));
+    defineAlias(target,"targetLevel",()=>target.calculator.targetLevel,value=>target.calculator.targetLevel=toSafeInteger(value,7,1,maxItemLevel));
+    defineAlias(target,"showHighRandom",()=>target.calculator.showHighRandom,value=>target.calculator.showHighRandom=toBoolean(value));
+    defineAlias(target,"showHighChests",()=>target.calculator.showHighChests,value=>target.calculator.showHighChests=toBoolean(value));
+    defineAlias(target,"ownedItemsFilter",()=>target.calculator.ownedItemsFilter,value=>target.calculator.ownedItemsFilter=normalizeFilter(value,["low","high","all"],"low"));
     defineAlias(target,"plans",()=>target.calculator.plans,value=>target.calculator.plans=normalizeItemLevelMap(value,chestLevels));
     defineAlias(target,"guaranteed",()=>target.calculator.guaranteed,value=>target.calculator.guaranteed=normalizeItemLevelMap(value,chestLevels));
     defineAlias(target,"manualPlan",()=>target.calculator.manualPlan,value=>target.calculator.manualPlan=normalizeLevelObject(value,chestLevels));
@@ -377,6 +400,7 @@ export function createRavenGearStateRuntimeModule({
     defineAlias(target,"manualChoiceBankRedeemed",()=>target.calculator.manualChoiceBankRedeemed,value=>target.calculator.manualChoiceBankRedeemed=normalizeChoiceBankObject(value));
 
     defineAlias(target,"manualOwned",()=>target.inventory.manualOwned,value=>target.inventory.manualOwned=normalizeLevelObject(value,allItemLevels));
+    defineAlias(target,"manualTechPoints",()=>target.inventory.manualTechPoints,value=>target.inventory.manualTechPoints=toSafeInteger(value,0,0));
     defineAlias(target,"inventoryInputFilter",()=>target.inventory.inputFilter,value=>target.inventory.inputFilter=normalizeFilter(value,["all","left","right"],"all"));
     defineAlias(target,"upgradedOwnedFilter",()=>target.inventory.upgradedFilter,value=>target.inventory.upgradedFilter=normalizeFilter(value,["all","left","right"],"all"));
     defineAlias(target,"upgradedOwnedViewMode",()=>target.inventory.upgradedViewMode,value=>target.inventory.upgradedViewMode=normalizeFilter(value,["combined","calculated"],"combined"));
@@ -394,6 +418,7 @@ export function createRavenGearStateRuntimeModule({
     defineAlias(target,"hideMoreInformationSections",()=>target.settings.hideMoreInformationSections,value=>target.settings.hideMoreInformationSections=toBoolean(value));
     defineAlias(target,"hideAdvancedSections",()=>target.settings.hideAdvancedSections,value=>target.settings.hideAdvancedSections=toBoolean(value));
     defineAlias(target,"snapshotMode",()=>target.settings.snapshotMode,value=>target.settings.snapshotMode=normalizeSnapshotMode(value));
+    defineAlias(target,"subtextMode",()=>target.settings.subtextMode,value=>target.settings.subtextMode=normalizeSubtextMode(value));
     defineAlias(target,"dismissedMessages",()=>target.settings.dismissedMessages,value=>target.settings.dismissedMessages=normalizeBooleanMap(value));
     defineAlias(target,"allowZoom",()=>target.settings.allowZoom,value=>target.settings.allowZoom=toBoolean(value));
 

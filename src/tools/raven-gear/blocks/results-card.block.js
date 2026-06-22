@@ -51,7 +51,7 @@ function resultsBody(prefix,actions){
 </div>
 <div class="card2__action">
 <label class="toggle2 toggle2--text">
-<input class="toggle2__input" data-action="${actions.showHighChests}" data-action-event="change" id="${prefix}showHighChestLevels" type="checkbox"/>
+<input class="toggle2__input" data-action="${actions.showHighChests}" data-action-event="change" data-source0="checked" id="${prefix}showHighChestLevels" type="checkbox"/>
 <span class="toggle2__label">Show Lv. 6+</span>
 </label>
 </div>

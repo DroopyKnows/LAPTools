@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raven Gear — Math Inspector</title>
+<style>
+  :root{ --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --accent:#7c3aed; --bg:#f1f5f9; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font:13px/1.5 ui-sans-serif,Arial,Helvetica,sans-serif; color:var(--ink);
+    background:radial-gradient(circle at top left,rgba(124,58,237,.10),transparent 42%),
+               radial-gradient(circle at top right,rgba(37,99,235,.10),transparent 42%),
+               linear-gradient(180deg,#eef2f7,#dbe4ef); padding:18px; }
+  h1{ font-size:18px; margin:0 0 2px; }
+  .sub{ color:var(--muted); margin:0 0 16px; max-width:760px; }
+  .sub code{ background:#fff; border:1px solid var(--line); border-radius:5px; padding:1px 5px; }
+  .layout{ display:grid; grid-template-columns:minmax(300px,360px) 1fr; gap:14px; align-items:start; }
+  @media (max-width:760px){ .layout{ grid-template-columns:1fr; } }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:13px 15px;
+    margin:0 0 12px; box-shadow:0 4px 10px rgba(100,116,139,.06); }
+  .card h2{ font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:var(--muted);
+    margin:0 0 9px; }
+  .levelrow{ display:flex; gap:5px; flex-wrap:wrap; }
+  .lvl{ display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .lvl span{ font-size:10px; color:var(--muted); }
+  .lvl input{ width:42px; text-align:center; border:1px solid var(--line); border-radius:7px;
+    padding:4px 2px; font:inherit; }
+  .lvl input:focus{ outline:2px solid var(--accent); outline-offset:0; border-color:transparent; }
+  .ctl{ display:flex; align-items:center; gap:10px; margin:2px 0; flex-wrap:wrap; }
+  .ctl label{ color:var(--muted); min-width:54px; }
+  .seg button{ border:1px solid var(--line); background:#fff; padding:5px 11px; cursor:pointer;
+    font:inherit; }
+  .seg button:first-child{ border-radius:8px 0 0 8px; }
+  .seg button:last-child{ border-radius:0 8px 8px 0; border-left:0; }
+  .seg button.on{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  select,.num{ border:1px solid var(--line); border-radius:8px; padding:5px 8px; font:inherit; background:#fff; }
+  .num{ width:84px; }
+  input:disabled{ opacity:.45; cursor:not-allowed; background:#f1f5f9; }
+  .seg{ display:inline-flex; flex-wrap:wrap; }
+  .stage{ display:grid; grid-template-columns:minmax(0,2fr) minmax(0,3fr); border-top:1px solid var(--line); }
+  .stage:first-child{ border-top:0; }
+  .stage-main{ border-left:3px solid var(--accent); padding:10px 14px 12px 11px; }
+  .stage-fns{ border-left:1px solid var(--line); padding:10px 6px 12px 14px; display:flex; flex-wrap:wrap; gap:5px; align-content:flex-start; }
+  .stage .lbl{ font-weight:600; }
+  .stage .desc{ color:var(--muted); font-size:11.5px; margin:1px 0 6px; }
+  @media (max-width:620px){
+    .stage, .stages-head{ grid-template-columns:1fr; }
+    .stages-head .col-head:last-child{ display:none; }
+    .stage-fns{ border-left:0; border-top:1px dashed var(--line); margin-left:11px; }
+  }
+  .pills{ display:flex; gap:5px; flex-wrap:wrap; }
+  .pill{ border:1px solid var(--line); border-radius:999px; padding:2px 9px; background:#f8fafc;
+    font-variant-numeric:tabular-nums; }
+  .pill b{ color:var(--accent); }
+  .pill.zero{ color:#cbd5e1; }
+  .mono{ font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11.5px;
+    background:#0f172a; color:#e2e8f0; border-radius:9px; padding:9px 11px; white-space:pre-wrap;
+    word-break:break-word; }
+  .row2{ display:flex; gap:7px; flex-wrap:wrap; align-items:center; }
+  .tag{ font-size:11px; color:var(--muted); }
+  .fn{ font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:10.5px; height:fit-content;
+    background:#eef2ff; color:#4338ca; border:1px solid #e0e7ff; border-radius:6px; padding:2px 7px; cursor:help; }
+  .stages-head{ display:grid; grid-template-columns:minmax(0,2fr) minmax(0,3fr); border-bottom:1px solid var(--line); }
+  .stages-head .col-head{ margin:0 0 7px; padding-left:14px; }
+  .err{ color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; border-radius:9px; padding:9px 11px; }
+  .research{ background:linear-gradient(90deg,rgba(124,58,237,.10),transparent); border-radius:9px; padding:8px 11px; }
+  .bar{ height:8px; background:#ede9fe; border-radius:999px; overflow:hidden; margin-top:5px; }
+  .bar > i{ display:block; height:100%; background:var(--accent); }
+  .bal-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .bal-box{ background:#f8fafc; border:1px solid var(--line); border-radius:10px; padding:8px 6px 7px; text-align:center; }
+  .bal-box .bk{ font-size:9px; text-transform:uppercase; letter-spacing:.03em; color:#94a3b8; }
+  .bal-box .bv{ font-size:18px; font-weight:700; line-height:1.2; }
+  .bal-badge{ margin-top:9px; font-size:11.5px; border-radius:8px; padding:6px 10px; text-align:center; }
+  .bal-badge.ok{ background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; }
+  .bal-badge.bad{ background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; }
+  .bal-fns-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:9px; }
+  @media (max-width:620px){ .bal-fns-grid{ grid-template-columns:1fr; } }
+  .bal-fn-card{ border:1px solid var(--line); border-radius:10px; padding:7px 9px 8px; }
+  .bal-fn-label{ font-size:9px; text-transform:uppercase; letter-spacing:.04em; color:#94a3b8; margin:0 0 6px; }
+  .bal-fn-chips{ display:flex; flex-wrap:wrap; gap:4px; }
+</style></head>
+<body>
+<h1>Raven Gear — Math Inspector</h1>
+<p class="sub">Type inputs on the left; the right side recomputes the <b>actual</b> calculator engine
+live — the same <code>computeFromBundle(bundle)</code> the app and What If use, assembled here from the
+pure modules (no app, no DOM coupling). This is your spreadsheet, wired to the real math, and a runnable
+oracle: it shows every stage of the pipeline for any input.</p>
+
+<div class="layout">
+  <!-- ── INPUTS ───────────────────────────────────────────── -->
+  <div>
+    <div class="card">
+      <h2>Baseline (owned, before chests)</h2>
+      <div class="levelrow" id="inBaseline"></div>
+      <div class="ctl" style="margin-top:10px"><label>High item</label>
+        <span class="seg" id="inHigh"><button data-hl="0" class="on">None</button><button data-hl="8">L8</button><button data-hl="9">L9</button><button data-hl="10">L10</button><button data-hl="11">L11</button><button data-hl="12">L12</button></span>
+      </div>
+      <div class="tag">High-level gear is single-copy — at most one L8–12 item, no duplicates.</div>
+    </div>
+    <div class="card">
+      <h2>Random chests (per level)</h2>
+      <div class="levelrow" id="inRandom"></div>
+    </div>
+    <div class="card">
+      <h2>Choice chests (per level)</h2>
+      <div class="levelrow" id="inChoice"></div>
+    </div>
+    <div class="card">
+      <h2>Settings</h2>
+      <div class="ctl"><label>Side</label>
+        <span class="seg" id="inSide"><button data-side="left" class="on">Left · 2/9</button><button data-side="right">Right · 1/9</button></span>
+      </div>
+      <div class="ctl"><label>Target</label>
+        <select id="inTarget"></select>
+        <label style="min-width:0">Show L6–7 chests</label>
+        <input type="checkbox" id="inShowHigh">
+      </div>
+      <div class="ctl"><label>Banked</label>
+        <input class="num" id="inBanked" type="number" min="0" step="1" value="0" placeholder="0" disabled>
+        <span class="tag" id="bankedHint">tech points — needs an owned high item</span>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Balance check</h2>
+      <div class="tag" style="margin:0 0 9px">Count conservation: every random chest makes exactly one item, so Generated must equal Random Chests and Target + Non-target must equal Generated. Catches items spawned or lost by rounding.</div>
+      <div id="outBalance"></div>
+    </div>
+  </div>
+
+  <!-- ── OUTPUT ────────────────────────────────────────────── -->
+  <div>
+    <div class="card">
+      <h2>The bundle (engine input)</h2>
+      <div class="mono" id="outBundle"></div>
+    </div>
+    <div class="card" id="outStages">
+      <div class="stages-head"><h2 class="col-head">Pipeline — every stage, live</h2><h2 class="col-head">Functions</h2></div>
+      <div id="stages"></div>
+    </div>
+    <div class="card">
+      <h2>Balance check — functions</h2>
+      <div class="bal-fns-grid" id="outBalanceFns"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  /*
+   * ───────────────────────────────────────────────────────────────────────────────
+   * RAVEN GEAR — MATH INSPECTOR   (a self-explaining, runnable oracle)
+   * ───────────────────────────────────────────────────────────────────────────────
+   * WHAT THIS IS: feed inputs on the left, watch the REAL calculator engine compute
+   * on the right, stage by stage. It calls computeFromBundle(bundle) — the exact pure
+   * function the app's Calculator and What-If use — so this page is the authoritative
+   * reference for the math.  AI READING THIS: if you are porting or reimplementing the
+   * logic (e.g. the React port), CALL this engine or check your output against this
+   * page. Do not re-derive the rules from scratch; they are subtle and load-bearing.
+   *
+   * THE ECONOMY (why the numbers are what they are):
+   *  • Every gear piece is worth its lossless L1-equivalent value = 3^(level-1)
+   *    (L1=1, L2=3, … L7=729, L8=2187, …). This falls straight out of 3:1 fusion.
+   *  • L1–L7 FUSE: 3 of a level → 1 of the next, capped at L8. A sub-3 remainder is
+   *    stranded (its value is locked until you have 3).
+   *  • Chests only ever drop L1–L7. That is why Random/Choice inputs stop at L7, and
+   *    why an L8+ DUPLICATE is impossible — high-level gear is single-copy.
+   *  • L8–L12 do NOT fuse; they "research". Each duplicate you feed in grants its
+   *    L1-equivalent value as TECH POINTS. Climbing one level costs 3^L − 3^(L-1)
+   *    (L8→L9 = 4374). There is NO stranding here — every point is live progress,
+   *    which is why a clean % is meaningful for high gear but not for low gear.
+   *  • CROSSOVER: low gear that only REACHES L8 after fusion still researches. The
+   *    collapse (consumeDuplicatesIntoResearch) triggers on TOTAL VALUE ≥ 2187, not
+   *    on whether a raw L8 key is already present.
+   *
+   * THE TWO RANDOM PARAMETERS:
+   *  • A random chest yields the chosen TARGET item with probability 2/9 if the item's
+   *    side is "left" or 1/9 if "right"; the rest are non-target items. p is carried as
+   *    an exact ratio {num,den} so floor(qty·p) is integer-exact in any runtime.
+   *  • A choice chest is a whole target item directly (no probability).
+   *
+   * THE BUNDLE — the ONLY thing the engine reads:
+   *   { baseline, random, choice, p:{num,den}, target, side, showHighChests }
+   *   baseline = owned gear: a low-gear L1–7 stack + at most ONE high L8–12 item.
+   *   Every figure the Calculator/What-If display is a pure function of this bundle.
+   *
+   * WHY THE INPUTS ARE SHAPED THIS WAY:
+   *  • The high item is a single-select (None / L8…L12) because high gear is single-
+   *    copy — two high items, or a quantity > 1, are impossible STATES, not just bad
+   *    inputs, so the UI makes them unrepresentable.
+   *  • Banked tech points can only exist if you already OWN a high item, so the field
+   *    is disabled and cleared to 0 whenever "None" is selected.
+   * ───────────────────────────────────────────────────────────────────────────────
+   */
+  import { createMathModule } from "../../shared/math/index.js";
+  import { createPlanningMathModule } from "../../planning/planning-math.js";
+  import * as DomainPlanning from "../../planning/planning-domain.js";
+  import { createCalculationEngine } from "../../shared/math/calculation-engine.js";
+
+  // Assemble the engine from the pure modules — the same composition the headless suite
+  // (tests/pure-logic-tests.js) uses. The math layer (core + levels), the planning-math
+  // wrappers, and the inventory audit are pure: they read only their arguments + runtime, never
+  // the DOM or app state. So a tiny stub runtime is enough to run the WHOLE engine here.
+  // We import the engine DIRECTLY (createCalculationEngine) instead of booting the render module —
+  // computeFromBundle is the only thing the inspector needs, and it now lives in its own pure
+  // module. (A reimplementation should reproduce computeFromBundle's behavior; this assembly
+  // shows exactly which pure pieces it depends on.)
+  const runtime = { state:{}, mode:"manual", manualSide:"left", selectedSide(){ return runtime.manualSide; } };
+  Object.assign(runtime, createMathModule(runtime));
+  runtime.DomainPlanning = DomainPlanning;
+  Object.assign(runtime, createPlanningMathModule(runtime));
+  // The balance check uses the app's REAL audit (random-generation-ledger-domain.computeRandomPlanAuditDomain) —
+  // the engine imports it directly and returns it as model.randomAudit, passing this runtime as the
+  // injected math bag. So math + planning is the ENTIRE composition the engine needs; no inventory module.
+  const engine = createCalculationEngine(runtime);
+
+  const ITEM_LEVELS = [1,2,3,4,5,6,7,8,9,10,11,12];
+  const LOW_LEVELS = [1,2,3,4,5,6,7];   // baseline low gear (fusable, can stack) + chest levels
+  const CHEST_LEVELS = [1,2,3,4,5,6,7];
+  // baseline = low gear only; `high` is the single owned high-level item (0 = none, else 8..12).
+  const state = { baseline:{}, high:0, random:{}, choice:{}, side:"left", target:8, showHigh:false, banked:0 };
+
+  // ---- build inputs ----
+  // Handlers resolve state[storeKey] LIVE on each keystroke, so reseeding state.baseline /
+  // state.random to a fresh object (below) can't orphan them.
+  function levelInputs(mountId, levels, storeKey){
+    const mount = document.getElementById(mountId);
+    mount.innerHTML = levels.map(l=>`<label class="lvl"><span>L${l}</span><input data-l="${l}" type="number" min="0" step="1" placeholder="0"></label>`).join("");
+    mount.querySelectorAll("input").forEach(inp=>{
+      inp.addEventListener("input", ()=>{
+        const v = Math.max(0, Math.floor(Number(inp.value||0)));
+        const store = state[storeKey];
+        if(v>0) store[inp.dataset.l]=v; else delete store[inp.dataset.l];
+        update();
+      });
+    });
+  }
+  levelInputs("inBaseline", LOW_LEVELS, "baseline");
+  levelInputs("inRandom", CHEST_LEVELS, "random");
+  levelInputs("inChoice", CHEST_LEVELS, "choice");
+
+  // High-level item: single-select (8..12 or none), since high gear is single-copy. Banked
+  // research only exists when you own one, so it's disabled + cleared when "None".
+  const bankedInput = document.getElementById("inBanked");
+  function syncBanked(){
+    const hasHigh = state.high > 0;
+    bankedInput.disabled = !hasHigh;
+    if(!hasHigh){ state.banked = 0; bankedInput.value = "0"; }
+    document.getElementById("bankedHint").textContent = hasHigh
+      ? "tech points (research progress)"
+      : "tech points — needs an owned high item";
+  }
+  document.getElementById("inHigh").addEventListener("click", e=>{
+    const b = e.target.closest("button[data-hl]"); if(!b) return;
+    state.high = Number(b.dataset.hl);
+    document.querySelectorAll("#inHigh button").forEach(x=>x.classList.toggle("on", x===b));
+    syncBanked();
+    update();
+  });
+
+  const targetSel = document.getElementById("inTarget");
+  targetSel.innerHTML = ITEM_LEVELS.map(l=>`<option value="${l}"${l===8?" selected":""}>Level ${l}</option>`).join("");
+  targetSel.addEventListener("change", ()=>{ state.target = Number(targetSel.value); update(); });
+
+  document.getElementById("inSide").addEventListener("click", e=>{
+    const b = e.target.closest("button[data-side]"); if(!b) return;
+    state.side = b.dataset.side; runtime.manualSide = state.side;
+    document.querySelectorAll("#inSide button").forEach(x=>x.classList.toggle("on", x===b));
+    update();
+  });
+  document.getElementById("inShowHigh").addEventListener("change", e=>{ state.showHigh = e.target.checked; update(); });
+  document.getElementById("inBanked").addEventListener("input", e=>{ state.banked = Math.max(0,Math.floor(Number(e.target.value||0))); update(); });
+
+  // ---- render helpers ----
+  const ratioForSide = s => s==="left" ? {num:2,den:9} : {num:1,den:9};
+  function levelObjPills(obj, levels){
+    const ls = levels || Object.keys(obj||{}).map(Number).sort((a,b)=>b-a);
+    if(!ls.length || ls.every(l=>!(Number(obj[l])>0))) return `<span class="pill zero">—</span>`;
+    return ls.map(l=>{
+      const v = Number((obj||{})[l]||0);
+      return `<span class="pill${v>0?"":" zero"}">L${l} <b>${v>0?v:"·"}</b></span>`;
+    }).join("");
+  }
+  function valuePills(levels, values){
+    return levels.map((l,i)=>{
+      const v = values[i];
+      const shown = (v==null||v==="-"||v==="") ? "·" : v;
+      return `<span class="pill${shown==="·"?" zero":""}">L${l} <b>${shown}</b></span>`;
+    }).join("");
+  }
+  // Every stage is two columns: the left shows what it computes; the right (under the
+  // "Functions" column header) holds chips for the engine functions it calls — call → domain
+  // delegate → leaf primitive — each chip's source file in its title. So this page doubles as
+  // a stage→source map. Chips are direct children of .stage-fns so they wrap/grid freely.
+  function fnChips(fns){
+    return (fns||[]).map(x=>`<code class="fn" title="${x.f}">${x.n}</code>`).join("");
+  }
+  function stage(lbl, desc, fns, inner){
+    return `<div class="stage"><div class="stage-main"><div class="lbl">${lbl}</div><div class="desc">${desc}</div>${inner}</div><div class="stage-fns">${fnChips(fns)}</div></div>`;
+  }
+
+  // ---- the live compute ----
+  function update(){
+    const stagesEl = document.getElementById("stages");
+    try{
+      const p = ratioForSide(state.side);
+      const bundle = {
+        baseline: { ...state.baseline, ...(state.high>0 ? {[state.high]:1} : {}) },
+        random:   {...state.random},
+        choice:   {...state.choice},
+        p,
+        target:   state.target,
+        side:     state.side,
+        showHighChests: state.showHigh,
+        banked:   state.banked
+      };
+      document.getElementById("outBundle").textContent =
+        JSON.stringify({ ...bundle, p:`${p.num}/${p.den} (${(p.num/p.den*100).toFixed(3)}%)` }, null, 2);
+
+      // ONE call. The engine returns the model AND every pipeline intermediate, so this page is a
+      // pure visualizer over computeFromBundle — it no longer re-runs any helper itself. The
+      // intermediates the model now carries:
+      //   expectedTargetItems = whole target items the chests produce (floor(random·p) rolled up + choice)
+      //   effectiveOwned      = baseline + expected, rolled up 3→1     (projected inventory / "pool")
+      //   research            = pool collapsed into a single high item (only when pool value ≥ 2187)
+      //   randomAudit         = the app's count-conservation audit of the random plan
+      const m = engine.computeFromBundle(bundle);
+      const expected = m.expectedTargetItems;
+      const pool     = m.effectiveOwned;
+      const research = m.research;
+
+      const pct = research.isResearch
+        ? Math.floor(research.techPoints / (runtime.requiredTechPointsForLevel(research.level) || 1) * 100) : 0;
+
+      // Balance check — straight off the model. m.randomAudit is the app's REAL plan-level audit
+      // (inventory-math.computeRandomPlanAudit, the exact function computeRawItemPlan calls):
+      // deterministic split → target → non-target → allocate evenly across the side's roster →
+      // leftover, with count conservation. The engine computed it; we only render it.
+      const bal = m.randomAudit.audit;
+      const balBox = (k,v)=>`<div class="bal-box"><div class="bk">${k}</div><div class="bv">${v}</div></div>`;
+      document.getElementById("outBalance").innerHTML =
+        `<div class="bal-grid">`
+        + balBox("Random Chests", bal.randomChestCount) + balBox("Generated", bal.generatedCount) + balBox("Target", bal.targetRandomCount)
+        + balBox("Non-target", bal.nontargetCount) + balBox("Allocated", bal.allocatedCount) + balBox("Leftover", bal.leftoverCount)
+        + `</div>`
+        + `<div class="bal-badge ${bal.balances?"ok":"bad"}">${bal.balances ? "✓ balances — no items spawned or lost to rounding" : "✗ CHECK — rounding changed the item count"}</div>`;
+
+      stagesEl.innerHTML = [
+        stage("1 · Expected target items", "floor(random × p) per level, rolled up 3→1 — plus choice chests (whole items).",
+          [{n:"targetItemsFromPlanAndChoice()",f:"planning/planning-math.js"},
+           {n:"targetItemsFromPlanAndChoiceDomain()",f:"planning/planning-domain.js"},
+           {n:"floorExpectedItems()",f:"planning/planning-domain.js"},
+           {n:"simplifyUpByLevelDomain()",f:"inventory/inventory-domain.js"}],
+          `<div class="pills">${levelObjPills(expected, ITEM_LEVELS)}</div>`),
+        stage("2 · Pool = baseline + expected (rolled up)", "Your projected inventory toward the target (baseline owned + expected items, fused).",
+          [{n:"calculateEffectiveOwnedForRemainingItems()",f:"planning/planning-math.js"},
+           {n:"calculateEffectiveOwnedForRemainingItemsDomain()",f:"planning/planning-domain.js"},
+           {n:"rawTargetAdditionsFromPlanAndChoiceDomain()",f:"planning/planning-domain.js"},
+           {n:"simplifyWholeByLevelDomain()",f:"planning/planning-domain.js"}],
+          `<div class="pills">${levelObjPills(pool, ITEM_LEVELS)}</div>`),
+        stage("3 · Remaining items needed", `Per level toward L${state.target}: required − pool equivalent (ceil).`,
+          [{n:"requiredAtLevel(target, level)",f:"shared/math/core.js"},
+           {n:"levelObjectEquivalentAtLevel(pool, level)",f:"shared/math/levels.js"}],
+          `<div class="pills">${valuePills(m.itemResultLevels, m.itemValues)}</div>`),
+        stage("3b · Item requirement (baseline only)", "Same need against the raw baseline — equals row 3 when no chests are planned.",
+          [{n:"requiredAtLevel(target, level)",f:"shared/math/core.js"},
+           {n:"levelObjectEquivalentAtLevel(baseline, level)",f:"shared/math/levels.js"}],
+          `<div class="pills">${valuePills(m.itemResultLevels, m.itemBaselineValues)}</div>`),
+        stage("4 · Remaining chests needed", "Per column, ceil(remaining ÷ p) with that level's own planned chests excluded (no double-count).",
+          [{n:"calculateEffectiveOwnedForRemainingChestColumn()",f:"planning/planning-math.js"},
+           {n:"rawTargetAdditionsFromPlanExcludingLevelDomain()",f:"planning/planning-domain.js"},
+           {n:"requiredAtLevel() · levelObjectEquivalentAtLevel()",f:"shared/math/core.js + levels.js"},
+           {n:"ceil(remaining × den / num)",f:"calculator/calculator-render.js"}],
+          `<div class="pills">${valuePills(m.chestResultLevels, m.chestValues)}</div>`),
+        stage("5 · Non-target items by side", "Deterministic 2/3·1/3 split, minus the target items already counted on its side.",
+          [{n:"nontargetSideTotalsFromRandomPlan()",f:"planning/planning-math.js"},
+           {n:"deterministicSideTotalsFromRandomPlanDomain()",f:"planning/planning-domain.js"},
+           {n:"targetItemsRawFromRandomPlanDomain()",f:"planning/planning-domain.js"},
+           {n:"valuesFromLevelObject()",f:"shared/math/levels.js"}],
+          `<div class="pills">${m.randomSideDisplayValues.map((v,i)=>`<span class="pill${v==="-"?" zero":""}">L${[7,6,5,4,3,2,1][i]} <b>${v==="-"?"·":v}</b></span>`).join("")}</div>`),
+        stage("6 · High-level research collapse", "If the pool's total value reaches L8+ (2187), it consumes into a single research item.",
+          [{n:"consumeDuplicatesIntoResearch(pool, banked)",f:"shared/math/levels.js"},
+           {n:"equivalentAtLevel(obj, 1)",f:"shared/math/levels.js"},
+           {n:"researchLevelForValue()",f:"shared/math/levels.js"},
+           {n:"requiredTechPointsForLevel()",f:"shared/math/levels.js"}],
+          research.isResearch
+            ? `<div class="research"><div class="row2"><span class="pill"><b>L${research.level}</b></span><span>research progress <b>${pct}%</b></span><span class="tag">${research.techPoints} / ${runtime.requiredTechPointsForLevel(research.level)||"—"} tech points</span></div><div class="bar"><i style="width:${Math.min(100,pct)}%"></i></div></div>`
+            : `<div class="tag">Not research yet — pool value below the L8 base (2187). Low gear fuses 3→1 as usual.</div>`)
+      ].join("");
+    }catch(err){
+      stagesEl.innerHTML = `<div class="err"><b>Engine error:</b> ${String(err && err.stack || err)}</div>`;
+    }
+  }
+
+  // The engine functions behind each of the 6 balance boxes (real wiring). Static — rendered once
+  // as small labelled cards of chips, mirroring the chips in the pipeline's Functions column.
+  const BALANCE_FNS = [
+    { label:"Random chests", fns:[
+      {n:"levelObjectTotalCount()",f:"shared/math/levels.js"}] },
+    { label:"Generated", fns:[
+      {n:"deterministicSideTotalsFromRandomPlan()",f:"planning/planning-math.js"},
+      {n:"levelObjectTotalCount()",f:"shared/math/levels.js"}] },
+    { label:"Target", fns:[
+      {n:"rawTargetFromRandomPlan()",f:"planning/planning-math.js"},
+      {n:"levelObjectTotalCount()",f:"shared/math/levels.js"}] },
+    { label:"Non-target", fns:[
+      {n:"subtractLevelObjects()",f:"shared/math/levels.js"},
+      {n:"levelObjectTotalCount()",f:"shared/math/levels.js"}] },
+    { label:"Allocated", fns:[
+      {n:"itemsBySide() · otherItemsOnSide()",f:"inventory/random-generation-ledger-domain.js"},
+      {n:"allocatePoolToItems()",f:"inventory/random-generation-ledger-domain.js"},
+      {n:"addLevelObjects()",f:"shared/math/levels.js"},
+      {n:"levelObjectTotalCount()",f:"shared/math/levels.js"}] },
+    { label:"Leftover", fns:[
+      {n:"allocatePoolToItems()",f:"inventory/random-generation-ledger-domain.js"},
+      {n:"levelObjectTotalCount()",f:"shared/math/levels.js"}] }
+  ];
+  document.getElementById("outBalanceFns").innerHTML = BALANCE_FNS.map(s=>
+    `<div class="bal-fn-card"><div class="bal-fn-label">${s.label} functions</div><div class="bal-fn-chips">${fnChips(s.fns)}</div></div>`).join("");
+
+  // start empty — every input is the user's to drive.
+  syncBanked();
+  update();
+</script>
+</body></html>

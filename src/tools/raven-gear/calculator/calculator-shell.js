@@ -16,6 +16,7 @@
 import { renderChestInputCardMarkup } from "../blocks/chest-input-card.block.js";
 import { renderResultsCardMarkup } from "../blocks/results-card.block.js";
 import { renderNontargetCardMarkup } from "../blocks/nontarget-card.block.js";
+import { renderChangeSummaryCardMarkup } from "../blocks/change-summary-card.block.js";
 
 export const CALCULATOR_SHELL_MARKUP=`<section class="" id="calculatorSubPage">
 <section class="card2 card2--white card2--lg" id="goalCard">
@@ -33,7 +34,7 @@ export const CALCULATOR_SHELL_MARKUP=`<section class="" id="calculatorSubPage">
 <span class="value-box2-unit value-box2-unit--above value-box2-unit--fill">
 <label class="value-box2__label value-box2__label--above value-box2__label--main value-box2__label--size-12" for="targetItem">Target Raven Item</label>
 <div class="value-box2 value-box2--sm value-box2--manual value-box2--select">
-<select class="value-box2__select" data-action="onTargetItemChange" data-action-event="change" id="targetItem">
+<select class="value-box2__select" data-action="onTargetItemChange" data-action-event="change" data-source0="value" id="targetItem">
 <option value="Heart of Wisdom">Heart of Wisdom</option>
 <option value="Feather of Night">Feather of Night</option>
 <option value="Sharp Beak">Sharp Beak</option>
@@ -69,15 +70,15 @@ export const CALCULATOR_SHELL_MARKUP=`<section class="" id="calculatorSubPage">
 <span class="value-box2-unit value-box2-unit--above value-box2-unit--fill">
 <label class="value-box2__label value-box2__label--above value-box2__label--main value-box2__label--size-12" for="targetLevel">Target Gear Level</label>
 <div class="value-box2 value-box2--sm value-box2--manual value-box2--select">
-<select class="value-box2__select" data-action="renderAll" data-action-event="change" id="targetLevel"></select>
+<select class="value-box2__select" data-action="onTargetLevelChange" data-action-event="change" data-source0="value" id="targetLevel"></select>
 </div>
 </span>
 <span class="tabs2-unit tabs2-unit--label-above tabs2-unit--fill">
 <span class="tabs2__label tabs2__label--size-12">Owned Items Filter</span>
 <span class="tabs2 tabs2--inline tabs2--neutral" role="group" aria-label="Owned items filter" style="--tabs-cols:3">
-<button type="button" class="tabs2__tab active" id="ownedViewLow" data-action="setHighestOwned" data-action-event="click" data-arg0="7" data-arg0-type="number">7-</button>
-<button type="button" class="tabs2__tab" id="ownedViewHigh" data-action="setHighestOwned" data-action-event="click" data-arg0="8" data-arg0-type="number">8+</button>
-<button type="button" class="tabs2__tab" id="ownedViewAll" data-action="setHighestOwned" data-action-event="click" data-arg0="12" data-arg0-type="number">All</button>
+<button type="button" class="tabs2__tab active" id="ownedViewLow" data-action="setOwnedItemsFilter" data-action-event="click" data-arg0="low">7-</button>
+<button type="button" class="tabs2__tab" id="ownedViewHigh" data-action="setOwnedItemsFilter" data-action-event="click" data-arg0="high">8+</button>
+<button type="button" class="tabs2__tab" id="ownedViewAll" data-action="setOwnedItemsFilter" data-action-event="click" data-arg0="all">All</button>
 </span>
 </span>
 </div>
@@ -99,7 +100,8 @@ export const CALCULATOR_SHELL_MARKUP=`<section class="" id="calculatorSubPage">
 <div class="card2__content card2__content--after-header" id="ownedOpenSnapshotContent"><div class="card2 card2--muted card2--md card2--pad-half card2__snapshot-open" id="ownedOpenSnapshot"></div></div>
 <div class="card2__content card2__content--after-header" id="ownedInputs"></div>
 </section>
-${renderChestInputCardMarkup({resetMode:"dynamic"})}
-${renderResultsCardMarkup()}
+${renderChestInputCardMarkup({resetMode:"dynamic", actions:{ refreshInputs:"setCalcShowHighRandom" }})}
+${renderResultsCardMarkup({ actions:{ showHighChests:"setCalcShowHighChests" }})}
+${renderChangeSummaryCardMarkup()}
 ${renderNontargetCardMarkup()}
 </section>`;

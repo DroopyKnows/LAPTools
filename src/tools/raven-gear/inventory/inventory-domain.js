@@ -1,3 +1,4 @@
+// @ts-check
 // Pure inventory domain helpers.
 // No DOM, no localStorage, no app state mutation.
 
@@ -11,32 +12,66 @@ const DOMAIN_RAVEN_ITEM_NAMES=getRavenItems().map(item=>item.name);
 const DOMAIN_ITEM_LEVELS=ITEM_LEVELS;
 const DOMAIN_MAX_ITEM_LEVEL=MAX_ITEM_LEVEL;
 
+/**
+ * @param {unknown} value
+ * @returns {boolean} true when value is a non-null, non-array object.
+ */
 function domainIsPlainObject(value){
   return !!value && typeof value==="object" && !Array.isArray(value);
 }
 
+/**
+ * Coerce to a clamped, floored integer, falling back when not finite.
+ * @param {unknown} value
+ * @param {number} [fallback]
+ * @param {number} [min]
+ * @param {number} [max]
+ * @returns {number}
+ */
 function domainToSafeInteger(value, fallback=0, min=0, max=Number.MAX_SAFE_INTEGER){
   const number=Number(value);
   if(!Number.isFinite(number)) return fallback;
   return Math.max(min,Math.min(max,Math.floor(number)));
 }
 
+/**
+ * @param {number} value
+ * @param {number} [digits]
+ * @returns {number} value rounded to `digits` decimal places.
+ */
 function domainRound(value, digits=6){
   const factor=Math.pow(10,digits);
   return Math.round(Number(value||0)*factor)/factor;
 }
 
+/**
+ * @param {number|string} level
+ * @returns {string}
+ */
 function domainLevelKey(level){
   return String(Number(level));
 }
 
+/**
+ * An inventory with an empty {@link LevelObject} for every item.
+ * @param {string[]} [itemNames]
+ * @returns {ItemLevelMap}
+ */
 function createEmptyInventoryDomain(itemNames=DOMAIN_RAVEN_ITEM_NAMES){
+  /** @type {ItemLevelMap} */
   const inventory={};
   itemNames.forEach(name=>inventory[name]={});
   return inventory;
 }
 
+/**
+ * Drop unknown levels and non-positive quantities; floor the rest.
+ * @param {unknown} source
+ * @param {number[]} [levels] allowed levels (defaults to all item levels).
+ * @returns {LevelObject}
+ */
 function normalizeLevelObjectDomain(source, levels=DOMAIN_ITEM_LEVELS){
+  /** @type {LevelObject} */
   const out={};
   if(!domainIsPlainObject(source)) return out;
   const allowed=new Set(levels.map(Number));
@@ -49,7 +84,15 @@ function normalizeLevelObjectDomain(source, levels=DOMAIN_ITEM_LEVELS){
   return out;
 }
 
+/**
+ * Normalize a whole inventory: one cleaned {@link LevelObject} per known item.
+ * @param {unknown} source
+ * @param {string[]} [itemNames]
+ * @param {number[]} [levels]
+ * @returns {ItemLevelMap}
+ */
 function normalizeInventoryDomain(source, itemNames=DOMAIN_RAVEN_ITEM_NAMES, levels=DOMAIN_ITEM_LEVELS){
+  /** @type {ItemLevelMap} */
   const out={};
   itemNames.forEach(name=>{
     out[name]=normalizeLevelObjectDomain(domainIsPlainObject(source) ? source[name] : {}, levels);
@@ -57,6 +100,12 @@ function normalizeInventoryDomain(source, itemNames=DOMAIN_RAVEN_ITEM_NAMES, lev
   return out;
 }
 
+/**
+ * @param {unknown} source
+ * @param {string[]} [itemNames]
+ * @param {number[]} [levels]
+ * @returns {boolean} true when every item maps allowed levels to non-negative integers.
+ */
 function isValidInventoryDomain(source, itemNames=DOMAIN_RAVEN_ITEM_NAMES, levels=DOMAIN_ITEM_LEVELS){
   if(!domainIsPlainObject(source)) return false;
   const allowed=new Set(levels.map(Number));
@@ -70,7 +119,13 @@ function isValidInventoryDomain(source, itemNames=DOMAIN_RAVEN_ITEM_NAMES, level
   });
 }
 
+/**
+ * Drop non-positive entries and renumber keys.
+ * @param {Record<string, unknown>} source
+ * @returns {LevelObject}
+ */
 function compactLevelObjectDomain(source){
+  /** @type {LevelObject} */
   const out={};
   Object.keys(source||{}).forEach(key=>{
     const qty=Number(source[key]||0);
@@ -79,7 +134,14 @@ function compactLevelObjectDomain(source){
   return out;
 }
 
+/**
+ * Sum any number of level objects per level (contributions may be signed; a level
+ * that nets to zero is dropped).
+ * @param {...LevelObject} objects
+ * @returns {LevelObject}
+ */
 function addLevelObjectsDomain(...objects){
+  /** @type {LevelObject} */
   const out={};
   objects.forEach(obj=>{
     Object.keys(obj||{}).forEach(key=>{
@@ -93,7 +155,14 @@ function addLevelObjectsDomain(...objects){
   return out;
 }
 
+/**
+ * a - b per level, keeping only positive results.
+ * @param {LevelObject} a
+ * @param {LevelObject} b
+ * @returns {LevelObject}
+ */
 function subtractLevelObjectsDomain(a,b){
+  /** @type {LevelObject} */
   const out={};
   const keys=new Set([...Object.keys(a||{}),...Object.keys(b||{})]);
   keys.forEach(key=>{
@@ -104,10 +173,21 @@ function subtractLevelObjectsDomain(a,b){
   return out;
 }
 
+/**
+ * @param {LevelObject} source
+ * @returns {number} total quantity across all levels.
+ */
 function levelObjectTotalCountDomain(source){
   return Object.values(source||{}).reduce((sum,value)=>sum+Number(value||0),0);
 }
 
+/**
+ * Value of an inventory expressed in units of `level`, rolling higher levels down
+ * at 3x per level (a level-(n+1) item is worth 3 level-n items).
+ * @param {LevelObject} source
+ * @param {number} level
+ * @returns {number}
+ */
 function levelObjectEquivalentAtLevelDomain(source,level){
   let total=0;
   Object.keys(source||{}).forEach(key=>{
@@ -118,7 +198,14 @@ function levelObjectEquivalentAtLevelDomain(source,level){
   return total;
 }
 
+/**
+ * Roll 3-of-a-level up into one of the next level, carrying upward.
+ * @param {LevelObject} source
+ * @param {number} [maxLevel]
+ * @returns {LevelObject}
+ */
 function simplifyUpByLevelDomain(source,maxLevel=DOMAIN_MAX_ITEM_LEVEL){
+  /** @type {LevelObject} */
   const result={};
   let carry=0;
 

@@ -4,6 +4,7 @@
 
 import { chestLevels, allItemLevels, MAX_ITEM_LEVEL } from "../metadata/item-metadata.js";
 import { renderStateRows } from "./whatif-ui-renderers.js";
+import { renderChangeSummarySnapshot } from "../blocks/change-summary-card.block.js";
 
 export function createWhatIfResultsModule(runtime) {
   const {
@@ -41,7 +42,11 @@ function renderWhatIfScenario(){
   const ownedBase=source==="starting" ? currentInventory : combined;
   const rawScenarioAdds=rawTargetAdditionsFromPlanAndChoice(effPlan,effChoice,p);
   const expected=simplifyUpByLevel(rawScenarioAdds);
-  const after=simplifyUpByLevel(addLevelObjects(ownedBase,rawScenarioAdds));
+  const afterRaw=addLevelObjects(ownedBase,rawScenarioAdds);
+  // High-level items collapse their duplicates into research; low-level fuse as before.
+  const combinedResearch=runtime.consumeDuplicatesIntoResearch(combined,baseline.techPoints);
+  const afterResearch=runtime.consumeDuplicatesIntoResearch(afterRaw,baseline.techPoints);
+  const after=afterResearch.isResearch ? afterResearch.displayObject : simplifyUpByLevel(afterRaw);
 
   // Scenario Setup: keep the selects, showHigh, and baseline toggle in sync with
   // state. (Chance is set by the Results block via the whatIf env's chanceIds.)
@@ -58,13 +63,27 @@ function renderWhatIfScenario(){
 
   const summary=runtime.byId("whatIfChangeSummary");
   if(summary){
-    const compactSummaryPills=(obj,emptyText)=>renderCompactLevelBoxes(obj || {}, allItemLevels, {itemName:item.name,techPoints:baseline.techPoints}) || renderEmptyState({title:"",message:emptyText,className:"notice2 notice2--empty",compact:true});
+    const compactSummaryPills=(obj,emptyText,techPoints)=>renderCompactLevelBoxes(obj || {}, allItemLevels, {itemName:item.name,techPoints:techPoints!==undefined?techPoints:baseline.techPoints}) || renderEmptyState({title:"",message:emptyText,className:"notice2 notice2--empty",compact:true});
     summary.innerHTML=renderStateRows([
       {title:"Current Inventory",sub:`Manually entered inventory for ${item.name}.`,html:compactSummaryPills(currentInventory,"No current inventory entered.")},
-      {title:"Combined Inventory Baseline",sub:"Current Inventory plus calculated inventory from saved plans.",html:compactSummaryPills(combined,"No combined inventory yet.")},
+      {title:"Combined Inventory",sub:"Current Inventory plus calculated inventory from saved plans.",html:compactSummaryPills(combinedResearch.isResearch?combinedResearch.displayObject:combined,"No combined inventory yet.",combinedResearch.isResearch?combinedResearch.techPoints:undefined)},
       {title:"What If Additions",sub:"Estimated target duplicates from this scenario.",html:compactSummaryPills(expected,whatIfHasInputs()?"No target items expected.":"No What If chests entered yet.")},
-      {title:"After What If",sub:"Selected baseline plus this scenario.",html:compactSummaryPills(after,"No inventory projected yet."),strong:true}
+      {title:"After What If",sub:"Selected baseline plus this scenario.",html:compactSummaryPills(after,"No inventory projected yet.",afterResearch.isResearch?afterResearch.techPoints:undefined),strong:true}
     ]);
+
+    // Snapshot — Previous (the chosen baseline: starting or combined) | New (After What If).
+    const prevObj=source==="combined" ? (combinedResearch.isResearch?combinedResearch.displayObject:combined) : currentInventory;
+    const prevTech=source==="combined" && combinedResearch.isResearch ? combinedResearch.techPoints : undefined;
+    const snapHtml=renderChangeSummarySnapshot(
+      compactSummaryPills(prevObj,"No record",prevTech),
+      compactSummaryPills(after,"No change",afterResearch.isResearch?afterResearch.techPoints:undefined)
+    );
+    const csCollapsed=runtime.byId("whatIfChangeSummaryCollapsedSnapshot"); if(csCollapsed) csCollapsed.innerHTML=snapHtml;
+    // Open snapshot prepended to the rows stack (first item) so it sits on top of the rows with
+    // the stack's gap separating it from the first row card.
+    const wifStack=summary.querySelector(".stack2");
+    (wifStack||summary).insertAdjacentHTML("afterbegin",
+      `<div class="card2 card2--muted card2--md card2--pad-half card2__snapshot-open" id="whatIfChangeSummaryOpenSnapshot">${snapHtml}</div>`);
   }
 
   // Results + Non-target: shared blocks, one compute → two views.

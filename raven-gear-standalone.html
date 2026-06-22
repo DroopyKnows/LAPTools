@@ -25,14 +25,13 @@
                                     setter, and no-op home hooks. The tool's OWN
                                     sub-page nav (page tabs) works without them.
 
-  CSS: the design tokens + base primitives are loaded below in the same cascade
-  layers the hub declares; the tool injects its own stylesheet on mount. (Stage 7
-  will repoint these to src/shared/styles so only shared CSS is needed.)
+  CSS: pure element/utility primitives + the 3 foundation tokens they need load below
+  from the tool's OWN styles/primitives.css (layer base); the tool injects the rest of its
+  stylesheet on mount. No src/shared CSS is referenced — the tool is fully self-contained.
 -->
 <style>
 @layer tokens, base, components, overrides;
-@import url("src/shared/styles/tokens.css") layer(tokens);
-@import url("src/shared/styles/base.css") layer(base);
+@import url("src/tools/raven-gear/styles/primitives.css") layer(base);
 </style>
 <style>
   body{ margin:0; }

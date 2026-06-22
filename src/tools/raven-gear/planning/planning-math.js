@@ -16,75 +16,6 @@ export function createPlanningMathModule(runtime){
       return runtime.DomainPlanning.calculateAdditionalOwnedFromPlanDomain(plan,p);
     }
 
-    function buildLeftoverHelperRows(plan, samePerItemProb, oppositePerItemProb){
-      const sameRows=[];
-      const oppositeRows=[];
-      const sameFractionTotals={};
-      const oppositeFractionTotals={};
-
-      for(let i=0; i<2; i++){
-        const raw={};
-        chestLevels.forEach(level=>{
-          const qty=runtime.safeNum(plan[level]);
-          if(qty>0) raw[level]=qty*samePerItemProb;
-        });
-        const simplified=runtime.simplifyBucketDecimal(raw);
-        const display=runtime.displayRowFromSimplified(simplified);
-        const fractions=runtime.fractionalRemainderFromSimplified(simplified);
-        sameRows.push(display);
-        runtime.addObjects(sameFractionTotals,fractions);
-      }
-
-      const sameRemainderDisplay=runtime.displayRowFromSimplified(runtime.simplifyBucketDecimal(sameFractionTotals));
-      sameRows.push(sameRemainderDisplay);
-
-      for(let i=0; i<3; i++){
-        const raw={};
-        chestLevels.forEach(level=>{
-          const qty=runtime.safeNum(plan[level]);
-          if(qty>0) raw[level]=qty*oppositePerItemProb;
-        });
-        const simplified=runtime.simplifyBucketDecimal(raw);
-        const display=runtime.displayRowFromSimplified(simplified);
-        const fractions=runtime.fractionalRemainderFromSimplified(simplified);
-        oppositeRows.push(display);
-        runtime.addObjects(oppositeFractionTotals,fractions);
-      }
-
-      const oppositeRemainderDisplay=runtime.displayRowFromSimplified(runtime.simplifyBucketDecimal(oppositeFractionTotals));
-      oppositeRows.push(oppositeRemainderDisplay);
-
-      return {
-        sameRows,
-        oppositeRows,
-        sameTotal:runtime.addDisplayRows(sameRows),
-        oppositeTotal:runtime.addDisplayRows(oppositeRows),
-        allTotal:runtime.addDisplayRows([...sameRows,...oppositeRows])
-      };
-    }
-
-    function rawRandomSideTotals(plan, selectedSideValue){
-      const left={};
-      const right={};
-      chestLevels.forEach(level=>{
-        const qty=runtime.safeNum(plan[level]);
-        if(qty<=0) return;
-
-        if(selectedSideValue==="left"){
-          // Target item is left. Left leftovers are the other 2 left items (2/9 each);
-          // right leftovers are the 3 right items (1/9 each).
-          left[level]=(left[level]||0)+runtime.excelRoundWhole(qty*(4/9));
-          right[level]=(right[level]||0)+runtime.excelRoundWhole(qty*(3/9));
-        }else{
-          // Target item is right. Right leftovers are the other 2 right items (1/9 each);
-          // left leftovers are the 3 left items (2/9 each).
-          right[level]=(right[level]||0)+runtime.excelRoundWhole(qty*(2/9));
-          left[level]=(left[level]||0)+runtime.excelRoundWhole(qty*(6/9));
-        }
-      });
-      return {left,right};
-    }
-
     function calculateAdditionalOwnedFromPlanExcludingLevel(plan, p, excludedLevel){
       return runtime.DomainPlanning.calculateAdditionalOwnedFromPlanExcludingLevelDomain(plan,p,excludedLevel);
     }
@@ -141,8 +72,6 @@ export function createPlanningMathModule(runtime){
     targetItemsFromRandomPlan,
     targetItemsFromPlanAndChoice,
     calculateAdditionalOwnedFromPlan,
-    buildLeftoverHelperRows,
-    rawRandomSideTotals,
     calculateAdditionalOwnedFromPlanExcludingLevel,
     deterministicSideTotalsFromRandomPlan,
     targetItemsRawFromRandomPlan,

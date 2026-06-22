@@ -31,8 +31,8 @@ import { createRavenGearBundlesModule } from "../bundles/bundles-runtime.js";
 import { createRavenGearBootstrapModule } from "./raven-gear-bootstrap.js";
 import { createRavenGearBridgeModule } from "./raven-gear-bridge.js";
 import { wireRavenGearFeatureModules } from "./wire-feature-modules.js";
-import { createAppNavigationRuntimeModule } from "../../../shared/navigation/app-navigation-runtime.js";
-import { createDelegatedActionRuntimeModule } from "../../../shared/events/delegated-actions.js";
+import { createAppNavigationRuntimeModule } from "../shared/navigation/app-navigation-runtime.js";
+import { createDelegatedActionRuntimeModule } from "../shared/events/delegated-actions.js";
 import {
   exposeRavenGearRuntimeState,
   getRavenSubPage,
@@ -262,10 +262,7 @@ const {
   showPage,
   applyRouteFromHash,
   bindAppRouteEvents,
-  openGlobalMenu,
-  closeGlobalMenu,
-  setHomeCategory,
-  initializeHomeContent,
+  bindZoomGuard,
   setRavenSubPage,
   showRavenSettings,
   closeRavenSettings,
@@ -274,9 +271,8 @@ const {
   setGlobalSetting
 }=appNavigationRuntime;
 
-// Hub-home initialization is owned by the hub bootstrap (app-boot.js); the tool
-// no longer initializes home content. `initializeHomeContent` remains available
-// (it routes through host.navigation) but is not auto-invoked here.
+// Hub chrome (global menu, home category/init) is owned by the hub, not the tool;
+// those functions were dropped from the tool's navigation runtime during isolation.
 
 // Delegated UI event wiring
 const delegatedRuntime=createDelegatedActionRuntimeModule({
@@ -302,6 +298,7 @@ registerDelegatedActions();
 function bindRavenGearUiEventListeners(signal){
   bindDelegatedUiEvents({ signal });
   if(typeof bindAppRouteEvents==="function") bindAppRouteEvents({ signal });
+  if(typeof bindZoomGuard==="function") bindZoomGuard({ signal });
 }
 
 Object.assign(window,{
@@ -340,8 +337,8 @@ const ravenRuntimeBindings={
   renderInventorySnapshotBlock, renderEmptyState,
   ensureModalHost, closeAppModal, showInventorySnapshotModal,
   showConfirmModal, showChoiceModal, appPageRoutes, appPageHashes, ravenPageRoutes, cleanAppHash,
-  appHashForPage, updateAppHash, showPage, applyRouteFromHash, bindAppRouteEvents, openGlobalMenu,
-  closeGlobalMenu, setHomeCategory, initializeHomeContent, setRavenSubPage, showRavenSettings, closeRavenSettings, toggleCard,
+  appHashForPage, updateAppHash, showPage, applyRouteFromHash, bindAppRouteEvents, bindZoomGuard,
+  setRavenSubPage, showRavenSettings, closeRavenSettings, toggleCard,
   applyGlobalDisplaySettings, setGlobalSetting, delegatedActionNames, registerDelegatedActions, parseDelegatedDataValue, collectDelegatedArgs,
   runNamedDelegatedAction, bindDelegatedUiEvents,
   appNavigationRuntime, delegatedRuntime, getRavenSubPage, setRavenSubPageValue

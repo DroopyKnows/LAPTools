@@ -2,11 +2,17 @@
 // External helpers/data/state are read from runtime at call time; internal helpers call lexically.
 // Note: resultsSnapshotPillEntry's `pillMode` param is named to avoid shadowing the runtime `mode`.
 
-import { MAX_ITEM_LEVEL, allItemLevels, chestDefaultLevels, chestLevels, guaranteedDefaultLevels, topUpBundleDefinitions } from "../metadata/item-metadata.js";
+import { MAX_ITEM_LEVEL, allItemLevels, chestLevels, guaranteedDefaultLevels, topUpBundleDefinitions, MANUAL_HIGH_LEVEL_KEY } from "../metadata/item-metadata.js";
 import { renderPill2 } from "../ui/pill/pill.js";
 import { uiLevelTone } from "../shared/ui/ui-helpers.js";
+import { createCalculationEngine } from "../shared/math/calculation-engine.js";
+import { buildChangeSummaryRows, renderChangeSummarySnapshot } from "../blocks/change-summary-card.block.js";
+import { renderStateRows } from "../shared/ui/ui-renderers.js";
 
 export function createCalculatorRenderModule(runtime){
+    // The drop-rate engine (computeFromBundle) + its two small helpers now live in their own
+    // pure module; this render module is just the view over the model the engine returns.
+    const { computeFromBundle, estimatedDisplayLevels, ratioForSide } = createCalculationEngine(runtime);
     // ── Environment adapter ──
     // Everything the Results / Non-target compute + views read from the page's "current
     // selection" lives behind this `env`, so the same code can drive a second instance
@@ -15,30 +21,45 @@ export function createCalculatorRenderModule(runtime){
       prefix: "",
       byId: id => runtime.byId(id),
       probability: () => runtime.probability(),
-      targetLevel: () => Number(runtime.byId("targetLevel").value || 7),
+      targetLevel: () => runtime.state.targetLevel,
       ownedObject: () => runtime.currentOwnedObject(),
-      planObject: () => runtime.currentPlanObject(),
+      randomObject: () => runtime.currentRandomObject(),
       guaranteedObject: () => runtime.currentGuaranteedObject(),
       totalChoiceObject: () => runtime.totalChoiceObject(),
       bundleRandomTotals: () => runtime.bundleRandomTotals(),
       // Chest-input write/render surface (the chest card subsystem):
       bundleObject: () => runtime.currentTopUpBundleObject(),
       bundleTotals: () => runtime.bundleTotals(),
-      showHighRandom: () => !!(runtime.byId("showHighRandom") && runtime.byId("showHighRandom").checked),
+      showHighRandom: () => !!runtime.state.showHighRandom,
       // Manual mode is a bankless sandbox (like What If): no choice-chest bank, and
       // top-up CHOICE chests auto-apply. Derive bank from mode so every env.bank
       // consumer routes manual through the same bank-off path as What If's bank:false.
       get bank(){ return runtime.mode !== "manual"; },
       actions: { setGroupValue:"setGroupValue", adjustGroup:"adjustGroup", setBundleQty:"setBundleQty", adjustBundleQty:"adjustBundleQty" },
-      showHighChests: () => !!(runtime.byId("showHighChestLevels") && runtime.byId("showHighChestLevels").checked),
+      showHighChests: () => !!runtime.state.showHighChests,
       side: () => runtime.selectedSide(),
       subjectLabel: () => runtime.mode === "specific" ? runtime.selectedItemName() : "target",
       isManual: () => runtime.mode === "manual",
       itemLabel: () => runtime.selectedItemName(),
       showMetSnapshot: () => runtime.mode === "specific",
-      projectedOwned: () => (typeof runtime.projectedOwnedForInventoryItem === "function")
+      // Manual mode has no item, so it must NOT project the leftover specific item — compute
+      // owned+plan+choice from the manual-aware current* accessors (mirrors the What If env).
+      projectedOwned: () => (runtime.mode !== "manual" && typeof runtime.projectedOwnedForInventoryItem === "function")
         ? runtime.projectedOwnedForInventoryItem(runtime.selectedItemName())
-        : runtime.calculateOwnedPlusPlanPlusChoice(runtime.currentOwnedObject(), runtime.calculateAdditionalOwnedFromPlanAndChoice(runtime.currentPlanObject(), runtime.currentGuaranteedObject(), runtime.probability()), {}),
+        : runtime.calculateOwnedPlusPlanPlusChoice(runtime.currentOwnedObject(), runtime.calculateAdditionalOwnedFromPlanAndChoice(runtime.currentRandomObject(), runtime.currentGuaranteedObject(), runtime.probability()), {}),
+      // Inventory Change Summary block accessors. combinedObject = current + calculated inventory
+      // from saved plans (same helper What If's "Combined Inventory" row uses); techPoints = banked
+      // research points for the selected item (drives the high-level duplicate→research collapse).
+      combinedObject: () => (typeof runtime.combinedInventoryForItem === "function")
+        ? runtime.combinedInventoryForItem(runtime.selectedItemName())
+        : runtime.currentOwnedObject(),
+      techPoints: () => runtime.mode === "manual"
+        ? Math.max(0, Math.floor(Number(runtime.state.manualTechPoints || 0)))
+        : ((runtime.state.inventoryTechPointsByItem || {})[runtime.selectedItemName()] || 0),
+      additionsTitle: "Plan Additions",
+      additionsSub: "Estimated target duplicates from this plan.",
+      afterTitle: "After Plan",
+      afterSub: "Current inventory plus this plan.",
       chanceIds: ["chanceValue", "chanceValueManual"]
     };
 
@@ -56,14 +77,28 @@ export function createCalculatorRenderModule(runtime){
       return `<div class="grid2 grid2--min-lg grid2--gap-md grid2--fill grid2--align-center" data-grid2 data-grid2-cols="2" data-grid2-direction="bottom-up" data-grid2-max-width="50%">${cells}</div>`;
     }
 
+    // Maps a manual value-box's data source to its soft fill marker class. "owned" keys to
+    // the active drop side (blue=left, purple=right); other sources reuse the pill tones.
+    function manualSourceClass(source){
+      switch(source){
+        case "random": return "value-box2--src-random";
+        case "choice": case "guaranteed": return "value-box2--src-choice";
+        case "topup-random": return "value-box2--src-topup-random";
+        case "topup-choice": return "value-box2--src-topup-choice";
+        case "owned": return runtime.selectedSide()==="right" ? "value-box2--src-owned-right" : "value-box2--src-owned-left";
+        default: return "";
+      }
+    }
+
     function buildStepper(containerId,group,levels){
       const wrap=runtime.byId(containerId);
       const obj=runtime.getGroupObject(group);
+      const srcClass=manualSourceClass(group);
 
       const cells=levels.map(level=>`
         <span class="value-box2-unit value-box2-unit--above">
           <span class="value-box2__label value-box2__label--above">Level ${level}</span>
-          <div class="value-box2 value-box2--sm value-box2--manual value-box2--stepper">
+          <div class="value-box2 value-box2--sm value-box2--manual value-box2--stepper ${srcClass}">
             <button type="button" class="button2 button2--sm button2--step-ghost" aria-label="Decrease Level ${level}" data-action="adjustGroup" data-action-event="click" data-arg0="${group}" data-arg1="${level}" data-arg2="-1">&minus;</button>
             <span class="value-box2__content"><input class="value-box2__input" data-input-key="${group}-${level}" type="number" min="0" step="1" value="${obj[level]||""}" placeholder="0" data-action="setGroupValue" data-action-event="input" data-arg0="${group}" data-arg1="${level}" data-source2="value" /></span>
             <button type="button" class="button2 button2--sm button2--step-ghost" aria-label="Increase Level ${level}" data-action="adjustGroup" data-action-event="click" data-arg0="${group}" data-arg1="${level}" data-arg2="1">+</button>
@@ -98,8 +133,11 @@ export function createCalculatorRenderModule(runtime){
 
     function renderBundleQuantityField(key,title,qty,env=calculatorEnv){
       const safeKey=runtime.uiEscapeAttr(key);
+      // weekly special = choice top-up tone; daily must-buy tiers = random top-up tone.
+      const srcClass=manualSourceClass(String(key).startsWith("weekly") ? "topup-choice" : "topup-random");
       return renderQuantityStepperInput({
         label:`${title} Quantity`,
+        className:srcClass,
         value:qty || "",
         inputAttrs:`data-input-key="${env.prefix}bundle-${safeKey}" data-action="${env.actions.setBundleQty}" data-action-event="input" data-arg0="${safeKey}" data-source1="value"`,
         decreaseAttrs:`data-action="${env.actions.adjustBundleQty}" data-action-event="click" data-arg0="${safeKey}" data-arg1="-1" data-arg1-type="number"`,
@@ -159,7 +197,7 @@ export function createCalculatorRenderModule(runtime){
       if(!wrap) return;
       wrap.innerHTML="";
 
-      const plan=env.planObject();
+      const random=env.randomObject();
       const guaranteed=env.guaranteedObject();
 
       // labeled-rows grid (label col 30px, NO data-grid2), each level row on an empty
@@ -175,15 +213,15 @@ export function createCalculatorRenderModule(runtime){
               <div class="stack2 stack2--row stack2--gap-2 stack2--fill" style="width:100%">
                 <span class="value-box2-unit value-box2-unit--above">
                   <span class="value-box2__label value-box2__label--above">Random</span>
-                  <div class="value-box2 value-box2--sm value-box2--manual value-box2--stepper">
-                    <button type="button" class="button2 button2--sm button2--step-ghost" aria-label="Decrease Random Lvl ${level}" data-action="${env.actions.adjustGroup}" data-action-event="click" data-arg0="plan" data-arg1="${level}" data-arg2="-1">&minus;</button>
-                    <span class="value-box2__content"><input class="value-box2__input" data-input-key="${env.prefix}plan-${level}" type="number" min="0" step="1" value="${plan[level]||""}" placeholder="0" data-action="${env.actions.setGroupValue}" data-action-event="input" data-arg0="plan" data-arg1="${level}" data-source2="value" /></span>
-                    <button type="button" class="button2 button2--sm button2--step-ghost" aria-label="Increase Random Lvl ${level}" data-action="${env.actions.adjustGroup}" data-action-event="click" data-arg0="plan" data-arg1="${level}" data-arg2="1">+</button>
+                  <div class="value-box2 value-box2--sm value-box2--manual value-box2--stepper value-box2--src-random">
+                    <button type="button" class="button2 button2--sm button2--step-ghost" aria-label="Decrease Random Lvl ${level}" data-action="${env.actions.adjustGroup}" data-action-event="click" data-arg0="random" data-arg1="${level}" data-arg2="-1">&minus;</button>
+                    <span class="value-box2__content"><input class="value-box2__input" data-input-key="${env.prefix}random-${level}" type="number" min="0" step="1" value="${random[level]||""}" placeholder="0" data-action="${env.actions.setGroupValue}" data-action-event="input" data-arg0="random" data-arg1="${level}" data-source2="value" /></span>
+                    <button type="button" class="button2 button2--sm button2--step-ghost" aria-label="Increase Random Lvl ${level}" data-action="${env.actions.adjustGroup}" data-action-event="click" data-arg0="random" data-arg1="${level}" data-arg2="1">+</button>
                   </div>
                 </span>
                 <span class="value-box2-unit value-box2-unit--above">
                   <span class="value-box2__label value-box2__label--above">Choice</span>
-                  <div class="value-box2 value-box2--sm value-box2--manual value-box2--stepper">
+                  <div class="value-box2 value-box2--sm value-box2--manual value-box2--stepper value-box2--src-choice">
                     <button type="button" class="button2 button2--sm button2--step-ghost" aria-label="Decrease Choice Lvl ${level}" data-action="${env.actions.adjustGroup}" data-action-event="click" data-arg0="guaranteed" data-arg1="${level}" data-arg2="-1">&minus;</button>
                     <span class="value-box2__content"><input class="value-box2__input" data-input-key="${env.prefix}guaranteed-${level}" type="number" min="0" step="1" value="${guaranteed[level]||""}" placeholder="0" data-action="${env.actions.setGroupValue}" data-action-event="input" data-arg0="guaranteed" data-arg1="${level}" data-source2="value" /></span>
                     <button type="button" class="button2 button2--sm button2--step-ghost" aria-label="Increase Choice Lvl ${level}" data-action="${env.actions.adjustGroup}" data-action-event="click" data-arg0="guaranteed" data-arg1="${level}" data-arg2="1">+</button>
@@ -206,7 +244,7 @@ export function createCalculatorRenderModule(runtime){
       return `
         <span class="value-box2-unit value-box2-unit--above">
           <span class="value-box2__label value-box2__label--above">Level ${level}</span>
-          <div class="value-box2 value-box2--sm value-box2--manual value-box2--stepper">
+          <div class="value-box2 value-box2--sm value-box2--manual value-box2--stepper ${manualSourceClass("owned")}">
             <button type="button" class="button2 button2--sm button2--step-ghost" aria-label="Decrease Level ${level}" data-action="adjustGroup" data-action-event="click" data-arg0="owned" data-arg1="${level}" data-arg2="-1">&minus;</button>
             <span class="value-box2__content"><input class="value-box2__input" data-input-key="owned-${safeName}-${level}" type="number" min="0" step="1" inputmode="numeric" value="${value}" placeholder="0" data-action="setGroupValue" data-action-event="input" data-arg0="owned" data-arg1="${level}" data-source2="value" /></span>
             <button type="button" class="button2 button2--sm button2--step-ghost" aria-label="Increase Level ${level}" data-action="adjustGroup" data-action-event="click" data-arg0="owned" data-arg1="${level}" data-arg2="1">+</button>
@@ -247,6 +285,14 @@ export function createCalculatorRenderModule(runtime){
           ? runtime.renderCompactLevelBoxes(values,allItemLevels,{itemName})
           : "";
         html=boxes || renderCollapsedSnapshotEmpty("No current inventory entered.");
+      }else{
+        // Manual mode: snapshot the manual owned object, keyed to the manual high-level state
+        // (its tech points) so L8+ render as research %.
+        const values=runtime.state.manualOwned || {};
+        const boxes=typeof runtime.renderCompactLevelBoxes==="function"
+          ? runtime.renderCompactLevelBoxes(values,allItemLevels,{itemName:MANUAL_HIGH_LEVEL_KEY,techPoints:Math.max(0,Math.floor(Number(runtime.state.manualTechPoints||0)))})
+          : "";
+        html=boxes || renderCollapsedSnapshotEmpty("No current inventory entered.");
       }
       if(collapsed) collapsed.innerHTML=html;
       // The open slot is a padded card; hide it when empty (manual mode) so there's
@@ -263,7 +309,7 @@ export function createCalculatorRenderModule(runtime){
           if(value>0) entries.push({level,value,type});
         });
       };
-      pushEntries(env.planObject(),"manual-random");
+      pushEntries(env.randomObject(),"manual-random");
       pushEntries(env.guaranteedObject(),"manual-choice");
       const totals=env.bundleTotals ? env.bundleTotals() : {random:{},choice:{}};
       pushEntries(totals.random || {},"tu-random");
@@ -407,13 +453,13 @@ export function createCalculatorRenderModule(runtime){
 
     function renderNontargetAssignedSnapshot(leftValues,rightValues,env=calculatorEnv){
       const html=`
-        <div class="stack2 stack2--row stack2--gap-6 stack2--justify-center stack2--align-start stack2--fill">
+        <div class="stack2 stack2--row stack2--gap-6 stack2--justify-center stack2--align-stretch stack2--fill">
           <div class="stack2 stack2--column stack2--gap-0 stack2--align-stretch">
-            <div>${renderAssignedNontargetPills(leftValues)}</div>
+            <div style="margin-top:auto">${renderAssignedNontargetPills(leftValues)}</div>
             <div class="grid2__caption">Items Assigned Left</div>
           </div>
           <div class="stack2 stack2--column stack2--gap-0 stack2--align-stretch">
-            <div>${renderAssignedNontargetPills(rightValues)}</div>
+            <div style="margin-top:auto">${renderAssignedNontargetPills(rightValues)}</div>
             <div class="grid2__caption">Items Assigned Right</div>
           </div>
         </div>
@@ -424,8 +470,8 @@ export function createCalculatorRenderModule(runtime){
       });
     }
 
-    function updateOwnedTargetViewTabs(view){
-      const normalized=Number(view||7)>=12 ? "all" : Number(view||7)>=8 ? "high" : "low";
+    function updateOwnedTargetViewTabs(filter){
+      const normalized=(filter==="all"||filter==="high") ? filter : "low";
       [
         ["ownedViewLow","low"],
         ["ownedViewHigh","high"],
@@ -442,10 +488,10 @@ export function createCalculatorRenderModule(runtime){
     function renderOwnedInputs(){
       const wrap=runtime.byId("ownedInputs");
       if(!wrap) return;
-      const view=Number(runtime.state.highestGlobalOwned||7);
-      const showHigh=view>=8;
-      const showAll=view>=12;
-      updateOwnedTargetViewTabs(view);
+      const filter=runtime.state.ownedItemsFilter||"low";
+      const showHigh=filter!=="low";
+      const showAll=filter==="all";
+      updateOwnedTargetViewTabs(filter);
       renderOwnedTargetCollapsedSnapshot();
       if(!showHigh){
         if(runtime.mode!=="specific"){
@@ -459,7 +505,25 @@ export function createCalculatorRenderModule(runtime){
         return;
       }
       if(runtime.mode!=="specific"){
-        wrap.innerHTML=runtime.renderEmptyState({title:"",message:"Level 8+ owned target input is only available in Specific Item runtime.mode.",className:"notice2 notice2--empty",compact:true});
+        // Manual mode: reuse the SAME high-level panel, wired to the manual key (its readers/
+        // setters route to manualOwned + manualTechPoints). Lower levels 1-7 use the manual
+        // stepper (built imperatively into the placeholder container below).
+        const manualLowerCardHtml=`
+          <section class="card2 card2--white card2--xs card2--collapsible" id="ownedLowerLevelsCard">
+            <button class="card2__header card2__header--toggle card2__collapse-toggle stack2 stack2--row stack2--align-center stack2--justify-between" data-action="toggleCard" data-action-event="click" data-arg0="ownedLowerLevelsCard" type="button">
+              <span class="card2__title">Show Level 1-7</span>
+              <span class="card2__chev">⌄</span>
+            </button>
+            <div class="card2__content card2__content--after-header"><div id="ownedManualLowerInputs"></div></div>
+          </section>
+        `;
+        const manualHighHtml=typeof runtime.renderHighLevelInventoryPanel==="function"
+          ? runtime.renderHighLevelInventoryPanel(MANUAL_HIGH_LEVEL_KEY,{extraContentHtml:showAll ? "" : manualLowerCardHtml})
+          : "";
+        wrap.innerHTML=showAll
+          ? `<div class="owned-target-high-level-panel">${manualHighHtml}<div class="owned-target-lower-level-body owned-target-all-levels-body"><div id="ownedManualLowerInputs"></div></div></div>`
+          : `<div class="owned-target-high-level-panel">${manualHighHtml}</div>`;
+        buildStepper("ownedManualLowerInputs","owned",[7,6,5,4,3,2,1]);
         return;
       }
       const itemName=runtime.selectedItemName();
@@ -493,8 +557,8 @@ export function createCalculatorRenderModule(runtime){
       `;
     }
 
-    function renderPlanInputs(){
-      const showHigh=runtime.byId("showHighRandom")?.checked;
+    function renderRandomInputs(){
+      const showHigh=!!runtime.state.showHighRandom;
       const levels=showHigh ? [7,6,5,4,3,2,1] : [5,4,3,2,1];
 
       if(runtime.byId("combinedChestInputs")){
@@ -503,12 +567,12 @@ export function createCalculatorRenderModule(runtime){
         return;
       }
 
-      buildStepper("planInputs","plan",levels);
+      buildStepper("planInputs","random",levels);
       renderChestInputCollapsedSnapshot();
     }
 
     function renderGuaranteedInputs(){
-      const showHigh=runtime.byId("showHighRandom")?.checked || runtime.byId("showHighGuaranteed")?.checked;
+      const showHigh=!!runtime.state.showHighRandom;
       const levels=showHigh ? [7,6,5,4,3,2,1] : guaranteedDefaultLevels;
 
       if(runtime.byId("combinedChestInputs")){
@@ -553,8 +617,8 @@ export function createCalculatorRenderModule(runtime){
       grid.innerHTML=levelPillGridMarkup(filtered.map(entry=>levelPillUnit(entry.level,entry.value)));
     }
 
-    function hasPlanInput(){
-      return Object.values(runtime.currentPlanObject()||{}).some(v=>Number(v||0)>0);
+    function hasRandomInput(){
+      return Object.values(runtime.currentRandomObject()||{}).some(v=>Number(v||0)>0);
     }
 
     function renderDualDetailCompactPill(entry={}){
@@ -688,10 +752,23 @@ export function createCalculatorRenderModule(runtime){
 
       let snapshotHtml="";
       if(env.showMetSnapshot()){
-        const snapshotLevels=[targetLevel, targetLevel-1, targetLevel-2].filter(level=>level>=1 && level<=MAX_ITEM_LEVEL);
+        const itemName=runtime.selectedItemName();
         const combined=env.projectedOwned() || {};
-        const simplified=runtime.simplifyUpByLevel(combined);
-        snapshotHtml=levelPillGridMarkup(snapshotLevels.map(level=>levelPillUnit(level,simplified[level]?runtime.roundNice(simplified[level]):"-")));
+        const banked=(runtime.state.inventoryTechPointsByItem||{})[itemName]||0;
+        const research=runtime.consumeDuplicatesIntoResearch(combined,banked);
+        if(research.isResearch && typeof runtime.renderCompactLevelBoxes==="function"){
+          // High-level item: duplicates are consumed into research, shown as one L8+ pill.
+          snapshotHtml=runtime.renderCompactLevelBoxes(research.displayObject,allItemLevels,{itemName,techPoints:research.techPoints});
+        }else{
+          const simplified=runtime.simplifyUpByLevel(combined);
+          // Anchor the snapshot on the highest item actually owned, then the next 2 levels
+          // down (shown even when empty) — independent of the target-level selection.
+          let highest=0;
+          Object.keys(simplified).forEach(k=>{ if(Number(simplified[k]||0)>0 && Number(k)>highest) highest=Number(k); });
+          const anchor=highest>0 ? highest : targetLevel;
+          const snapshotLevels=[anchor, anchor-1, anchor-2].filter(level=>level>=1 && level<=MAX_ITEM_LEVEL);
+          snapshotHtml=levelPillGridMarkup(snapshotLevels.map(level=>levelPillUnit(level,simplified[level]?runtime.roundNice(simplified[level]):"-")));
+        }
       }
 
       wrap.innerHTML=`
@@ -722,15 +799,6 @@ export function createCalculatorRenderModule(runtime){
 
       if(itemSub) itemSub.hidden=!itemsHasRemaining;
       if(chestSub) chestSub.hidden=!chestsHasRemaining;
-    }
-
-    function estimatedDisplayLevels(obj){
-      const set=new Set(chestLevels);
-      Object.keys(obj||{}).forEach(levelKey=>{
-        const level=Number(levelKey);
-        if(level>=1 && level<=MAX_ITEM_LEVEL && Number(obj[levelKey]||0)>0) set.add(level);
-      });
-      return Array.from(set).sort((a,b)=>b-a);
     }
 
     function topUpDetailLabel(value){
@@ -879,92 +947,31 @@ export function createCalculatorRenderModule(runtime){
     // zero DOM writes; renderResultsView(model) and renderNontargetView(model)
     // are the two card-block views over that single model. calculateResults()
     // remains as the backwards-compatible "compute + render both" entry point.
+    // The engine itself (computeFromBundle + the CalcBundle typedef) lives in shared/math/calculation-engine.js.
+
+    // Build a CalcBundle from an env surface (calculator selection or What If), run the engine,
+    // and attach the display-only strings. The bundle merges plan + top-ups into `random`; the
+    // two empty-state messages still distinguish plan vs top-up, so they're derived from env here.
     function computeResults(env=calculatorEnv){
-      const p=env.probability();
-      const target=env.targetLevel();
-      const owned=env.ownedObject();
-      const plan=env.planObject();
-      const guaranteed=env.guaranteedObject();
-      const totalChoice=env.totalChoiceObject();
-      const bundleRandom=env.bundleRandomTotals();
-      const activePlan=runtime.levelObjectPlus(plan,bundleRandom);
-      const planHasInput=Object.values(plan||{}).some(v=>Number(v||0)>0);
-
-      const additionalOwned=runtime.calculateAdditionalOwnedFromPlan(activePlan,p);
-      const additionalOwnedForRemainingItems=runtime.calculateAdditionalOwnedFromPlanAndChoice(activePlan,totalChoice,p);
-      const effectiveOwned=runtime.calculateOwnedPlusPlanPlusChoice(owned,additionalOwned,totalChoice);
-      const effectiveOwnedForItems=runtime.calculateEffectiveOwnedForRemainingItems(owned,activePlan,totalChoice,p);
-
-      const itemResultLevels=allItemLevels.filter(level=>level<=target);
-      const showHighChests=env.showHighChests();
-      const chestResultLevels=showHighChests ? chestLevels : chestDefaultLevels;
-
-      const itemBaselineValues=itemResultLevels.map(level=>{
-        const raw=runtime.requiredAtLevel(target,level);
-        const ownedEq=runtime.levelObjectEquivalentAtLevel(owned,level);
-        const remaining=Math.max(0,raw-ownedEq);
-        return remaining>0 ? String(Math.ceil(remaining)) : "-";
-      });
-
-      const itemValues=itemResultLevels.map(level=>{
-        const raw=runtime.requiredAtLevel(target,level);
-        const ownedEq=runtime.levelObjectEquivalentAtLevel(effectiveOwnedForItems,level);
-        const remaining=Math.max(0,raw-ownedEq);
-        return remaining>0 ? String(Math.ceil(remaining)) : "-";
-      });
-
-      const chestValues=chestResultLevels.map(level=>{
-        const effectiveOwnedForChestColumn=runtime.calculateEffectiveOwnedForRemainingChestColumn(owned,activePlan,totalChoice,p,level);
-        const raw=runtime.requiredAtLevel(target,level);
-        const ownedEq=runtime.levelObjectEquivalentAtLevel(effectiveOwnedForChestColumn,level);
-        const remainingItems=Math.max(0,raw-ownedEq);
-        const baseChestNeed=remainingItems>0 ? Math.ceil(remainingItems/p) : 0;
-        const planSameLevel=Number(activePlan[level]||0);
-        const chestNeed=Math.max(0,baseChestNeed-planSameLevel);
-        return chestNeed ? String(chestNeed) : "-";
-      });
-
-      const expectedAddtlOwned=runtime.targetItemsFromPlanAndChoice(activePlan,totalChoice,p);
-      const estimatedLevels=estimatedDisplayLevels(expectedAddtlOwned);
-      const expectedValues=estimatedLevels.map(level=>{
-        const val=expectedAddtlOwned[level]||0;
-        return val>0 ? String(val) : "-";
-      });
-
       const side=env.side();
-
-      // Deterministic nontarget logic:
-      // Every random chest creates exactly one item.
-      // Side totals use the actual game drop table: Left = 2/3, Right = 1/3.
-      // Target items are then subtracted from the selected target item's side.
-      const nontargetTotals=runtime.nontargetSideTotalsFromRandomPlan(activePlan,side,p);
-
-      const leftSideValues=runtime.valuesFromLevelObject(nontargetTotals.left,chestLevels);
-      const rightSideValues=runtime.valuesFromLevelObject(nontargetTotals.right,chestLevels);
-
-      const randomSideDisplayValues=chestLevels.map(level=>{
-        const leftVal=runtime.safeNum(nontargetTotals.left[level]);
-        const rightVal=runtime.safeNum(nontargetTotals.right[level]);
-        if(leftVal<=0 && rightVal<=0) return "-";
-        const parts=[];
-        if(leftVal>0) parts.push("L: "+Math.floor(leftVal));
-        if(rightVal>0) parts.push("R: "+Math.floor(rightVal));
-        return parts.join(" / ");
-      });
-
-      const noPlanMessage=planHasInput || Object.values(bundleRandom||{}).some(v=>Number(v||0)>0) ? "No leftovers expected." : "No planned chests entered yet.";
-      const expectedEmptyMessage=planHasInput ? "No target items expected." : "No planned chests entered yet.";
-      const chanceText=(p*100).toFixed(3)+"%";
-      const expectedSubLabel=env.subjectLabel();
-
-      // One compute pass → a plain model that the two card views read from.
+      /** @type {CalcBundle} */
+      const bundle={
+        baseline: env.ownedObject(),
+        random:   runtime.levelObjectPlus(env.randomObject(), env.bundleRandomTotals()),
+        choice:   env.totalChoiceObject(),
+        p:        ratioForSide(side),
+        target:   env.targetLevel(),
+        side,
+        showHighChests: env.showHighChests()
+      };
+      const model=computeFromBundle(bundle);
+      const randomHasInput=Object.values(env.randomObject()||{}).some(v=>Number(v||0)>0);
+      const anyRandomInput=Object.values(bundle.random||{}).some(v=>Number(v||0)>0);
       return {
-        target, side,
-        itemResultLevels, itemValues, itemBaselineValues,
-        chestResultLevels, chestValues,
-        estimatedLevels, expectedValues, expectedEmptyMessage,
-        leftSideValues, rightSideValues, randomSideDisplayValues,
-        noPlanMessage, chanceText, chanceSide:side, expectedSubLabel
+        ...model,
+        noPlanMessage: anyRandomInput ? "No leftovers expected." : "No planned chests entered yet.",
+        expectedEmptyMessage: randomHasInput ? "No target items expected." : "No planned chests entered yet.",
+        expectedSubLabel: env.subjectLabel()
       };
     }
 
@@ -1006,6 +1013,35 @@ export function createCalculatorRenderModule(runtime){
       renderNontargetAssignedSnapshot(model.leftSideValues,model.rightSideValues,env);
     }
 
+    // Inventory Change Summary view over the computeResults() model. A third view (alongside
+    // Results / Non-target) of the SAME model + env, so the "Additions" row reuses the model's
+    // expectedTargetItems (the Results "Estimated Target Items From Plan" object) verbatim.
+    function renderChangeSummaryView(model,env=calculatorEnv){
+      const slot=env.byId(env.prefix+"changeSummary");
+      if(!slot) return;
+      const envWithMsg=Object.assign({}, env, { additionsEmpty: (model && model.expectedEmptyMessage) || "No target items expected." });
+      const rows=buildChangeSummaryRows(envWithMsg, model, runtime);
+      slot.innerHTML=renderStateRows(rows);
+
+      // Collapsed/open snapshot — Previous (current inventory / owned target items) | New (projected).
+      const itemName=env.itemLabel();
+      const tech=typeof env.techPoints==="function" ? env.techPoints() : 0;
+      const pills=(obj,emptyText,tp)=>runtime.renderCompactLevelBoxes(obj||{}, allItemLevels, {itemName, techPoints: tp===undefined ? tech : tp})
+        || runtime.renderEmptyState({title:"",message:emptyText,className:"notice2 notice2--empty",compact:true});
+      const after=env.projectedOwned()||{};
+      const afterRes=runtime.consumeDuplicatesIntoResearch(after, tech);
+      const afterHtml=pills(afterRes.isResearch ? afterRes.displayObject : after, "No change", afterRes.isResearch ? afterRes.techPoints : undefined);
+      const previousHtml=pills(env.ownedObject()||{}, "No record");
+      const snapHtml=renderChangeSummarySnapshot(previousHtml, afterHtml);
+      // Collapsed preview in the header; open snapshot prepended to the rows stack so it sits on
+      // top of the rows with the stack's gap separating it from the first row card.
+      const collapsed=env.byId(env.prefix+"changeSummaryCollapsedSnapshot");
+      if(collapsed) collapsed.innerHTML=snapHtml;
+      const stack=slot.querySelector(".stack2");
+      (stack||slot).insertAdjacentHTML("afterbegin",
+        `<div class="card2 card2--muted card2--md card2--pad-half card2__snapshot-open" id="${env.prefix}changeSummaryOpenSnapshot">${snapHtml}</div>`);
+    }
+
     // Backwards-compatible single entry: one compute, both card views (calculator env).
     function calculateResults(){
       const model=computeResults();
@@ -1024,9 +1060,9 @@ export function createCalculatorRenderModule(runtime){
     renderTopUpCompactDetailPill,
     buildCombinedChestInputs,
     renderOwnedInputs,
-    renderPlanInputs,
+    renderRandomInputs,
     renderGuaranteedInputs,
-    hasPlanInput,
+    hasRandomInput,
     makeFilteredResultTable,
     renderDualDetailCompactPill,
     levelPillGridMarkup,
@@ -1044,7 +1080,9 @@ export function createCalculatorRenderModule(runtime){
     renderChoiceBankRedeem,
     calculateResults,
     computeResults,
+    computeFromBundle,
     renderResultsView,
-    renderNontargetView
+    renderNontargetView,
+    renderChangeSummaryView
   };
 }

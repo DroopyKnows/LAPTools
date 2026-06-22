@@ -4,6 +4,12 @@
 import { renderMetaPillRow, renderResultSectionCard } from "./scanner-ui-renderers.js";
 import { renderBagScannerCardMarkup } from "../blocks/bag-scanner-card.block.js";
 import { initAllGrids } from "../ui/grid/grid.js";
+import {
+  scannerHasReviewIssueDomain,
+  scannerIsDevExplanationDomain,
+  scannerFirstCleanTextDomain,
+  scannerReviewReasonDomain
+} from "./scanner-domain.js";
 
 export function createScannerRenderModule(deps){
   const {
@@ -48,64 +54,12 @@ export function createScannerRenderModule(deps){
     return blocks || renderEmptyState({title:"No Raven items detected.",message:"Try a clearer screenshot.",className:"notice2 notice2--empty"});
   }
 
-  function scannerHasReviewIssue(scan){
-    if(!scan) return false;
-    if((scan.detectedCount||0)<=0) return true;
-    if(scan.requiresReview===true) return true;
-    if(scan.canAutoApply===false) return true;
-    if(scan.isConsistent===false) return true;
-    return false;
-  }
-
-  function scannerIsDevExplanation(text){
-    const lower=String(text||"").toLowerCase();
-    return (
-      lower.includes("scanner counts physical raven tiles") ||
-      lower.includes("duplicate item+level tiles") ||
-      lower.includes("worker aligns") ||
-      lower.includes("aligns local screenshot rows") ||
-      lower.includes("continued global row numbers") ||
-      lower.includes("duplicate overlap rows") ||
-      lower.includes("trusted overlap") ||
-      lower.includes("cut-off/artifact") ||
-      lower.includes("row alignment creates conflicts")
-    );
-  }
-
-  function scannerFirstCleanText(values){
-    const list=Array.isArray(values) ? values : [];
-    for(const value of list){
-      const text=String(value||"").trim();
-      if(text && !scannerIsDevExplanation(text)) return text;
-    }
-    return "";
-  }
-
-  function scannerReviewReason(scan){
-    if(!scan) return "Scan failed. Please try again.";
-    const result=scan.result || {};
-    if((scan.detectedCount||0)<=0) return "Scan failed. No Raven items were detected.";
-
-    const directReason=String(
-      result.reviewReason ||
-      result.errorReason ||
-      result.warningMessage ||
-      result.errorMessage ||
-      result.error ||
-      ""
-    ).trim();
-    if(directReason && !scannerIsDevExplanation(directReason)) return directReason;
-
-    const warning=scannerFirstCleanText(scan.warnings);
-    if(warning) return warning;
-
-    const note=scannerFirstCleanText(scan.notes);
-    if(note) return note;
-
-    if(scan.isConsistent===false) return "Review needed. The screenshots could not be matched cleanly.";
-    if(scan.canAutoApply===false) return "Review needed before replacing Active Inventory.";
-    return "Review needed before replacing Active Inventory.";
-  }
+  // Pure review-decision logic now lives in scanner-domain.js (typed + tested);
+  // aliased here so the render code + the module's exports below are unchanged.
+  const scannerHasReviewIssue=scannerHasReviewIssueDomain;
+  const scannerIsDevExplanation=scannerIsDevExplanationDomain;
+  const scannerFirstCleanText=scannerFirstCleanTextDomain;
+  const scannerReviewReason=scannerReviewReasonDomain;
 
   function renderBagScannerIssue(scan){
     if(!scannerHasReviewIssue(scan)) return "";

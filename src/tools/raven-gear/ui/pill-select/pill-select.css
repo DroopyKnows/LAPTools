@@ -55,3 +55,15 @@
   color: var(--c-white, #ffffff);
   box-shadow: var(--shadow-pill-selected, 0 6px 14px rgba(15, 23, 42, .16));
 }
+
+/* TONE — level: the active option adopts the level palette instead of the dark slate fill.
+   Used by the L8–12 high-level selector, where every option is the same (levelRed) tone, so
+   the active fill is correct regardless of which option is selected. Higher specificity than
+   the .active state-bridge rule, so it wins for both the BEM --selected and JS .active states. */
+.pill-select2--tone-level .pill-select2__option--selected,
+.pill-select2--tone-level .pill-select2__option.active {
+  border-color: var(--tone-lvl-red-strong-bg, #dc2626);
+  background: var(--tone-lvl-red-strong-bg, #dc2626);
+  color: var(--c-white, #ffffff);
+  box-shadow: var(--shadow-pill-selected, 0 6px 14px rgba(15, 23, 42, .16));
+}

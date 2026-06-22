@@ -1,13 +1,13 @@
-// Tool isolation guard.
+// Tool isolation guard (strict).
 //
-// The import rule (see AGENT.md): a file under src/tools/** MAY import from
-// src/shared, but MAY NOT import from src/app or src/pages. This traces the
-// static import closure of each tool entry and exits non-zero if any resolved
-// import lands under src/app/ or src/pages/.
+// The rule: every file in a tool entry's static import closure MUST live under
+// src/tools/raven-gear/. The tool depends on NOTHING outside its own directory —
+// not src/app, not src/pages, and not src/shared. This traces the closure from
+// each tool entry and exits non-zero if any resolved import lands outside the
+// tool root. Must read 0.
 //
-// Introduced in Stage 2; the tool still reaches into the hub until Stage 3
-// severs those imports, so violations are expected (and listed) until then.
-// From Stage 3 onward this must read 0.
+// NOTE: this parses JS `import`/`export … from` only. CSS @import isolation is
+// proven separately by booting raven-gear-standalone.html from a tools-only folder.
 
 import { readFileSync, existsSync, statSync } from "node:fs";
 import { dirname, resolve, relative, sep } from "node:path";
@@ -20,8 +20,8 @@ const TOOL_ENTRIES = [
   "src/tools/raven-gear/raven-gear-runtime.js"
 ];
 
-// Forbidden destinations (relative to repo root).
-const FORBIDDEN_DIRS = ["src/app", "src/pages"];
+// Allow-list root (relative to repo root): every closure file must resolve under this.
+const TOOL_ROOT = "src/tools/raven-gear";
 
 const IMPORT_RE = /(?:^|[\s;])(?:import|export)\b[^'"`]*?\sfrom\s*["']([^"']+)["']/g;
 const BARE_IMPORT_RE = /(?:^|[\s;])import\s*["']([^"']+)["']/g;
@@ -74,7 +74,8 @@ function traceClosure(entryAbs){
 
 function isForbidden(absPath){
   const rel = toPosix(relative(repoRoot, absPath));
-  return FORBIDDEN_DIRS.some(dir => rel === dir || rel.startsWith(dir + "/"));
+  // A closure file is a violation if it is NOT under the tool root.
+  return !(rel === TOOL_ROOT || rel.startsWith(TOOL_ROOT + "/"));
 }
 
 function chainTo(file, importedBy, entryAbs){
@@ -98,7 +99,7 @@ for(const entry of TOOL_ENTRIES){
   }
   const { visited, importedBy } = traceClosure(entryAbs);
   const violations = [...visited].filter(isForbidden).sort();
-  console.log(`\n[${entry}] closure: ${visited.size} files, ${violations.length} forbidden import(s) into ${FORBIDDEN_DIRS.join("/")}`);
+  console.log(`\n[${entry}] closure: ${visited.size} files, ${violations.length} import(s) outside ${TOOL_ROOT}/`);
   for(const v of violations){
     console.log("  - " + chainTo(v, importedBy, entryAbs).join("  ->  "));
   }
@@ -109,5 +110,5 @@ if(totalViolations > 0){
   console.error(`\ncheck-tool-isolation: ${totalViolations} violation(s).`);
   process.exit(1);
 }
-console.log("\ncheck-tool-isolation: OK (0 hub imports in any tool closure).");
+console.log("\ncheck-tool-isolation: OK (0 imports outside the tool in any closure).");
 void pathToFileURL;

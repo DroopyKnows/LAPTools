@@ -41,6 +41,9 @@
   /* Effects */
   --overlay-modal: rgba(15, 23, 42, .48);
   --border-modal: rgba(148, 163, 184, .35);
+  /* Modal panel — slightly tinted frosted surface (echoes the .global-topbar treatment).
+     A touch more opaque than the topbar since it sits over the dark scrim, not the page. */
+  --modal-panel-bg: rgba(255, 255, 255, .90);
   --focus-ring-blue: rgba(59, 130, 246, .12);
   --shadow-value-box: 0 1px 2px rgba(15, 23, 42, .04);
   --shadow-toggle: 0 1px 3px rgba(15, 23, 42, .15);
@@ -53,6 +56,30 @@
   --shadow-tabs-primary: 0 6px 14px rgba(37, 99, 235, .18);
   --shadow-pill-selected: 0 6px 14px rgba(15, 23, 42, .16);
   --shadow-modal: 0 22px 60px rgba(15, 23, 42, .28);
+
+  /* Glass surface for large cards — frosted translucent fill that reveals the page
+     background through a backdrop blur (adapted from the Liquid Glass kit, light values;
+     this app has no dark theme). The sheen is a faint top-left reflection. */
+  --glass-card-bg:     rgba(255, 255, 255, .70);
+  --glass-card-border: rgba(15, 23, 42, .10);
+  --glass-card-blur:   blur(18px) saturate(180%);
+  /* Definition comes from elevation (a deeper ambient shadow) rather than a heavier border,
+     so the card lifts off the background without framing its contents. */
+  --glass-card-shadow: 0 12px 30px rgba(15, 23, 42, .14), inset 0 1px 0 rgba(255, 255, 255, .9);
+  --glass-card-sheen:  linear-gradient(135deg, rgba(255, 255, 255, .45) 0%, rgba(255, 255, 255, 0) 45%);
+
+  /* Dark glass variant (kit .glass--dark, adapted for a light page) — a faint dark tint
+     instead of a white fill. The kit's white border is invisible on light, so use a dark
+     border and a slightly heavier tint to frost the color and keep card edges legible. The
+     large-card rule points here; swap it back to --glass-card-bg/-border for the white look. */
+  --glass-card-dark-bg:     rgba(15, 23, 42, .13);
+  --glass-card-dark-border: rgba(15, 23, 42, .16);
+
+  /* Nested cards inside a glass card — translucent versions of the muted/white tones so the
+     frosted parent shows through and they read as soft inner shelves, not opaque blocks. */
+  --glass-nested-muted-bg: rgba(248, 250, 252, .50);
+  --glass-nested-white-bg: rgba(255, 255, 255, .48);
+  --glass-nested-border:   rgba(15, 23, 42, .07);
 
   /* Pill status and badge tones */
   --tone-neutral-bg:       var(--c-slate-100);       --tone-neutral-bd:       var(--c-slate-200);    --tone-neutral-tx:       var(--c-slate-900);
@@ -77,6 +104,28 @@
   --tone-top-up-random-bg: #dcfce7;                --tone-top-up-random-bd: #86efac;              --tone-top-up-random-tx: #166534;
   --tone-top-up-choice-bg: #fef3c7;                --tone-top-up-choice-bd: #fbbf24;              --tone-top-up-choice-tx: #92400e;
 
+  /* Soft (manual value-box fill) variants of the top-up source tones — lighter so they
+     mark an input field without the saturated weight of the pill tone. */
+  --tone-top-up-random-soft-bg: #ecfdf3;           --tone-top-up-random-soft-bd: #bbf7d0;
+  --tone-top-up-choice-soft-bg: #fffaeb;           --tone-top-up-choice-soft-bd: #fde68a;
+
+  /* Owned/inventory manual value-box fills — soft "ghost" tints keyed to the item's
+     drop side (blue = left, purple = right). Softer than the --tone-left/right pills. */
+  --vbox-owned-left-bg:  #f3f8ff;                  --vbox-owned-left-bd:  #d6e6fb;
+  --vbox-owned-right-bg: #faf5ff;                  --vbox-owned-right-bd: #e9d8fb;
+
+  /* Active chip on neutral segmented controls (tabs / text toggle / card toggle) — a light cool
+     slate matching the card's *apparent* tone (translucent white reads white over the near-white
+     tracks, so the tint is baked in here instead), no flashbang. Defining outline drawn as a 1px
+     inset ring (box-shadow, no layout shift). (Primary tabs keep their colored active fill.) */
+  --control-active-bg: rgba(241, 245, 253, .96);
+  --control-active-border: rgba(15, 23, 42, .16);
+
+  /* Default manual value-box "well" (inset editable field). Translucent cool tint (not solid
+     slate-50) so the field reads as recessed glass instead of a bright opaque block on the
+     frosted cards/modals. Shared by selects, value-box text fields, and modal text inputs. */
+  --vbox-well-bg:        rgba(15, 23, 42, .03);    --vbox-well-shadow:    inset 0 1px 3px rgba(15, 23, 42, .09);
+
   /* level-rarity tones */
   --tone-lvl-gray-bg:      #f1f5f9; --tone-lvl-gray-bd:   #94a3b8; --tone-lvl-gray-tx:   #334155;
   --tone-lvl-green-bg:     #dcfce7; --tone-lvl-green-bd:  #4ade80; --tone-lvl-green-tx:  #166534;
@@ -84,6 +133,8 @@
   --tone-lvl-purple-bg:    #f3e8ff; --tone-lvl-purple-bd: #a855f7; --tone-lvl-purple-tx: #6b21a8;
   --tone-lvl-gold-bg:      #fff7ed; --tone-lvl-gold-bd:   #f97316; --tone-lvl-gold-tx:   #7c2d12;
   --tone-lvl-red-bg:       #fef2f2; --tone-lvl-red-bd:    #f87171; --tone-lvl-red-tx:    #991b1b;
+  /* Saturated level-red fill (white text) — pill-select active option. */
+  --tone-lvl-red-strong-bg: #dc2626;
 
   /* Hero card tones */
   --hero-card-bg-start:    #0f172a; --hero-card-bg-end:    #111827; --hero-card-fg:        #ffffff;

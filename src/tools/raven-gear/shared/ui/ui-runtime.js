@@ -16,6 +16,7 @@ import {
   ensureModalHost,
   showChoiceModal,
   showConfirmModal,
+  showExportBackupModal,
   showInventorySnapshotModal
 } from "./ui-modals.js";
 
@@ -32,7 +33,8 @@ export function createSharedUiRuntimeModule(){
     closeAppModal,
     showInventorySnapshotModal,
     showConfirmModal,
-    showChoiceModal
+    showChoiceModal,
+    showExportBackupModal
   };
 
   // Legacy globals

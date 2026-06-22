@@ -158,6 +158,21 @@ export function renderEmptyState(config){
   </div>`;
 }
 
+// Inventory Change Summary rows — a vertical stack of nested cards, each a {title, sub, html}
+// state snapshot. Surface-agnostic (Calculator + What If both feed it rows); the `strong` row
+// gets violet emphasis via card2's tone variables (its sanctioned override API). Moved here from
+// whatif-ui-renderers.js so the shared change-summary block can own it.
+export function renderStateRows(rows, options){
+  const cfg=Object.assign({rowClass:"card2 card2--muted card2--md", titleClass:"card2__title", subClass:"card2__body", valueRenderer:null}, options || {});
+  const strongStyle=' style="--card-bg:linear-gradient(145deg,rgba(124,58,237,.06),rgba(37,99,235,.05));--card-border:1px solid rgba(124,58,237,.26)"';
+  return `<div class="stack2 stack2--column stack2--gap-4">${(rows || []).map(row=>`<div class="${cfg.rowClass}${row.strong ? " strong" : ""}"${row.strong ? strongStyle : ""}>
+    <div class="stack2 stack2--row stack2--gap-2 stack2--align-start stack2--wrap card2__default-header">
+      <div class="card2__text"><div class="${cfg.titleClass}">${row.title}</div>${row.sub ? `<div class="${cfg.subClass}">${row.sub}</div>` : ""}</div>
+    </div>
+    <div class="card2__content card2__content--after-header">${cfg.valueRenderer ? cfg.valueRenderer(row) : (row.html || "")}</div>
+  </div>`).join("")}</div>`;
+}
+
 // Generic collapsible card2 shell (title/subtext/chevron/collapsed-snapshot slot +
 // toggleCard wiring) for the big calculator cards, so they don't hand-roll identical markup.
 // Two header layouts:
@@ -173,6 +188,7 @@ export function renderCollapsibleCard2(config){
     subtext:"",
     snapshot:null,        // { id, className } → card2__header-extra collapsed-snapshot slot
     contentClass:"",      // extra classes on card2__content
+    contentId:"",         // optional explicit id on card2__content (else unset, as before)
     headerAside:"",       // control rendered beside the toggle (e.g. chest "Show Lvl 6–7")
     bodyHtml:"",          // inner content — passed through verbatim
     afterContent:""       // sibling after content, inside the section (e.g. nontarget more-info)
@@ -206,6 +222,7 @@ export function renderCollapsibleCard2(config){
       +`</button>`;
   }
 
-  const contentHtml=`<div class="${uiClassName("card2__content","card2__content--after-header",cfg.contentClass)}">${cfg.bodyHtml}</div>`;
+  const contentIdAttr=cfg.contentId?` id="${cfg.contentId}"`:"";
+  const contentHtml=`<div class="${uiClassName("card2__content","card2__content--after-header",cfg.contentClass)}"${contentIdAttr}>${cfg.bodyHtml}</div>`;
   return `<section class="${sectionClass}" id="${cfg.id}">${headerHtml}${contentHtml}${cfg.afterContent}</section>`;
 }
