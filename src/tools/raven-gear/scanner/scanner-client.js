@@ -1,6 +1,6 @@
 // Bag-scanner worker client: posts images to the scan worker and returns its response.
 
-const BAG_SCANNER_WORKER_URL = "https://laptools-openai-worker.andrewpeoples98.workers.dev";
+const BAG_SCANNER_WORKER_URL = "https://laptools-openai-worker.thelaphub.workers.dev";
 
 function normalizeScannerBaseUrl(url) {
   return String(url || "").trim().replace(/\/+$/g, "");
