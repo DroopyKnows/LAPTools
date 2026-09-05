@@ -14,7 +14,7 @@
 /*   -- hub h- primitive layer (hub-private; loaded first so hub surfaces compose over it). */
 @import url("./styles/hub-ui/index.css")                         layer(components);
 /*   -- hub: home -- */
-@import url("./styles/home.css")                                 layer(components);
+@import url("./styles/home.css?v=1.0.34")                                layer(components);
 /*   -- hub: global navigation -- */
 @import url("./styles/navigation.css")                           layer(components);
 
