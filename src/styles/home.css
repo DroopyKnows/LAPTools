@@ -66,6 +66,24 @@
   white-space:nowrap;
 }
 
+/* Moved notice: the whole card is the link to the new hub. */
+.home-moved-card{
+  display:block;
+  margin-top:0;
+  margin-bottom:14px;
+  text-decoration:none;
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.home-moved-card .h-card__title,
+.home-moved-card .h-card__sub{display:block;}
+.home-moved-card .h-card__sub{color:var(--c-blue-600);}
+.home-moved-card:hover,
+.home-moved-card:focus-visible{
+  transform:translateY(-2px);
+  box-shadow:0 20px 42px rgba(15,23,42,.2),inset 0 1px 0 rgba(255,255,255,.9);
+}
+.home-moved-card:active{transform:translateY(0);}
+
 /* Card mini-actions wrapper — composition, not a primitive: the Need Help card
    overrides it to a grid and the Raven tool reuses it, so the wrapper stays. */
 .home-mini-actions{
